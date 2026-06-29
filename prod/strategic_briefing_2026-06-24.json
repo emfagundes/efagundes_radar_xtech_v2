@@ -1,0 +1,91 @@
+{
+  "insight_executivo": "Storage decola na Europa (13.5 GW) e atrai US$11B no Brasil até 2035 — mas Selic real de 9.62% e Brent em queda travam o fechamento financeiro de BESS sem PPA.",
+  "correlacao_mercado": "O vetor de armazenamento ganha momentum global (storage empata com nuclear na Europa, US$11B projetados ao Brasil), porém os números brasileiros são adversos: Selic real de 9.62% está muito acima dos 6% que tornam infraestrutura intensiva em capital marginal, elevando o retorno mínimo exigido em BESS e transmissão. Simultaneamente, o Brent caiu -24.16% em 30d para US$75.52 — isso barateia o combustível das termelétricas, derruba o PLD e PRESSIONA a receita de projetos de storage no mercado spot, tornando inviável fechar BESS sem PPA de longo prazo. O cobre recuou -3.83%, aliviando marginalmente o CAPEX, mas sinalizando demanda de eletrificação ainda hesitante.",
+  "pergunta_estrategica": "Com Selic real a 9.62% e PLD pressionado pelo Brent a US$75, qual fração do seu pipeline de BESS você ainda consegue financiar SEM um PPA de 10+ anos contratado?",
+  "contexto_pergunta": "A pergunta surge da confluência entre o custo real de capital de 9.62% e a queda de -24% no Brent, que esvazia a receita spot que sustentaria projetos de storage.",
+  "sinais_atencao": [
+    {
+      "titulo": "Storage empata com nuclear na Europa após 13.5 GW de baterias",
+      "contexto": "A escala europeia valida a tecnologia, mas o modelo de receita só fecha lá com mecanismos de capacidade — exigindo desenho regulatório equivalente no Brasil.",
+      "tipo": "oportunidade"
+    },
+    {
+      "titulo": "Brent -24% em 30d derruba PLD e ameaça receita spot de BESS",
+      "contexto": "Combustível mais barato reduz o custo das termelétricas e o PLD, comprimindo o arbitrage que sustentaria storage sem contrato firme — reprecificar pipeline agora.",
+      "tipo": "risco"
+    },
+    {
+      "titulo": "ANP avança na Lei do Gás enquanto Europa alimenta demanda de IA",
+      "contexto": "Convergência entre gás regulado e a fome energética de data centers de IA reabre a tese de geração firme — janela para posicionar contratos de capacidade.",
+      "tipo": "ruptura"
+    }
+  ],
+  "ciclo": "2026-06-24",
+  "gerado_em": "2026-06-25T07:30:05.136014-03:00",
+  "modelo": "claude-opus-4-8",
+  "market_data": {
+    "Selic": {
+      "valor": 14.25,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo de capital para projetos de infraestrutura e P&D",
+      "unidade": "% a.a."
+    },
+    "Selic Real": {
+      "valor": 9.62,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo real de capital; acima de 6% torna projetos de infraestrutura marginais inviáveis",
+      "unidade": "calculado"
+    },
+    "IPCA": {
+      "valor": 0.58,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão sobre contratos de energia, insumos e reajustes tarifários",
+      "unidade": "% a.m."
+    },
+    "Brent": {
+      "valor": 75.52,
+      "variacao_30d_pct": -24.16,
+      "variacao_7d_pct": -5.07,
+      "relevancia": "Referência global de preço de energia; pressão sobre PLD e termelétricas",
+      "unidade": "USD/barril"
+    },
+    "Cobre": {
+      "valor": 6.1175,
+      "variacao_30d_pct": -3.83,
+      "variacao_7d_pct": -5.62,
+      "relevancia": "Sinal de eletrificação e infraestrutura; BESS, transmissão, EVs",
+      "unidade": "USD/lb"
+    },
+    "Ibovespa": {
+      "valor": 171259.0,
+      "variacao_30d_pct": -3.44,
+      "variacao_7d_pct": 1.67,
+      "relevancia": "Humor do mercado brasileiro; base para força relativa setorial",
+      "unidade": "pontos"
+    },
+    "IEE proxy (CPFE3)": {
+      "valor": 44.12,
+      "variacao_30d_pct": 1.89,
+      "variacao_7d_pct": 1.59,
+      "relevancia": "Proxy do setor elétrico B3; CPFL Energia — distribuição, geração e transmissão",
+      "unidade": "BRL/ação"
+    },
+    "UTIL (Utilidades)": {
+      "valor": 18381.7109,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Percepção de infraestrutura defensiva; saneamento, energia, concessões",
+      "unidade": "pontos"
+    },
+    "Brent Tendência 30d": {
+      "valor": -24.16,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão energética global: queda — impacta PLD e competitividade de renováveis",
+      "unidade": "calculado"
+    }
+  }
+}

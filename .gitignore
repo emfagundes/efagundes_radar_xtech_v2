@@ -1,0 +1,22 @@
+# Credenciais
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# macOS
+.DS_Store
+
+# Banco de dados
+db/intel.sqlite
+
+# Feeds temporários
+prod/feed_bruto.json
+prod/feed_limpo.json
+prod/intel_output.json
+prod/market_signals.json
+prod/seen_hashes.json

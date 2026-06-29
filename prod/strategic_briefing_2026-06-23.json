@@ -1,0 +1,98 @@
+{
+  "insight_executivo": "Petrobras crava FID de US$ 1,2 bi em biorrefino enquanto Brent despenca 25,75% — o combustível fóssil ficou mais barato e ameaça o payback do renovável.",
+  "correlacao_mercado": "O FID de US$ 1,2 bi da Petrobras para bioQAV e diesel renovável na RPBC nasce em um ambiente hostil: Brent caiu 25,75% (US$ 76,88), barateando o combustível fóssil concorrente e estreitando o spread que sustenta a economia do renovável. Soma-se a Selic real de 9,62% — muito acima do limiar de 6% que torna projetos de infraestrutura marginais — e o USD/BRL a 5,17, que encarece todo equipamento importado de refino. A tese só fecha com mandato regulatório de mistura ou prêmio de descarbonização, não com paridade de mercado spot.",
+  "pergunta_estrategica": "Com Brent -25,75% e Selic real a 9,62%, qual fração do FID de US$ 1,2 bi da Petrobras depende de prêmio regulatório de carbono — e o que acontece se ele não vier em 90 dias?",
+  "contexto_pergunta": "A pergunta surge da confluência entre a queda de 25,75% no Brent e o FID de biorrefino da Petrobras, que precisa de spread que o mercado fóssil não está entregando.",
+  "sinais_atencao": [
+    {
+      "titulo": "Petrobras aprova FID de US$ 1,2 bi em biorrefino na RPBC",
+      "contexto": "Aposta de capital intensivo em renovável feita com Brent em queda e Selic real a 9,62% — só viável com regulação de carbono, não com economia spot.",
+      "tipo": "risco"
+    },
+    {
+      "titulo": "EPE propõe R$ 5,7 bi para conectar 4 GW de cargas eletrointensivas no Nordeste",
+      "contexto": "Data centers em Pecém e Parnaíba viram âncora de demanda firme — janela para PPAs e infraestrutura dedicada antes da concorrência se posicionar.",
+      "tipo": "oportunidade"
+    },
+    {
+      "titulo": "Leilão de transmissão de outubro: R$ 8,9 bi e 1.866 km em nove lotes",
+      "contexto": "Selic real a 9,62% e USD/BRL 5,17 pressionam o WACC dos lances — disciplina de capital separa quem fecha financiamento de quem só ganha o lote.",
+      "tipo": "ruptura"
+    }
+  ],
+  "ciclo": "2026-06-23",
+  "gerado_em": "2026-06-23T19:02:15.567152-03:00",
+  "modelo": "claude-opus-4-8",
+  "market_data": {
+    "USD/BRL": {
+      "valor": 5.1696,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "CAPEX de equipamentos importados, dívida externa, insumos industriais",
+      "unidade": "BRL por USD"
+    },
+    "Selic": {
+      "valor": 14.25,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo de capital para projetos de infraestrutura e P&D",
+      "unidade": "% a.a."
+    },
+    "Selic Real": {
+      "valor": 9.62,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo real de capital; acima de 6% torna projetos de infraestrutura marginais inviáveis",
+      "unidade": "calculado"
+    },
+    "IPCA": {
+      "valor": 0.58,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão sobre contratos de energia, insumos e reajustes tarifários",
+      "unidade": "% a.m."
+    },
+    "Brent": {
+      "valor": 76.88,
+      "variacao_30d_pct": -25.75,
+      "variacao_7d_pct": -2.63,
+      "relevancia": "Referência global de preço de energia; pressão sobre PLD e termelétricas",
+      "unidade": "USD/barril"
+    },
+    "Cobre": {
+      "valor": 6.125,
+      "variacao_30d_pct": -3.42,
+      "variacao_7d_pct": -5.61,
+      "relevancia": "Sinal de eletrificação e infraestrutura; BESS, transmissão, EVs",
+      "unidade": "USD/lb"
+    },
+    "Ibovespa": {
+      "valor": 171258.875,
+      "variacao_30d_pct": -3.44,
+      "variacao_7d_pct": 1.67,
+      "relevancia": "Humor do mercado brasileiro; base para força relativa setorial",
+      "unidade": "pontos"
+    },
+    "IEE proxy (CPFE3)": {
+      "valor": 44.12,
+      "variacao_30d_pct": 1.89,
+      "variacao_7d_pct": 1.59,
+      "relevancia": "Proxy do setor elétrico B3; CPFL Energia — distribuição, geração e transmissão",
+      "unidade": "BRL/ação"
+    },
+    "UTIL (Utilidades)": {
+      "valor": 18381.7109,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Percepção de infraestrutura defensiva; saneamento, energia, concessões",
+      "unidade": "pontos"
+    },
+    "Brent Tendência 30d": {
+      "valor": -25.75,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão energética global: queda — impacta PLD e competitividade de renováveis",
+      "unidade": "calculado"
+    }
+  }
+}

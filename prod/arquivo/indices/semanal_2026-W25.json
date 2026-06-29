@@ -1,0 +1,59 @@
+{
+  "periodo": "semanal",
+  "chave": "semanal_2026-W25",
+  "criado_em": "2026-06-17T18:06:29.144539-03:00",
+  "entradas": [
+    {
+      "arquivo": "arquivo/2026/06/2026-06-17_18-06.json",
+      "gerado_em": "2026-06-17T21:06:29.102366+00:00",
+      "total_itens": 399,
+      "frase_do_dia": "",
+      "top5": [],
+      "temas": [
+        ""
+      ]
+    },
+    {
+      "arquivo": "arquivo/2026/06/2026-06-17_23-14.json",
+      "gerado_em": "2026-06-18T02:14:15.747774+00:00",
+      "total_itens": 210,
+      "frase_do_dia": "",
+      "top5": [],
+      "temas": [
+        ""
+      ]
+    },
+    {
+      "arquivo": "arquivo/2026/06/2026-06-18_12-06.json",
+      "gerado_em": "2026-06-18T15:06:07.597929+00:00",
+      "total_itens": 214,
+      "frase_do_dia": "",
+      "top5": [],
+      "temas": [
+        ""
+      ]
+    },
+    {
+      "arquivo": "arquivo/2026/06/2026-06-19_14-40.json",
+      "gerado_em": "2026-06-19T17:40:25.576670+00:00",
+      "total_itens": 322,
+      "frase_do_dia": "",
+      "top5": [],
+      "temas": [
+        ""
+      ]
+    },
+    {
+      "arquivo": "arquivo/2026/06/2026-06-20_11-28.json",
+      "gerado_em": "2026-06-20T14:28:01.888500+00:00",
+      "total_itens": 230,
+      "frase_do_dia": "",
+      "top5": [],
+      "temas": [
+        ""
+      ]
+    }
+  ],
+  "atualizado_em": "2026-06-20T11:28:01.924398-03:00",
+  "total_execucoes": 5
+}

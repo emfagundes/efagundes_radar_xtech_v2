@@ -1,0 +1,91 @@
+{
+  "insight_executivo": "Abundância de renováveis na América Latina vira problema de flexibilidade — mas Brent -21,94% derruba o PLD e Selic real de 9,62% inviabiliza o armazenamento que resolveria.",
+  "correlacao_mercado": "O vetor de flexibilidade energética (V2G da VW, 'clean power success creates harder problem') colide com dois números hostis: Brent caindo 21,94% barateia o combustível das termelétricas, reduz o PLD e PRESSIONA a receita spot de BESS e V2G — não a favorece. Somado à Selic real de 9,62% (muito acima do teto de 6% que torna infraestrutura marginal), o fechamento financeiro de projetos de armazenamento só fica viável com PPA ou receita de capacidade contratada, jamais no mercado livre.",
+  "pergunta_estrategica": "Com PLD comprimido pelo Brent a US$73 e Selic real em 9,62%, sua tese de flexibilidade (V2G/BESS) sobrevive sem PPA de longo prazo ou contrato de capacidade?",
+  "contexto_pergunta": "A pergunta surge da confluência entre Brent -21,94% derrubando a receita spot e o sinal de que o excesso de renováveis exige flexibilidade que o mercado ainda não remunera.",
+  "sinais_atencao": [
+    {
+      "titulo": "Excesso de renováveis na América Latina vira problema de flexibilidade",
+      "contexto": "A escassez já não é de geração, mas de armazenamento e despacho — quem controlar flexibilidade captura o prêmio; quem só gerar enfrentará curtailment e preço negativo.",
+      "tipo": "ruptura"
+    },
+    {
+      "titulo": "VW & Elli levam V2G ao mercado de volume",
+      "contexto": "Frota de EVs como ativo de rede distribuída ameaça o modelo de pico das térmicas, mas só escala se a regulação remunerar o serviço de flexibilidade.",
+      "tipo": "oportunidade"
+    },
+    {
+      "titulo": "Mercado livre mais complexo deve eliminar pequenas comercializadoras",
+      "contexto": "Selic real de 9,62% e volatilidade do PLD elevam exigência de capital e gestão de risco — consolidação acelerada redesenha o jogo de quem compra energia.",
+      "tipo": "risco"
+    }
+  ],
+  "ciclo": "2026-06-26",
+  "gerado_em": "2026-06-26T10:01:23.793414-03:00",
+  "modelo": "claude-opus-4-8",
+  "market_data": {
+    "Selic": {
+      "valor": 14.25,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo de capital para projetos de infraestrutura e P&D",
+      "unidade": "% a.a."
+    },
+    "Selic Real": {
+      "valor": 9.62,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo real de capital; acima de 6% torna projetos de infraestrutura marginais inviáveis",
+      "unidade": "calculado"
+    },
+    "IPCA": {
+      "valor": 0.58,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão sobre contratos de energia, insumos e reajustes tarifários",
+      "unidade": "% a.m."
+    },
+    "Brent": {
+      "valor": 73.15,
+      "variacao_30d_pct": -21.94,
+      "variacao_7d_pct": -6.1,
+      "relevancia": "Referência global de preço de energia; pressão sobre PLD e termelétricas",
+      "unidade": "USD/barril"
+    },
+    "Cobre": {
+      "valor": 6.1815,
+      "variacao_30d_pct": -3.35,
+      "variacao_7d_pct": -2.75,
+      "relevancia": "Sinal de eletrificação e infraestrutura; BESS, transmissão, EVs",
+      "unidade": "USD/lb"
+    },
+    "Ibovespa": {
+      "valor": 171990.0,
+      "variacao_30d_pct": -2.14,
+      "variacao_7d_pct": 2.03,
+      "relevancia": "Humor do mercado brasileiro; base para força relativa setorial",
+      "unidade": "pontos"
+    },
+    "IEE proxy (CPFE3)": {
+      "valor": 45.12,
+      "variacao_30d_pct": 2.13,
+      "variacao_7d_pct": 2.83,
+      "relevancia": "Proxy do setor elétrico B3; CPFL Energia — distribuição, geração e transmissão",
+      "unidade": "BRL/ação"
+    },
+    "UTIL (Utilidades)": {
+      "valor": 18690.6797,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Percepção de infraestrutura defensiva; saneamento, energia, concessões",
+      "unidade": "pontos"
+    },
+    "Brent Tendência 30d": {
+      "valor": -21.94,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão energética global: queda — impacta PLD e competitividade de renováveis",
+      "unidade": "calculado"
+    }
+  }
+}

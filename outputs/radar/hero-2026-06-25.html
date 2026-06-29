@@ -1,0 +1,328 @@
+<!-- hero-radar-xtechs-2026-06-25 | efagundes.com · think tank --><div class="rte5">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+.rte5, .rte5 * { box-sizing:border-box; }
+.rte5 {
+  --bg:#0F1722; --bg2:#131D2B; --panel:#151F2E; --panel2:#1B2A3D;
+  --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.10); --text:#E6EDF3; --muted:#A8B3C2; --weak:#718096;
+  --terra:#5B8CFF; --terra2:#79A3FF; --danger:#D96C6C; --amber:#D9A441; --green:#2FA87C; --tech:#5B8CFF;
+  --accent-blue:#5B8CFF; --accent-blue-hover:#79A3FF;
+  max-width:1440px; margin:0 auto; padding:0 20px 56px; color:var(--text); background:var(--bg);
+  font-family:inherit; line-height:1.65; letter-spacing:.005em;
+}
+.rte5 a { color:inherit; }
+.rte5-header { display:flex; justify-content:space-between; align-items:center; gap:18px; flex-wrap:wrap; padding:16px 0 20px; border-bottom:1px solid var(--line); margin-bottom:22px; }
+.rte5-brand { display:flex; align-items:center; gap:12px; }
+.rte5-logo { width:38px; height:38px; border-radius:10px; border:1px solid rgba(91,140,255,.35); background:rgba(91,140,255,.14); display:flex; align-items:center; justify-content:center; color:var(--terra2); font-size:18px; }
+.rte5-brand-title { font-size:.98rem; font-weight:700; letter-spacing:-.02em; margin:0; }
+.rte5-brand-sub { font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--muted); margin-top:2px; }
+.rte5-cycle { text-align:right; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--muted); }
+.rte5-cycle strong { color:var(--terra2); font-weight:600; }
+.rte5-section { margin:0 0 30px; }
+.rte5-section-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:0 0 12px; }
+.rte5-title { font-size:1.04rem; font-weight:800; color:var(--text); letter-spacing:-.02em; margin:0; display:flex; align-items:center; gap:9px; }
+.rte5-title:before { content:''; width:22px; height:1px; background:var(--terra2); display:inline-block; }
+.rte5-note { font-family:'IBM Plex Mono',monospace; font-size:.67rem; color:var(--weak); }
+.rte5-kicker { font-family:'IBM Plex Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.13em; color:var(--terra2); }
+
+.rte5-situation { position:relative; overflow:hidden; border:1px solid rgba(91,140,255,.24); border-radius:20px; background:radial-gradient(760px 420px at 86% 20%, rgba(91,140,255,.18), transparent 58%), linear-gradient(135deg, rgba(29,36,48,.97), rgba(15,17,21,.99)); padding:28px; display:grid; grid-template-columns:1.25fr .95fr; gap:22px; box-shadow:0 24px 70px rgba(0,0,0,.28); margin-bottom:30px; }
+.rte5-situation:before { content:''; position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size:44px 44px; mask-image:linear-gradient(to right, rgba(0,0,0,.55), transparent 82%); }
+.rte5-sit-left, .rte5-sit-right { position:relative; z-index:1; }
+.rte5-eyebrow { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.66rem; letter-spacing:.13em; text-transform:uppercase; margin-bottom:12px; }
+.rte5-headline { font-family:inherit !important; font-size:clamp(34px,3.4vw,52px); line-height:1.06; font-weight:650; letter-spacing:-0.045em; margin:0 0 24px; max-width:18ch; }
+.rte5-subtitle { font-size:1.0rem; color:var(--muted); line-height:1.65; max-width:820px; margin:0 0 14px; }
+.rte5-thesis-points { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px; }
+.rte5-thesis-point { border:1px solid var(--line); background:rgba(255,255,255,.035); border-radius:12px; padding:12px; min-height:112px; }
+.rte5-point-num { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.72rem; margin-bottom:6px; }
+.rte5-point-text { font-size:.79rem; color:var(--muted); line-height:1.5; }
+.rte5-metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+.rte5-metric { border:1px solid var(--line); background:rgba(15,23,34,.64); border-radius:14px; padding:13px; }
+.rte5-metric-val { font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:1.45rem; color:var(--terra2); line-height:1; }
+.rte5-metric-label { font-size:.72rem; color:var(--muted); margin-top:5px; }
+.rte5-ips-wrap { position:relative; display:inline-block; }
+.rte5-ips-icon { cursor:pointer; color:var(--terra2); font-size:.7rem; vertical-align:super; margin-left:2px; user-select:none; }
+.rte5-ips-tip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  width:240px; background:#0f1722; border:1px solid var(--line); border-radius:10px;
+  padding:10px 13px; font-size:.74rem; color:var(--muted); line-height:1.55;
+  box-shadow:0 4px 20px rgba(0,0,0,.5); z-index:999; pointer-events:none; }
+.rte5-ips-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-top-color:#0f1722; }
+.rte5-ips-wrap:hover .rte5-ips-tip,
+.rte5-ips-wrap.active .rte5-ips-tip { display:block; }
+.rte5-priority-card { border:1px solid rgba(217,108,108,.34); background:rgba(217,108,108,.07); border-radius:16px; padding:16px; }
+.rte5-priority-label { font-family:'IBM Plex Mono',monospace; color:var(--danger); font-size:.66rem; text-transform:uppercase; letter-spacing:.12em; margin-bottom:8px; }
+.rte5-priority-name { font-size:.95rem; font-weight:800; letter-spacing:-.02em; line-height:1.32; margin-bottom:10px; }
+.rte5-priority-decision { color:var(--text); font-size:.82rem; line-height:1.58; margin-top:10px; border-left:2px solid var(--danger); padding-left:10px; }
+.rte5-decision-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.rte5-decision-mini { border:1px solid var(--line); background:rgba(15,23,34,.48); border-left:3px solid var(--terra2); border-radius:12px; padding:10px; }
+.rte5-decision-mini-head { display:flex; gap:8px; align-items:center; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--terra2); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+.rte5-decision-mini-text { font-size:.78rem; color:var(--text); line-height:1.55; }
+.rte5-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.rte5-chip { --chip:var(--terra2); display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(91,140,255,.45); background:rgba(91,140,255,.11); color:var(--chip); border-radius:999px; padding:3px 8px; font-family:'IBM Plex Mono',monospace; font-size:.64rem; line-height:1.3; }
+
+.rte5-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.rte5-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.rte5-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:16px; }
+.rte5-card.soft { background:rgba(255,255,255,.028); }
+.rte5-card-title { font-size:.92rem; font-weight:800; letter-spacing:-.018em; margin:0 0 8px; }
+.rte5-card-body { font-size:.82rem; color:var(--muted); line-height:1.6; }
+.rte5-mini-label { font-family:'IBM Plex Mono',monospace; color:var(--weak); font-size:.63rem; text-transform:uppercase; letter-spacing:.10em; }
+.rte5-text-full { font-size:.82rem; color:var(--text); line-height:1.68; margin:0; }
+.rte5-details { margin-top:8px; border-top:1px solid var(--line); padding-top:8px; }
+.rte5-details summary { cursor:pointer; list-style:none; font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--terra2); text-transform:uppercase; letter-spacing:.08em; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.rte5-details summary::-webkit-details-marker { display:none; }
+.rte5-details[open] summary span { transform:rotate(45deg); }
+.rte5-details-body { margin-top:8px; }
+
+.rte5-pressure-card { border-left:3px solid var(--c); }
+.rte5-pressure-score { font-family:'IBM Plex Mono',monospace; font-size:2rem; font-weight:800; color:var(--c); line-height:1; }
+.rte5-pressure-score span { font-size:.84rem; color:var(--muted); }
+.rte5-pressure-name { font-size:.82rem; font-weight:800; margin:7px 0 4px; }
+.rte5-pressure-meta { font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--muted); }
+.rte5-pressure-events { margin-top:10px; border-top:1px solid var(--line); padding-top:9px; display:flex; flex-direction:column; gap:7px; }
+.rte5-event { display:flex; gap:7px; font-size:.74rem; line-height:1.42; color:var(--muted); }
+.rte5-event:before { content:'•'; color:var(--c); flex-shrink:0; }
+
+.rte5-mesa { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-horizon { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--panel); }
+.rte5-horizon-head { padding:10px 12px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--c); background:rgba(255,255,255,.035); border-bottom:1px solid var(--line); }
+.rte5-horizon-body { padding:12px; display:flex; flex-direction:column; gap:10px; }
+.rte5-action { background:rgba(15,23,34,.55); border:1px solid var(--line); border-left:3px solid var(--c); border-radius:10px; padding:11px; }
+.rte5-action-vetor { font-family:'IBM Plex Mono',monospace; color:var(--c); font-size:.62rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.rte5-action-text { font-size:.80rem; color:var(--text); line-height:1.6; }
+.rte5-action-risk { font-size:.76rem; color:var(--muted); margin-top:8px; border-top:1px solid var(--line); padding-top:8px; line-height:1.5; }
+.rte5-empty { font-family:'IBM Plex Mono',monospace; color:var(--weak); font-size:.74rem; padding:12px; text-align:center; }
+
+.rte5-map-wrap { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:16px; align-items:start; }
+.rte5-chart-card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; overflow-x:auto; }
+.rte5-chart-card canvas { width:100% !important; min-height:400px; max-height:460px; }
+.rte5-map-side { display:flex; flex-direction:column; gap:10px; }
+.rte5-quad-stat { border:1px solid var(--line); background:rgba(255,255,255,.028); border-left:3px solid var(--c); border-radius:12px; padding:12px; }
+.rte5-quad-num { font-family:'IBM Plex Mono',monospace; color:var(--c); font-size:1.4rem; font-weight:800; line-height:1; }
+.rte5-quad-name { font-size:.78rem; color:var(--text); font-weight:800; margin-top:5px; }
+.rte5-vector-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px; }
+.rte5-vector-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:14px; }
+.rte5-vector-name { font-size:.92rem; font-weight:850; line-height:1.32; letter-spacing:-.02em; margin-bottom:8px; }
+.rte5-vector-meta { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px; }
+.rte5-vector-desc { font-size:.79rem; color:var(--muted); line-height:1.58; margin-bottom:10px; }
+.rte5-vector-decision { border-left:2px solid var(--green); padding-left:10px; font-size:.80rem; color:var(--text); line-height:1.55; margin-top:9px; }
+.rte5-vector-risk { border-left:2px solid var(--amber); padding-left:10px; font-size:.78rem; color:var(--muted); line-height:1.52; margin-top:9px; }
+
+.rte5-capital-panel { display:grid; grid-template-columns:1.2fr .8fr; gap:16px; }
+.rte5-bars { display:flex; flex-direction:column; gap:12px; }
+.rte5-bar-row { display:grid; grid-template-columns:150px 1fr 62px; gap:10px; align-items:center; }
+.rte5-bar-label { font-size:.79rem; color:var(--text); font-weight:700; }
+.rte5-bar-bg { height:8px; background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden; }
+.rte5-bar-fill { height:100%; background:linear-gradient(90deg,var(--terra),var(--terra2)); border-radius:999px; width:calc(var(--w) * 100%); }
+.rte5-bar-level { font-family:'IBM Plex Mono',monospace; color:var(--muted); font-size:.66rem; text-align:right; }
+.rte5-facts { display:grid; grid-template-columns:1fr; gap:8px; }
+.rte5-fact { border:1px solid var(--line); background:rgba(255,255,255,.028); border-radius:10px; padding:10px; }
+.rte5-fact-value { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.95rem; font-weight:800; }
+.rte5-fact-context { font-size:.73rem; color:var(--muted); line-height:1.42; margin-top:3px; }
+
+.rte5-cluster { display:flex; flex-direction:column; }
+.rte5-cluster-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; }
+.rte5-cluster-name { font-size:.96rem; font-weight:850; letter-spacing:-.02em; line-height:1.34; margin-bottom:8px; }
+.rte5-cluster-tese { font-size:.81rem; color:var(--muted); line-height:1.62; }
+.rte5-signal-list { margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+.rte5-signal { display:flex; gap:7px; align-items:flex-start; font-size:.82rem; color:var(--muted); line-height:1.55; }
+.rte5-signal:before { content:'•'; color:var(--terra2); flex-shrink:0; }
+
+.rte5-scenario { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:16px; }
+.rte5-scenario-top { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+.rte5-scenario-num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; color:var(--c); border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.035); font-weight:800; flex-shrink:0; }
+.rte5-scenario-name { font-size:.97rem; font-weight:850; line-height:1.28; }
+.rte5-scenario-meta { font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--muted); margin-top:3px; }
+.rte5-scenario-text { font-size:.82rem; color:var(--muted); line-height:1.64; }
+.rte5-scenario-action { margin-top:12px; border:1px solid rgba(47,168,124,.22); border-left:3px solid var(--green); background:rgba(47,168,124,.07); border-radius:10px; padding:11px; font-size:.80rem; color:var(--text); line-height:1.56; }
+
+.rte5-briefing { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--terra2); border-radius:16px; padding:22px; width:100%; max-width:100%; }
+.rte5-brief-title { font-family:inherit !important; font-size:1.45rem; line-height:1.24; letter-spacing:-.025em; margin:0 0 6px; width:100%; max-width:100% !important; font-weight:800; }
+.rte5-brief-sub { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.75rem; margin-bottom:16px; width:100%; max-width:100% !important; }
+.rte5-brief-opening { font-size:.94rem; color:var(--text); line-height:1.78; margin:0 0 20px; width:100%; max-width:100% !important; display:block; }
+.rte5-brief-segment { border-top:1px solid var(--line); padding-top:16px; margin-top:16px; width:100%; max-width:100%; }
+.rte5-brief-horizon { display:inline-flex; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--amber); border:1px solid rgba(217,164,65,.28); background:rgba(217,164,65,.08); border-radius:999px; padding:3px 9px; margin-bottom:10px; }
+.rte5-brief-p { font-size:.90rem; color:var(--text); line-height:1.82; margin:0 0 12px; width:100%; max-width:100% !important; display:block; }
+.rte5-briefing p { width:100% !important; max-width:100% !important; }
+.rte5-decision-note { background:rgba(217,164,65,.08); border:1px solid rgba(217,164,65,.22); border-left:3px solid var(--amber); color:#F2D48A; border-radius:9px; padding:10px 12px; font-size:.82rem; line-height:1.55; margin:8px 0 0; width:100%; max-width:100% !important; box-sizing:border-box; }
+.rte5-cross { margin-top:18px; background:rgba(91,140,255,.08); border:1px solid rgba(91,140,255,.22); border-left:3px solid var(--terra2); border-radius:11px; padding:13px; font-size:.86rem; color:var(--text); line-height:1.65; width:100%; max-width:100% !important; box-sizing:border-box; }
+
+.rte5-footer { border-top:1px solid var(--line); margin-top:34px; padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; color:var(--weak); font-family:'IBM Plex Mono',monospace; font-size:.66rem; }
+
+@media(max-width:1080px) {
+  .rte5-situation, .rte5-map-wrap, .rte5-capital-panel { grid-template-columns:1fr; }
+  .rte5-thesis-points { grid-template-columns:1fr; }
+}
+@media(max-width:900px) {
+  .rte5-grid-4 { grid-template-columns:repeat(2,1fr); }
+  .rte5-grid-3, .rte5-grid-2, .rte5-mesa, .rte5-vector-cards { grid-template-columns:1fr; }
+  .rte5-cycle { text-align:left; }
+}
+@media(max-width:560px) {
+  .rte5 { padding:0 12px 40px; }
+  .rte5-situation { padding:18px; }
+  .rte5-grid-4 { grid-template-columns:1fr; }
+  .rte5-headline { font-family:inherit !important; font-size:clamp(42px,6vw,64px); line-height:1.02; font-weight:650; letter-spacing:-0.055em; margin:0 0 28px; max-width:13ch; }
+  .rte5-metrics { grid-template-columns:1fr 1fr; }
+  .rte5-bar-row { grid-template-columns:1fr; gap:5px; }
+  .rte5-bar-level { text-align:left; }
+}
+
+/* ── v7 Hero 2 cards ──────────────────────────────────────────────────────── */
+.rte5-hero { border:1px solid rgba(91,140,255,.20); border-radius:22px; background:radial-gradient(900px 500px at 72% 15%,rgba(91,140,255,.11),transparent 52%),linear-gradient(140deg,rgba(22,30,44,.99),rgba(12,17,27,.99)); padding:28px; margin-bottom:30px; box-shadow:0 24px 72px rgba(0,0,0,.32); overflow:hidden; position:relative; }
+.rte5-hero::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px); background-size:52px 52px; mask-image:linear-gradient(to right,rgba(0,0,0,.35),transparent 70%); pointer-events:none; }
+.rte5-hero-eyebrow { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:12px; position:relative; z-index:1; }
+.rte5-hero-eyebrow::before { content:''; width:16px; height:1px; background:var(--terra2); display:inline-block; }
+.rte5-hero-grid { display:grid; grid-template-columns:1.35fr 0.65fr; gap:20px; position:relative; z-index:1; align-items:stretch; }
+.rte5-hero-card { border:1px solid rgba(255,255,255,.07); border-radius:16px; background:rgba(255,255,255,.022); padding:20px; display:flex; flex-direction:column; gap:12px; }
+.rte5-hero-card.left { background:rgba(91,140,255,.04); border-color:rgba(91,140,255,.16); }
+.rte5-hero-card.right { background:rgba(255,255,255,.018); border-color:rgba(255,255,255,.06); }
+.rte5-hero-xtech { display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(91,140,255,.32); background:rgba(91,140,255,.09); border-radius:999px; padding:3px 12px; font-family:'IBM Plex Mono',monospace; font-size:.65rem; color:var(--terra2); width:fit-content; }
+.rte5-hero-manchete { font-family:inherit !important; font-size:clamp(18px,1.9vw,28px); line-height:1.18; font-weight:750; letter-spacing:-.035em; margin:0; }
+.rte5-hero-texto { font-size:.83rem; color:var(--muted); line-height:1.76; flex:1; }
+.rte5-hero-right-title { font-family:'IBM Plex Mono',monospace; font-size:.62rem; text-transform:uppercase; letter-spacing:.11em; color:var(--weak); margin-bottom:4px; }
+.rte5-hero-chart { width:100%; flex:1; min-height:160px; }
+.rte5-hero-metrics { display:flex; flex-direction:column; gap:6px; border-top:1px solid rgba(255,255,255,.06); padding-top:10px; margin-top:auto; }
+.rte5-hero-metric-row { display:flex; justify-content:space-between; align-items:center; }
+.rte5-hero-metric-label { font-size:.72rem; color:var(--weak); }
+.rte5-hero-metric-val { font-family:'IBM Plex Mono',monospace; font-size:.80rem; font-weight:700; color:var(--text); }
+/* ── v7 extras ──────────────────────────────────────────────────────────── */
+.rte5-grid-2plus3 { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.rte5-cenario-card { background:#151F2E; border-radius:12px; padding:16px; }
+.rte5-cenario-titulo { font-size:.92rem; font-weight:700; color:#E6EDF3; margin-bottom:4px; line-height:1.4; }
+.rte5-cen-head:hover { opacity:.9; }
+
+/* ── v7 Cockpit ──────────────────────────────────────────────────────────── */
+.rte5-ck-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rte5-ck-num { border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); border-radius:10px; padding:10px 12px; }
+.rte5-ck-val { font-family:'IBM Plex Mono',monospace; font-size:1.18rem; font-weight:800; color:#79A3FF; line-height:1; margin-bottom:3px; }
+.rte5-ck-lbl { font-size:.66rem; color:#718096; line-height:1.3; }
+
+/* ── v7 Impacto xTech ───────────────────────────────────────────────────────── */
+.rte5-impacto-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.rte5-impacto-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:14px; }
+.rte5-impacto-xtech { font-family:'IBM Plex Mono',monospace; font-size:.60rem; text-transform:uppercase; letter-spacing:.10em; color:var(--c); margin-bottom:8px; }
+.rte5-impacto-dir { font-size:1.3rem; font-weight:800; line-height:1; margin-bottom:6px; }
+.rte5-impacto-texto { font-size:.76rem; color:var(--muted); line-height:1.58; }
+.rte5-impacto-urg { font-family:'IBM Plex Mono',monospace; font-size:.62rem; margin-top:9px; padding-top:8px; border-top:1px solid var(--line); color:var(--weak); }
+
+/* ── v7 Graph anchor text ───────────────────────────────────────────────────── */
+.rte5-graph-anchor { font-size:.83rem; color:var(--muted); line-height:1.65; border-left:3px solid var(--terra2); padding:10px 14px; background:rgba(91,140,255,.05); border-radius:0 10px 10px 0; margin-bottom:14px; }
+
+/* ── v7 Score badge ─────────────────────────────────────────────────────────── */
+.rte5-score-badge { display:inline-flex; align-items:center; gap:5px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.055); border-radius:999px; padding:2px 9px; font-family:'IBM Plex Mono',monospace; font-size:.63rem; color:var(--muted); }
+
+/* ── v7 Fatos Duros ─────────────────────────────────────────────────────────── */
+.rte5-fatos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-fato-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:14px 16px; }
+.rte5-fato-valor { font-family:'IBM Plex Mono',monospace; font-size:1.45rem; font-weight:800; color:var(--terra2); line-height:1; margin-bottom:6px; }
+.rte5-fato-contexto { font-size:.79rem; color:var(--muted); line-height:1.55; }
+.rte5-fato-xtech { margin-top:10px; }
+
+/* ── v8 Lente de Decisão ───────────────────────────────────────────────────── */
+.rte5-lente-card { border-left:3px solid var(--c); }
+.rte5-lente-perfil { font-family:'IBM Plex Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.12em; color:var(--c); margin-bottom:12px; }
+.rte5-lente-label { display:block; font-family:'IBM Plex Mono',monospace; font-size:.60rem; color:var(--weak); text-transform:uppercase; letter-spacing:.09em; margin-bottom:3px; }
+.rte5-lente-sinal, .rte5-lente-decisao, .rte5-lente-risco { font-size:.80rem; color:var(--text); line-height:1.55; margin-bottom:10px; padding-left:8px; border-left:2px solid rgba(255,255,255,.07); }
+.rte5-lente-risco { color:var(--muted); }
+
+/* ── v7 Cenários xTech tabs ─────────────────────────────────────────────────── */
+.rte5-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.rte5-tab-btn { font-family:'IBM Plex Mono',monospace; font-size:.68rem; padding:5px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.10); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; }
+.rte5-tab-btn.active { border-color:var(--terra2); background:rgba(91,140,255,.12); color:var(--terra2); font-weight:700; }
+.rte5-tab-panel { display:none; }
+.rte5-tab-panel.active { display:block; }
+.rte5-cenario-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--terra2); border-radius:14px; padding:18px; }
+.rte5-cenario-titulo { font-size:.96rem; font-weight:800; letter-spacing:-.018em; line-height:1.32; margin-bottom:6px; }
+.rte5-cenario-horizonte { font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--amber); display:inline-flex; border:1px solid rgba(217,164,65,.28); background:rgba(217,164,65,.07); border-radius:999px; padding:2px 9px; margin-bottom:12px; }
+.rte5-cenario-narrativa { font-size:.83rem; color:var(--muted); line-height:1.68; }
+.rte5-cenario-mem { margin-top:12px; font-size:.77rem; color:var(--weak); border-top:1px solid var(--line); padding-top:10px; font-style:italic; }
+
+/* ── v7 Convergência ────────────────────────────────────────────────────────── */
+.rte5-conv-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+.rte5-conv-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.rte5-conv-titulo { font-size:.93rem; font-weight:800; letter-spacing:-.018em; line-height:1.3; }
+.rte5-conv-nivel { font-family:'IBM Plex Mono',monospace; font-size:.60rem; text-transform:uppercase; letter-spacing:.10em; }
+.rte5-conv-narrativa { font-size:.79rem; color:var(--muted); line-height:1.60; }
+.rte5-conv-sinais { font-size:.73rem; color:var(--muted); border-top:1px solid var(--line); padding-top:8px; }
+
+/* ── v7 CTA ─────────────────────────────────────────────────────────────────── */
+.rte5-cta-section { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.rte5-cta-card { border:1px solid var(--line); border-radius:18px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+.rte5-cta-card.empresa { background:rgba(47,168,124,.06); border-color:rgba(47,168,124,.28); }
+.rte5-cta-card.live { background:rgba(91,140,255,.06); border-color:rgba(91,140,255,.28); }
+.rte5-cta-kicker { font-family:'IBM Plex Mono',monospace; font-size:.64rem; text-transform:uppercase; letter-spacing:.13em; }
+.rte5-cta-card.empresa .rte5-cta-kicker { color:var(--green); }
+.rte5-cta-card.live .rte5-cta-kicker { color:var(--terra2); }
+.rte5-cta-headline { font-size:1.05rem; font-weight:800; letter-spacing:-.02em; line-height:1.32; }
+.rte5-cta-desc { font-size:.83rem; color:var(--muted); line-height:1.65; }
+.rte5-cta-btn { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:10px 22px; font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; text-decoration:none; cursor:pointer; border:none; }
+.rte5-cta-card.empresa .rte5-cta-btn { background:rgba(47,168,124,.18); color:var(--green); border:1px solid rgba(47,168,124,.40); }
+.rte5-cta-card.live .rte5-cta-btn { background:rgba(91,140,255,.18); color:var(--terra2); border:1px solid rgba(91,140,255,.40); }
+.rte5-cta-data { font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--weak); }
+
+@media(max-width:1080px) {
+  .rte5-hero, .rte5-cta-section { grid-template-columns:1fr; }
+  .rte5-impacto-grid { grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:900px) {
+  .rte5-impacto-grid { grid-template-columns:repeat(2,1fr); }
+  .rte5-fatos-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:560px) {
+  .rte5-impacto-grid, .rte5-fatos-grid { grid-template-columns:1fr; }
+  .rte5-hero-pills { flex-direction:column; }
+}
+
+/* ── Cabeçalhos de Horizonte (v9) ── */
+.radar-horizonte-header {
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 20px;
+  margin:40px 0 18px;
+  padding:14px 20px 14px 22px;
+  border-left:3px solid #5B8CFF;
+  background:linear-gradient(90deg, rgba(91,140,255,.10) 0%, rgba(91,140,255,.03) 60%, transparent 100%);
+  border-radius:0 12px 12px 0;
+}
+.horizonte-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.78rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.12em;
+  color:#79A3FF;
+  flex-shrink:0;
+}
+.horizonte-audiencia {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem; color:#A8B3C2;
+  flex-shrink:0;
+}
+.horizonte-pergunta {
+  font-size:.82rem; font-style:italic;
+  color:#E6EDF3; opacity:.75;
+  flex-grow:1;
+}
+@media(max-width:700px) {
+  .radar-horizonte-header { flex-direction:column; gap:5px; }
+}
+</style>
+
+<section class="rte5-situation" id="sala-situacao">
+  <div class="rte5-sit-left">
+    <div class="rte5-eyebrow">Sala de Situação Executiva <span style="color:#718096;font-family:'IBM Plex Mono',monospace;font-size:.68rem;">· dados até 2026-06-25</span></div>
+    <h1 class="rte5-headline">A regulação tarifária brasileira entra em ruptura simultânea: ANEEL reformula Fator X, homologa ciclo de transmissão 2026/2027 e data centers pressionam por infraestrutura confiável antes da segunda onda de investimentos.</h1>
+    <p class="rte5-subtitle">A revisão do mecanismo de ajuste busca reconciliar a receita das distribuidoras com a expansão estrutural da microgeração.</p>
+    <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px">A pressão sobre a ANEEL para reformular o Fator X marca a transição da microgeração distribuída de fenômeno marginal para variável estrutural do equilíbrio econômico-financeiro das concessionárias. O canal regulatório agora reconhece que a MMGD altera simultaneamente a receita faturável e os custos operacionais da rede, exigindo um redesenho do mecanismo de captura de eficiência. Para conselhos de distribuidoras e investidores em geração distribuída, está em jogo a previsibilidade do retorno regulado em um horizonte de revisões tarifárias mais contestadas.</p>
+    
+    <div style="margin-top:14px"><span class="rte5-chip" style="--chip:#79A3FF">Armazenamento em Baterias e Solar como Nova Fronteira Competitiva no Brasil</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (5)</summary><div style="margin-top:5px"><a href="https://www.pv-magazine.com/2026/06/25/storage-leading-growth-in-denmarks-energy-market/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Armazenamento liderando crescimento no mercado energético dinamarquês</a><a href="https://www.pv-magazine.com/2026/06/25/itrpv-global-solar-module-shipments-reached-approximately-706-gw-in-2025/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">ITRPV: Embarques globais de módulos solares atingiram 706 GW em 2025</a><a href="https://reneweconomy.com.au/wind-giant-unveils-huge-new-hybrid-proposal-with-option-for-batteries-to-be-plugged-into-turbines/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=wind-giant-unveils-huge-new-hybrid-proposal-with-option-for-batteries-to-be-plugged-into-turbines" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Gigante eólica apresenta proposta híbrida de grande escala com opção de baterias acopladas aos aerogeradores</a><a href="https://news.google.com/rss/articles/CBMipwFBVV95cUxPMjFnZEpySFRENFUzVFpiVFBBZjU1bmF6NDFMNmxFV1lDVkRWdXgzYXpTRzkyMG1FUWdZdW5ueW42T1dUbE1zcEwybWF0UnRpN1NSQjZ1SDVwcTlsX0FYcGRZSXR4MldYOWFUdUVjWDhOckpxbS01Tm95RjNBV3RsYndrYjhpeEh5UjJKWGwwWE1uei1tOTdqUnZ6dkJTTjlUQjlLZXh4cw?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Solfácil lança financiamento para projetos de armazenamento em bateria</a><a href="https://www.pv-magazine.com/2026/06/25/emmvee-ramps-up-1-4-gw-topcon-solar-cell-line-with-german-equipment-places-multi-gw-follow-up-order/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">EMMVEE amplia linha de produção de células solares TOPCon com 1,4 GW usando equipamentos alemães</a></div></details><span class="rte5-chip" style="--chip:#79A3FF">Data Centers, IA e Infraestrutura Digital como Vetor de Atração de Capital</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (5)</summary><div style="margin-top:5px"><a href="https://megawhat.uol.com.br/economia-e-politica/empresas/brasil-perdeu-a-primeira-onda-de-data-centers-mas-nao-pode-perder-a-segunda-diz-hitachi/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Data centers não buscam preço, e sim infraestrutura disponível, diz Hitachi</a><a href="https://news.google.com/rss/articles/CBMi5AFBVV95cUxNcFRuOGVHWTNMb3pNalN2TFZZN3duejlLR1BFUThtV1ZHMnhiUFB5SXJicnZrUURVWVYtRXdUMXhiSzhkLUJzVnRwckJYb0VYRFFaZ1JvVHBqTGRtZU1VT0VuLWNUaXFvN0RCSkZvUGR1eHhLZHlvcmdkd1RfQXNRZVVYVXBSRHRGZl9fd1NYbm5qemszSGh2U0NORDBGOUh0aW5yX25aZmU4T2lKLW81QkYxN3htQjU3NC1fSGZmSDM1Y0RQeU5xOExlLWdFWVd6eTV2R1JhMkhFZW1VS3lqUTNKRnE?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">CBRE: Demanda global por data centers continua superando oferta, elevando taxas de aluguel e custos de construção</a><a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxPM1VHMy1Wdnk2V2Znc1JEZmVPMVhJU2h0ZTc1c2JBM1NJZXVJejBSYXpiUzhIdDdTbEltcjROdHFCUTVTTmZNdVhWTXBfVHdhZGxPdTBKbkVvaFBMWTBnVW5aR1RDbW80OVdZRFVDeHpvNXdva09iS1hlRENuR1RQX3hHalRTaG9ZdnBiRjA1TzBwWks0aVZZYzVTa0lCNmFtN0J3SW15X04?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">FERC Estabelece Regras de Rede para Centros de Dados e Grandes Cargas</a><a href="https://teletime.com.br/24/06/2026/china-40-5g-mundo-gsma/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">China concentra 40% das conexões 5G do mundo, aponta GSMA</a><a href="https://teletime.com.br/24/06/2026/boletim-teletime-starlink-posteiro/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Disputa regulatória Starlink versus Anatel e conflito entre distribuidoras de energia e operadora postal</a></div></details><span class="rte5-chip" style="--chip:#79A3FF">Soberania Tarifária e Revisão Regulatória do Setor Elétrico Brasileiro</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (5)</summary><div style="margin-top:5px"><a href="https://megawhat.uol.com.br/distribuicao/aneel-deve-reformular-fator-x-para-reconhecer-impacto-estrutural-da-mmgd-nas-distribuidoras/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">ANEEL deve reformular Fator X para reconhecer impacto estrutural da microgeração distribuída nas distribuidoras</a><a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxPSV9wek9QNXAydFQ5MmgwZ3RqU0JCTi1lV2xoZFF6a1d0NTJfUE94YzJMeVBqTHhranV3b3JBSW1NSHlPZHFURk9KT2g4RkszNzFxVTR3cWhsbWk3VkNPX2hoSEpIZGQ0YnNxdmVpWTNoTjFGcnpJTW9xWVFzQllKQ1lyZEtNWEh2bDM0NmhmR2s2cnp1RHp2ekFEQWtyNDZkMFFnTGh4cWM2Wlh2TUxvcE51WUFlUQ?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Concluído cálculo das tarifas de transmissão para o ciclo 2026/2027</a><a href="https://megawhat.uol.com.br/geracao/nuclear/mme-suspende-reuniao-do-cnpe-casa-civil-questionou-resolucao-sobre-divida-de-angra-3/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Ministério de Minas e Energia cancela reunião do CNPE que retomaria discussão sobre repactuação da dívida de Angra 3</a><a href="https://megawhat.uol.com.br/transmissao/receita-de-transmissao-cresce-94-mas-impacto-na-conta-de-luz-e-de-11-diz-aneel/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Receita de transmissão cresce 9,4%, mas impacto na conta de luz é de 1,1%, segundo Aneel</a><a href="https://news.google.com/rss/articles/CBMigAJBVV95cUxOUFFiemwyMjBRN3BHMDRFMXVXWXk1eHk2R0p6TmszdzZBV0VWdm9ITGtQc0ZoVmlhWTg4bkQ2LTBGdVVLNWxFb1dVNUNnN2hueHJhTEFoLW5iWXlzZlQxNHJNQ2V2amlFa1VsZVZnT2N6b3ZGNkZJMWVkRmVJb0RFQU1sSWNucHFOVk5TbHAzZi1rX3daM0E3eklRXzdmWTVWYWlxQ3YxN3BkMGVPOHJJZUVjX3ZpdUt2bDFMblpRWnFkbXpHaExaSnJ2aGRLeU13ZkxJM2c1TmZFSEF0dFdWS2FwRlpLMjVpN2NkTlhZaWNjZG15QklPNlU4ak1QWWtp?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Início do processo de acessão do Brasil à Agência Internacional de Energia como membro pleno</a></div></details></div>
+  </div>
+  <div class="rte5-sit-right">
+    <div class="rte5-metrics">
+      <div class="rte5-metric"><div class="rte5-metric-val">164</div><div class="rte5-metric-label">sinais monitorados</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">102</div><div class="rte5-metric-label">fontes ativas</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">27</div><div class="rte5-metric-label">países cobertos</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">3.2</div><div class="rte5-metric-label"><span class="rte5-ips-wrap">IPS médio<span class="rte5-ips-icon" onclick="this.closest('.rte5-ips-wrap').classList.toggle('active')">ⓘ</span><span class="rte5-ips-tip">IPS médio considera o universo total de sinais monitorados. Os vetores exibidos são apenas os priorizados — por isso seus IPS individuais são mais altos que a média geral.</span></span></div></div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px;margin-top:2px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.10em;color:#718096"><abbr title="IPS — Índice de Pressão Estratégica (0–10): média ponderada de impacto no Brasil (25%), score de relevância dos sinais (25%), exposição setorial (20%), volume de sinais verificados (15%), confiança analítica (10%) e novidade tecnológica (5%). Faixa: 8.0–10.0 = Mobilizar Agora | 6.5–7.9 = Capturar Vantagem | 5.0–6.4 = Monitorar Vetores | < 5.0 = Ruído Operacional." style="text-decoration:underline dotted;cursor:help;color:inherit">IPS</abbr> por frente · 10 semanas</span><span style="font-family:'IBM Plex Mono',monospace;font-size:.56rem;color:#4A5568">0–10</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;font-weight:700;color:#2FA87C;width:70px;flex-shrink:0" >EnergyTech</span><span style="flex:1;min-width:0"><svg width="120" height="26" viewBox="0 0 120 26" style="display:block;overflow:visible"><line x1="0" y1="13.0" x2="120" y2="13.0" stroke="rgba(255,255,255,.06)" stroke-width="1"/><polyline points="0.0,8.0 13.3,7.4 26.7,8.0 40.0,8.3 53.3,7.2 66.7,11.9 80.0,13.2 93.3,13.9 106.7,13.6 120.0,13.4" fill="none" stroke="#2FA87C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/><circle cx="120.0" cy="13.4" r="2.4" fill="#2FA87C"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:800;color:#2FA87C;width:24px;text-align:right;flex-shrink:0">4.8</span><span style="font-size:.62rem;color:#718096;width:12px;flex-shrink:0">→</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;font-weight:700;color:#5DCAA5;width:70px;flex-shrink:0" title="3/10 semanas com dados">CleanTech</span><span style="flex:1;min-width:0"><svg width="120" height="26" viewBox="0 0 120 26" style="display:block;overflow:visible"><line x1="0" y1="13.0" x2="120" y2="13.0" stroke="rgba(255,255,255,.06)" stroke-width="1"/><polyline points="93.3,13.2 106.7,14.5 120.0,18.6" fill="none" stroke="#5DCAA5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/><circle cx="120.0" cy="18.6" r="2.4" fill="#5DCAA5"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:800;color:#5DCAA5;width:24px;text-align:right;flex-shrink:0">2.5</span><span style="font-size:.62rem;color:#D96C6C;width:12px;flex-shrink:0">↘</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;font-weight:700;color:#5B8CFF;width:70px;flex-shrink:0" >DeepTech</span><span style="flex:1;min-width:0"><svg width="120" height="26" viewBox="0 0 120 26" style="display:block;overflow:visible"><line x1="0" y1="13.0" x2="120" y2="13.0" stroke="rgba(255,255,255,.06)" stroke-width="1"/><polyline points="0.0,11.9 13.3,12.5 26.7,13.3 40.0,8.0 53.3,9.7 66.7,15.1 80.0,16.7 93.3,17.1 106.7,17.3 120.0,16.9" fill="none" stroke="#5B8CFF" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/><circle cx="120.0" cy="16.9" r="2.4" fill="#5B8CFF"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:800;color:#5B8CFF;width:24px;text-align:right;flex-shrink:0">3.2</span><span style="font-size:.62rem;color:#2FA87C;width:12px;flex-shrink:0">↗</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;font-weight:700;color:#7AB648;width:70px;flex-shrink:0" title="3/10 semanas com dados">AgriTech</span><span style="flex:1;min-width:0"><svg width="120" height="26" viewBox="0 0 120 26" style="display:block;overflow:visible"><line x1="0" y1="13.0" x2="120" y2="13.0" stroke="rgba(255,255,255,.06)" stroke-width="1"/><polyline points="93.3,17.7 106.7,18.0 120.0,17.6" fill="none" stroke="#7AB648" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/><circle cx="120.0" cy="17.6" r="2.4" fill="#7AB648"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:800;color:#7AB648;width:24px;text-align:right;flex-shrink:0">2.9</span><span style="font-size:.62rem;color:#718096;width:12px;flex-shrink:0">→</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;font-weight:700;color:#D9A441;width:70px;flex-shrink:0" title="6/10 semanas com dados">FinTech</span><span style="flex:1;min-width:0"><svg width="120" height="26" viewBox="0 0 120 26" style="display:block;overflow:visible"><line x1="0" y1="13.0" x2="120" y2="13.0" stroke="rgba(255,255,255,.06)" stroke-width="1"/><polyline points="26.7,14.1 40.0,14.0 53.3,11.3 93.3,15.4 106.7,15.6 120.0,17.0" fill="none" stroke="#D9A441" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/><circle cx="120.0" cy="17.0" r="2.4" fill="#D9A441"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:800;color:#D9A441;width:24px;text-align:right;flex-shrink:0">3.2</span><span style="font-size:.62rem;color:#D96C6C;width:12px;flex-shrink:0">↘</span></div><div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:#4A5568;margin-top:2px;padding-left:77px;padding-right:38px"><span>W16</span><span>W25</span></div></div><div style="border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:14px"><div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.10em;color:#718096;margin-bottom:6px">Impacto por frente xTech</div><div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:.64rem;font-weight:700;color:#2FA87C">EnergyTech</span><span style="font-size:.68rem;color:#D9A441">◆</span></div><div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">A recalibração do Fator X redefine o ambiente regulatório para empresas de tecnologia em energia distribuída, criando janela de oportunidade para soluções de gestão de receita, medição inteligente e plataformas de integração de MMGD. O reconhecimento institucional da microgeração como variável estrutural eleva a demanda por ferramentas que quantifiquem e monitorem seu impacto nas contas das distribuidoras.</div></div><div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:.64rem;font-weight:700;color:#5DCAA5">CleanTech</span><span style="font-size:.68rem;color:#D9A441">◆</span></div><div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">A reformulação regulatória pode alterar a estrutura de subsídios cruzados que sustenta parte da atratividade econômica da microgeração solar, introduzindo incerteza sobre o retorno de novos projetos residenciais e comerciais. Empresas de CleanTech devem monitorar o redesenho tarifário para antecipar ajustes nos modelos de negócio de geração distribuída.</div></div><div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:.64rem;font-weight:700;color:#D9A441">FinTech</span><span style="font-size:.68rem;color:#D96C6C">◆</span></div><div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">A incerteza regulatória sobre subsídios cruzados e viabilidade financeira das distribuidoras pode pressionar modelos de crédito e financiamento voltados a projetos de energia solar distribuída, elevando o risco percebido de carteiras de crédito verde. Plataformas de financiamento de MMGD precisarão represar ou reprificar operações até que o novo marco do Fator X seja consolidado.</div></div><div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:.64rem;font-weight:700;color:#5B8CFF">DeepTech</span><span style="font-size:.68rem;color:#D9A441">◆</span></div><div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">A necessidade de capturar simultaneamente o impacto da MMGD na receita faturável e na estrutura de custos das distribuidoras abre demanda por soluções avançadas de modelagem, simulação e análise preditiva — terreno natural para empresas de DeepTech com capacidade em digital twins de redes elétricas e algoritmos de otimização tarifária. O movimento regulatório sinaliza contratação acelerada de tecnologias de alta complexidade analítica pelo setor elétrico.</div></div><div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:.64rem;font-weight:700;color:#7AB648">AgriTech</span><span style="font-size:.68rem;color:#D9A441">◆</span></div><div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">O impacto sobre AgriTech é indireto e limitado ao segmento de agrovoltaica e microgeração rural, onde mudanças nos incentivos tarifários podem alterar a atratividade de projetos de energia solar em propriedades agrícolas. O monitoramento é recomendado, pois eventuais revisões nos subsídios cruzados podem encarecer a energia para pequenos produtores rurais conectados à rede.</div></div></div>
+  </div>
+</section></div><!-- /hero-radar-xtechs-2026-06-25 -->

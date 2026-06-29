@@ -1,0 +1,289 @@
+<!-- hero-nmentors-2026-06-25 | nMentors Engenharia -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+
+.nmb2, .nmb2 * { box-sizing: border-box; margin: 0; padding: 0; }
+.nmb2 {
+  font-family: 'Inter', sans-serif;
+  background: #0B1418;
+  border-radius: 16px;
+  color: #E8EEF4;
+  line-height: 1.6;
+  overflow: hidden;
+}
+.nmb2-header {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap; padding: 22px 32px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.015);
+}
+.nmb2-header-left { display: flex; flex-direction: column; gap: 3px; }
+.nmb2-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: #566880;
+}
+.nmb2-ciclo { font-size: 14px; font-weight: 700; color: #E8EEF4; }
+.nmb2-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  border-radius: 4px; padding: 3px 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.nmb2-tese-wrap {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 0;
+}
+.nmb2-tese-left {
+  padding: 28px 32px;
+  border-right: 1px solid rgba(255,255,255,.07);
+}
+.nmb2-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: #38D6B4; margin-bottom: 12px; display: block;
+}
+.nmb2-manchete {
+  font-family: 'Inter', sans-serif !important;
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 800; letter-spacing: -.035em;
+  line-height: 1.1; color: #E8EEF4;
+  margin-bottom: 14px;
+}
+.nmb2-insight {
+  font-size: 15px; color: #96A8BC;
+  line-height: 1.7; margin-bottom: 20px;
+}
+.nmb2-insight strong { color: #C8D6E8; font-weight: 600; }
+.nmb2-sinais-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .13em; text-transform: uppercase;
+  color: #D96C6C; margin-bottom: 10px; display: block;
+}
+.nmb2-sinais { display: flex; flex-direction: column; gap: 8px; }
+.nmb2-sinal {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 14px; color: #96A8BC; line-height: 1.5;
+}
+.nmb2-sinal-icon { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+.nmb2-tese-right {
+  padding: 28px 28px;
+  background: rgba(204,154,58,.04);
+  display: flex; flex-direction: column;
+  justify-content: center; gap: 0;
+}
+.nmb2-pergunta-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #CC9A3A; margin-bottom: 14px; display: block;
+}
+.nmb2-pergunta-icon {
+  width: 36px; height: 36px;
+  background: rgba(204,154,58,.12);
+  border: 1px solid rgba(204,154,58,.25);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+.nmb2-pergunta {
+  font-size: clamp(15px, 1.9vw, 18px);
+  font-weight: 700; color: #E8EEF4;
+  font-style: italic; line-height: 1.5;
+  margin-bottom: 16px;
+  padding-left: 14px;
+  border-left: 3px solid #CC9A3A;
+}
+.nmb2-pergunta-ctx { font-size: 13.5px; color: #718096; line-height: 1.6; }
+.nmb2-pergunta-ctx strong { color: #96A8BC; font-weight: 600; }
+.nmb2-cards-section {
+  padding: 28px 32px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+.nmb2-sec-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #566880; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.nmb2-sec-title::before {
+  content: ''; display: block;
+  width: 18px; height: 1px; background: #38D6B4;
+}
+.nmb2-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 14px;
+}
+.nmb2-card {
+  background: #0C1B24;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 13px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  position: relative; overflow: hidden;
+}
+.nmb2-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--c);
+}
+.nmb2-card.nm-monit { opacity: .6; }
+.nmb2-card-hd {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+}
+.nmb2-frente {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .05em; color: var(--c);
+}
+.nmb2-urg {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  border-radius: 4px; padding: 3px 8px;
+  background: var(--urg-bg); color: var(--urg-c);
+}
+.nmb2-como { font-size: 14.5px; color: #96A8BC; line-height: 1.65; flex: 1; }
+.nmb2-divider { height: 1px; background: rgba(255,255,255,.06); }
+.nmb2-servicos { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.nmb2-srv {
+  font-size: 13.5px; color: #C8D6E8;
+  display: flex; align-items: flex-start;
+  gap: 8px; line-height: 1.45;
+}
+.nmb2-srv-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--c); flex-shrink: 0; margin-top: 5px; opacity: .7;
+}
+.nmb2-cta {
+  font-size: 13px; font-weight: 700;
+  text-decoration: none; color: var(--c) !important;
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 2px;
+}
+.nmb2-cta:hover { opacity: .8; }
+.nmb2-cta-final {
+  margin: 0 32px 28px;
+  background: rgba(56,214,180,.05);
+  border: 1px solid rgba(56,214,180,.18);
+  border-radius: 12px; padding: 22px 26px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.nmb2-cta-text { font-size: 15px; font-weight: 600; color: #E8EEF4; }
+.nmb2-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.nmb2-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 700;
+  padding: 11px 22px; border-radius: 8px;
+  text-decoration: none; display: inline-block;
+  white-space: nowrap; border: none; cursor: pointer;
+}
+@media (max-width: 800px) {
+  .nmb2-tese-wrap { grid-template-columns: 1fr; }
+  .nmb2-tese-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .nmb2-header, .nmb2-tese-left, .nmb2-tese-right, .nmb2-cards-section { padding-left: 20px; padding-right: 20px; }
+  .nmb2-cta-final { margin: 0 20px 24px; }
+}
+@media (max-width: 560px) {
+  .nmb2-cards { grid-template-columns: 1fr; }
+  .nmb2-cta-final { flex-direction: column; align-items: flex-start; }
+}
+</style>
+<div class="nmb2">
+
+<!-- ── HEADER ── -->
+<div class="nmb2-header">
+  <div class="nmb2-header-left">
+    <span class="nmb2-eyebrow">nMentors Engenharia &middot; Briefing do Mentor</span>
+    <span class="nmb2-ciclo">Ciclo 25-06-2026</span>
+  </div>
+  <span class="nmb2-badge" style="background:rgba(217,108,108,.12);color:#D96C6C;margin-left:auto;"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="4" fill="#D96C6C"/></svg> EnergyTech &middot; DeepTech em alta</span>
+</div>
+
+<!-- ── TESE + PERGUNTA ── -->
+<div class="nmb2-tese-wrap">
+  <div class="nmb2-tese-left">
+    <span class="nmb2-kicker">Tese do ciclo</span>
+    <h2 class="nmb2-manchete">Regulador sinaliza reformulação do Fator X para reconhecer impacto estrutural da microgeração distribuída no equilíbrio financeiro das distribuidoras</h2>
+    <p class="nmb2-insight">Selic real a 9,62% e PLD pressionado por Brent em queda de 22,63% colidem com nova rodada regulatória (Fator X, tarifas de transmissão) que redefine quem captura valor no setor elétrico.</p>
+    <span class="nmb2-sinais-label">Sinais de aten&ccedil;&atilde;o neste ciclo</span>
+    <div class="nmb2-sinais">
+<div class="nmb2-sinal"><svg class="nmb2-sinal-icon" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5Z" stroke="#D96C6C" stroke-width="1.2" stroke-linejoin="round"/><line x1="7" y1="5.5" x2="7" y2="8.5" stroke="#D96C6C" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="10" r=".7" fill="#D96C6C"/></svg><span>Data centers priorizam infraestrutura disponível, não preço (Hitachi)</span></div>
+<div class="nmb2-sinal"><svg class="nmb2-sinal-icon" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5Z" stroke="#D96C6C" stroke-width="1.2" stroke-linejoin="round"/><line x1="7" y1="5.5" x2="7" y2="8.5" stroke="#D96C6C" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="10" r=".7" fill="#D96C6C"/></svg><span>Aneel deve reformular Fator X por impacto da MMGD nas distribuidoras</span></div>
+<div class="nmb2-sinal"><svg class="nmb2-sinal-icon" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5Z" stroke="#D96C6C" stroke-width="1.2" stroke-linejoin="round"/><line x1="7" y1="5.5" x2="7" y2="8.5" stroke="#D96C6C" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="10" r=".7" fill="#D96C6C"/></svg><span>Ação do MPF ameaça travar licenças hidrelétricas no Madeira</span></div>
+    </div>
+  </div>
+  <div class="nmb2-tese-right">
+    <span class="nmb2-pergunta-kicker">A pergunta que seu projeto precisa responder</span>
+    <div class="nmb2-pergunta-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="#CC9A3A" stroke-width="1.3" stroke-opacity=".6"/><path d="M7 7C7 5.9 7.9 5 9 5C10.1 5 11 5.9 11 7C11 8 10 8.5 9 9.5" stroke="#CC9A3A" stroke-width="1.3" stroke-linecap="round"/><circle cx="9" cy="12.5" r=".8" fill="#CC9A3A"/></svg></div>
+    <p class="nmb2-pergunta">&ldquo;Com Selic real a 9,62% e PLD em queda, seu portfólio depende de receita de spot ou de contratos de disponibilidade de longo prazo — e quanto dele você consegue blindar nos próximos 90 dias?&rdquo;</p>
+    <p class="nmb2-pergunta-ctx">A pergunta surge da confluência entre o custo real de capital de 9,62% e a fala da Hitachi de que data centers buscam infraestrutura disponível, não preço.</p>
+  </div>
+</div>
+
+<!-- ── CARDS xTECH ── -->
+<div class="nmb2-cards-section">
+  <p class="nmb2-sec-title">Como a nMentors atua neste ciclo</p>
+  <div class="nmb2-cards">
+<div class="nmb2-card" data-frente="EnergyTech" style="--c:#2FA87C;--urg-bg:rgba(217,108,108,.12);--urg-c:#D96C6C;">
+  <div class="nmb2-card-hd">
+    <span class="nmb2-frente">EnergyTech</span>
+    <span class="nmb2-urg">Agir agora</span>
+  </div>
+  <p class="nmb2-como">A nMentors mapeia o impacto regulatório da recalibração do Fator X no modelo de negócio de EnergyTechs, traduzindo mudanças estruturais em especificações técnicas para plataformas de MMGD e ferramentas de monitoramento de receita distribuída. Posicionamos nossos clientes para capturar a janela de oportunidade com soluções auditáveis, agnósticas de fornecedor e alinhadas ao novo ambiente regulatório.</p>
+  <div class="nmb2-divider"></div>
+  <ul class="nmb2-servicos"><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Modelagem de impacto tarifário da microgeração distribuída com quantificação do desvio no equilíbrio financeiro de distribuidoras</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Especificação técnica de plataforma de integração MMGD com medição inteligente e rastreabilidade regulatória para conformidade ANEEL</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Agente de IA para monitoramento contínuo de variáveis regulatórias do Fator X com alertas acionáveis para gestão de receita</li></ul>
+  <a class="nmb2-cta" href="https://nmentors.com.br/contato/" target="_blank" rel="noopener">Fale com a nMentors &rarr;</a>
+</div>
+<div class="nmb2-card" data-frente="CleanTech" style="--c:#38D6B4;--urg-bg:rgba(204,154,58,.12);--urg-c:#CC9A3A;">
+  <div class="nmb2-card-hd">
+    <span class="nmb2-frente">CleanTech</span>
+    <span class="nmb2-urg">Pr&oacute;ximos meses</span>
+  </div>
+  <p class="nmb2-como">A nMentors mapeia o impacto regulatório da reformulação do Fator X sobre os modelos de negócio de geração distribuída, traduzindo incerteza tarifária em decisões estruturadas de portfólio. Combinamos diagnóstico regulatório com modelagem financeira orientada por IA para antecipar cenários e proteger o retorno de projetos residenciais e comerciais em pipeline.</p>
+  <div class="nmb2-divider"></div>
+  <ul class="nmb2-servicos"><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Modelagem de sensibilidade tarifária para portfólios de microgeração distribuída sob cenários de redesenho do Fator X</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Diagnóstico regulatório com agentes de IA para monitoramento contínuo de revisões tarifárias ANEEL e impacto em subsídios cruzados</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Reestruturação de modelos de negócio de GD com análise de viabilidade econômica em múltiplos cenários regulatórios</li></ul>
+  <a class="nmb2-cta" href="https://nmentors.com.br/contato/" target="_blank" rel="noopener">Fale com a nMentors &rarr;</a>
+</div>
+<div class="nmb2-card" data-frente="DeepTech" style="--c:#4F83F0;--urg-bg:rgba(217,108,108,.12);--urg-c:#D96C6C;">
+  <div class="nmb2-card-hd">
+    <span class="nmb2-frente">DeepTech</span>
+    <span class="nmb2-urg">Agir agora</span>
+  </div>
+  <p class="nmb2-como">A nMentors estrutura soluções analíticas de alta complexidade para distribuidoras e empresas de DeepTech que precisam modelar o impacto da MMGD no equilíbrio financeiro e na revisão do Fator X, combinando arquitetura de IA com domínio regulatório setorial. Aceleramos a entrada no mercado de tecnologia para o setor elétrico com especificação técnica agnóstica de fornecedor e governança auditável para contratos com concessionárias.</p>
+  <div class="nmb2-divider"></div>
+  <ul class="nmb2-servicos"><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Modelagem preditiva de impacto da MMGD em receita faturável e estrutura tarifária de distribuidoras com algoritmos de otimização regulatória</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Desenvolvimento e integração de digital twins de redes de distribuição para simulação de cenários de penetração de microgeração e recálculo do Fator X</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Estruturação de proposta técnica e comercial para contratação de soluções DeepTech por distribuidoras, com mapeamento de requisitos ANEEL e rastreabilidade de evidências</li></ul>
+  <a class="nmb2-cta" href="https://nmentors.com.br/contato/" target="_blank" rel="noopener">Fale com a nMentors &rarr;</a>
+</div>
+<div class="nmb2-card nm-monit" data-frente="AgriTech" style="--c:#7AB648;--urg-bg:rgba(86,104,128,.12);--urg-c:#718096;">
+  <div class="nmb2-card-hd">
+    <span class="nmb2-frente">AgriTech</span>
+    <span class="nmb2-urg">Monitorar</span>
+  </div>
+  <p class="nmb2-como">A nMentors monitora continuamente o ambiente regulatório do setor elétrico e traduz sinais como a revisão do Fator X em impactos concretos sobre a viabilidade financeira de projetos agrovoltaicos e de microgeração rural. Antecipamos cenários tarifários adversos e reposicionamos a estrutura dos projetos para preservar a atratividade do investimento antes que mudanças regulatórias se consolidem.</p>
+  <div class="nmb2-divider"></div>
+  <ul class="nmb2-servicos"><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Análise de sensibilidade tarifária para projetos agrovoltaicos sob cenários de revisão do Fator X e subsídios cruzados</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Modelagem financeira de microgeração rural com simulação de impacto regulatório na TIR e payback do projeto</li><li class="nmb2-srv"><span class="nmb2-srv-dot"></span>Monitoramento regulatório contínuo com agentes de IA para ANEEL, MME e CMSE — alertas acionáveis para o pipeline agrovoltaico</li></ul>
+  <a class="nmb2-cta" href="https://nmentors.com.br/contato/" target="_blank" rel="noopener">Fale com a nMentors &rarr;</a>
+</div>
+  </div>
+</div>
+
+<!-- ── CTA FINAL ── -->
+<div class="nmb2-cta-final">
+  <p class="nmb2-cta-text">Quer entender como este ciclo impacta seu projeto?</p>
+  <div class="nmb2-btns">
+    <a class="nmb2-btn" href="https://nmentors.com.br/contato/" target="_blank" rel="noopener"
+       style="background:#38D6B4;color:#0B1418 !important;">Agendar sess&atilde;o diagn&oacute;stica &rarr;</a>
+    <a class="nmb2-btn" href="https://efagundes.com/radar-xtech/" target="_blank" rel="noopener"
+       style="background:rgba(255,255,255,.07);color:#E8EEF4 !important;border:1px solid rgba(255,255,255,.12);">Ver o Radar completo &rarr;</a>
+  </div>
+</div>
+
+</div>
+<!-- /hero-nmentors-2026-06-25 -->

@@ -1,0 +1,98 @@
+{
+  "insight_executivo": "Brent despenca 23% e Selic real em 9,62% comprimem o retorno de projetos de energia justo quando ACL e biometano ganham tração — janela de 90 dias para travar contratos.",
+  "correlacao_mercado": "A queda de 23,18% no Brent (US$71,99) barateia o combustível das termelétricas, derruba o PLD e pressiona a receita spot de renováveis e BESS — migrações ACL como a da Taesa (42 UCs) só se pagam com PPA de longo prazo, não no mercado de curto prazo. Com Selic real em 9,62%, muito acima dos 6% que tornam infraestrutura marginal, e USD/BRL em 5,1774 encarecendo equipamentos importados, o custo de capital exige contratos firmes antes do financiamento. O IEE proxy (CPFE3) subindo 5,74% mostra que o mercado ainda premia o setor elétrico regulado/defensivo, não o spot exposto.",
+  "pergunta_estrategica": "Com Brent -23% e Selic real a 9,62%, sua tese de migração para o ACL depende de PPA firme ou está apostando num PLD que acabou de perder o piso de competitividade?",
+  "contexto_pergunta": "A pergunta surge da confluência entre o Brent caindo 23,18% (que derruba o PLD) e a corrida por migração ao mercado livre vista no caso Taesa-Lead Energy.",
+  "sinais_atencao": [
+    {
+      "titulo": "Braskem tem recuperação extrajudicial rejeitada por credores",
+      "contexto": "Sinaliza estresse de crédito na petroquímica e contágio para fornecedores e cadeia industrial; revise exposição a contrapartes do setor.",
+      "tipo": "risco"
+    },
+    {
+      "titulo": "ANP coloca mais 86 blocos na Margem Equatorial para leilão",
+      "contexto": "Expansão exploratória contraria a queda do Brent: aposta de longo prazo em óleo que pode competir por capital com a agenda de transição.",
+      "tipo": "ruptura"
+    },
+    {
+      "titulo": "Biometano da Solvi entra no Reidi e corta R$41,5 mi em tributos",
+      "contexto": "Incentivo fiscal vira alavanca decisiva para viabilizar projetos sob Selic real de 9,62%; estruturar via Reidi muda o cálculo de retorno.",
+      "tipo": "oportunidade"
+    }
+  ],
+  "ciclo": "2026-06-27",
+  "gerado_em": "2026-06-27T16:15:57.301817-03:00",
+  "modelo": "claude-opus-4-8",
+  "market_data": {
+    "USD/BRL": {
+      "valor": 5.1774,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "CAPEX de equipamentos importados, dívida externa, insumos industriais",
+      "unidade": "BRL por USD"
+    },
+    "Selic": {
+      "valor": 14.25,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo de capital para projetos de infraestrutura e P&D",
+      "unidade": "% a.a."
+    },
+    "Selic Real": {
+      "valor": 9.62,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo real de capital; acima de 6% torna projetos de infraestrutura marginais inviáveis",
+      "unidade": "calculado"
+    },
+    "IPCA": {
+      "valor": 0.58,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão sobre contratos de energia, insumos e reajustes tarifários",
+      "unidade": "% a.m."
+    },
+    "Brent": {
+      "valor": 71.99,
+      "variacao_30d_pct": -23.18,
+      "variacao_7d_pct": -7.59,
+      "relevancia": "Referência global de preço de energia; pressão sobre PLD e termelétricas",
+      "unidade": "USD/barril"
+    },
+    "Cobre": {
+      "valor": 6.1415,
+      "variacao_30d_pct": -3.98,
+      "variacao_7d_pct": -3.38,
+      "relevancia": "Sinal de eletrificação e infraestrutura; BESS, transmissão, EVs",
+      "unidade": "USD/lb"
+    },
+    "Ibovespa": {
+      "valor": 173295.0,
+      "variacao_30d_pct": -1.01,
+      "variacao_7d_pct": 1.72,
+      "relevancia": "Humor do mercado brasileiro; base para força relativa setorial",
+      "unidade": "pontos"
+    },
+    "IEE proxy (CPFE3)": {
+      "valor": 45.5,
+      "variacao_30d_pct": 5.74,
+      "variacao_7d_pct": 2.55,
+      "relevancia": "Proxy do setor elétrico B3; CPFL Energia — distribuição, geração e transmissão",
+      "unidade": "BRL/ação"
+    },
+    "UTIL (Utilidades)": {
+      "valor": 18977.3301,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Percepção de infraestrutura defensiva; saneamento, energia, concessões",
+      "unidade": "pontos"
+    },
+    "Brent Tendência 30d": {
+      "valor": -23.18,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão energética global: queda — impacta PLD e competitividade de renováveis",
+      "unidade": "calculado"
+    }
+  }
+}

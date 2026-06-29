@@ -1,0 +1,1022 @@
+<div class="rte5">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+.rte5, .rte5 * { box-sizing:border-box; }
+.rte5 {
+  --bg:#0F1722; --bg2:#131D2B; --panel:#151F2E; --panel2:#1B2A3D;
+  --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.10); --text:#E6EDF3; --muted:#A8B3C2; --weak:#718096;
+  --terra:#5B8CFF; --terra2:#79A3FF; --danger:#D96C6C; --amber:#D9A441; --green:#2FA87C; --tech:#5B8CFF;
+  --accent-blue:#5B8CFF; --accent-blue-hover:#79A3FF;
+  max-width:1440px; margin:0 auto; padding:0 20px 56px; color:var(--text); background:var(--bg);
+  font-family:inherit; line-height:1.65; letter-spacing:.005em;
+}
+.rte5 a { color:inherit; }
+.rte5-header { display:flex; justify-content:space-between; align-items:center; gap:18px; flex-wrap:wrap; padding:16px 0 20px; border-bottom:1px solid var(--line); margin-bottom:22px; }
+.rte5-brand { display:flex; align-items:center; gap:12px; }
+.rte5-logo { width:38px; height:38px; border-radius:10px; border:1px solid rgba(91,140,255,.35); background:rgba(91,140,255,.14); display:flex; align-items:center; justify-content:center; color:var(--terra2); font-size:18px; }
+.rte5-brand-title { font-size:.98rem; font-weight:700; letter-spacing:-.02em; margin:0; }
+.rte5-brand-sub { font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--muted); margin-top:2px; }
+.rte5-cycle { text-align:right; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--muted); }
+.rte5-cycle strong { color:var(--terra2); font-weight:600; }
+.rte5-section { margin:0 0 30px; }
+.rte5-section-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:0 0 12px; }
+.rte5-title { font-size:1.04rem; font-weight:800; color:var(--text); letter-spacing:-.02em; margin:0; display:flex; align-items:center; gap:9px; }
+.rte5-title:before { content:''; width:22px; height:1px; background:var(--terra2); display:inline-block; }
+.rte5-note { font-family:'IBM Plex Mono',monospace; font-size:.67rem; color:var(--weak); }
+.rte5-kicker { font-family:'IBM Plex Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.13em; color:var(--terra2); }
+
+.rte5-situation { position:relative; overflow:hidden; border:1px solid rgba(91,140,255,.24); border-radius:20px; background:radial-gradient(760px 420px at 86% 20%, rgba(91,140,255,.18), transparent 58%), linear-gradient(135deg, rgba(29,36,48,.97), rgba(15,17,21,.99)); padding:28px; display:grid; grid-template-columns:1.25fr .95fr; gap:22px; box-shadow:0 24px 70px rgba(0,0,0,.28); margin-bottom:30px; }
+.rte5-situation:before { content:''; position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size:44px 44px; mask-image:linear-gradient(to right, rgba(0,0,0,.55), transparent 82%); }
+.rte5-sit-left, .rte5-sit-right { position:relative; z-index:1; }
+.rte5-eyebrow { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.66rem; letter-spacing:.13em; text-transform:uppercase; margin-bottom:12px; }
+.rte5-headline { font-family:inherit !important; font-size:clamp(34px,3.4vw,52px); line-height:1.06; font-weight:650; letter-spacing:-0.045em; margin:0 0 24px; max-width:18ch; }
+.rte5-subtitle { font-size:1.0rem; color:var(--muted); line-height:1.65; max-width:820px; margin:0 0 14px; }
+.rte5-thesis-points { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px; }
+.rte5-thesis-point { border:1px solid var(--line); background:rgba(255,255,255,.035); border-radius:12px; padding:12px; min-height:112px; }
+.rte5-point-num { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.72rem; margin-bottom:6px; }
+.rte5-point-text { font-size:.79rem; color:var(--muted); line-height:1.5; }
+.rte5-metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+.rte5-metric { border:1px solid var(--line); background:rgba(15,23,34,.64); border-radius:14px; padding:13px; }
+.rte5-metric-val { font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:1.45rem; color:var(--terra2); line-height:1; }
+.rte5-metric-label { font-size:.72rem; color:var(--muted); margin-top:5px; }
+.rte5-ips-wrap { position:relative; display:inline-block; }
+.rte5-ips-icon { cursor:pointer; color:var(--terra2); font-size:.7rem; vertical-align:super; margin-left:2px; user-select:none; }
+.rte5-ips-tip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+  width:240px; background:#0f1722; border:1px solid var(--line); border-radius:10px;
+  padding:10px 13px; font-size:.74rem; color:var(--muted); line-height:1.55;
+  box-shadow:0 4px 20px rgba(0,0,0,.5); z-index:999; pointer-events:none; }
+.rte5-ips-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-top-color:#0f1722; }
+.rte5-ips-wrap:hover .rte5-ips-tip,
+.rte5-ips-wrap.active .rte5-ips-tip { display:block; }
+.rte5-priority-card { border:1px solid rgba(217,108,108,.34); background:rgba(217,108,108,.07); border-radius:16px; padding:16px; }
+.rte5-priority-label { font-family:'IBM Plex Mono',monospace; color:var(--danger); font-size:.66rem; text-transform:uppercase; letter-spacing:.12em; margin-bottom:8px; }
+.rte5-priority-name { font-size:.95rem; font-weight:800; letter-spacing:-.02em; line-height:1.32; margin-bottom:10px; }
+.rte5-priority-decision { color:var(--text); font-size:.82rem; line-height:1.58; margin-top:10px; border-left:2px solid var(--danger); padding-left:10px; }
+.rte5-decision-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.rte5-decision-mini { border:1px solid var(--line); background:rgba(15,23,34,.48); border-left:3px solid var(--terra2); border-radius:12px; padding:10px; }
+.rte5-decision-mini-head { display:flex; gap:8px; align-items:center; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--terra2); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+.rte5-decision-mini-text { font-size:.78rem; color:var(--text); line-height:1.55; }
+.rte5-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.rte5-chip { --chip:var(--terra2); display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(91,140,255,.45); background:rgba(91,140,255,.11); color:var(--chip); border-radius:999px; padding:3px 8px; font-family:'IBM Plex Mono',monospace; font-size:.64rem; line-height:1.3; }
+
+.rte5-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.rte5-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.rte5-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:16px; }
+.rte5-card.soft { background:rgba(255,255,255,.028); }
+.rte5-card-title { font-size:.92rem; font-weight:800; letter-spacing:-.018em; margin:0 0 8px; }
+.rte5-card-body { font-size:.82rem; color:var(--muted); line-height:1.6; }
+.rte5-mini-label { font-family:'IBM Plex Mono',monospace; color:var(--weak); font-size:.63rem; text-transform:uppercase; letter-spacing:.10em; }
+.rte5-text-full { font-size:.82rem; color:var(--text); line-height:1.68; margin:0; }
+.rte5-details { margin-top:8px; border-top:1px solid var(--line); padding-top:8px; }
+.rte5-details summary { cursor:pointer; list-style:none; font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--terra2); text-transform:uppercase; letter-spacing:.08em; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.rte5-details summary::-webkit-details-marker { display:none; }
+.rte5-details[open] summary span { transform:rotate(45deg); }
+.rte5-details-body { margin-top:8px; }
+
+.rte5-pressure-card { border-left:3px solid var(--c); }
+.rte5-pressure-score { font-family:'IBM Plex Mono',monospace; font-size:2rem; font-weight:800; color:var(--c); line-height:1; }
+.rte5-pressure-score span { font-size:.84rem; color:var(--muted); }
+.rte5-pressure-name { font-size:.82rem; font-weight:800; margin:7px 0 4px; }
+.rte5-pressure-meta { font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--muted); }
+.rte5-pressure-events { margin-top:10px; border-top:1px solid var(--line); padding-top:9px; display:flex; flex-direction:column; gap:7px; }
+.rte5-event { display:flex; gap:7px; font-size:.74rem; line-height:1.42; color:var(--muted); }
+.rte5-event:before { content:'•'; color:var(--c); flex-shrink:0; }
+
+.rte5-mesa { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-horizon { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--panel); }
+.rte5-horizon-head { padding:10px 12px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--c); background:rgba(255,255,255,.035); border-bottom:1px solid var(--line); }
+.rte5-horizon-body { padding:12px; display:flex; flex-direction:column; gap:10px; }
+.rte5-action { background:rgba(15,23,34,.55); border:1px solid var(--line); border-left:3px solid var(--c); border-radius:10px; padding:11px; }
+.rte5-action-vetor { font-family:'IBM Plex Mono',monospace; color:var(--c); font-size:.62rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.rte5-action-text { font-size:.80rem; color:var(--text); line-height:1.6; }
+.rte5-action-risk { font-size:.76rem; color:var(--muted); margin-top:8px; border-top:1px solid var(--line); padding-top:8px; line-height:1.5; }
+.rte5-empty { font-family:'IBM Plex Mono',monospace; color:var(--weak); font-size:.74rem; padding:12px; text-align:center; }
+
+.rte5-map-wrap { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:16px; align-items:start; }
+.rte5-chart-card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; overflow-x:auto; }
+.rte5-chart-card canvas { width:100% !important; min-height:400px; max-height:460px; }
+.rte5-map-side { display:flex; flex-direction:column; gap:10px; }
+.rte5-quad-stat { border:1px solid var(--line); background:rgba(255,255,255,.028); border-left:3px solid var(--c); border-radius:12px; padding:12px; }
+.rte5-quad-num { font-family:'IBM Plex Mono',monospace; color:var(--c); font-size:1.4rem; font-weight:800; line-height:1; }
+.rte5-quad-name { font-size:.78rem; color:var(--text); font-weight:800; margin-top:5px; }
+.rte5-vector-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px; }
+.rte5-vector-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:14px; }
+.rte5-vector-name { font-size:.92rem; font-weight:850; line-height:1.32; letter-spacing:-.02em; margin-bottom:8px; }
+.rte5-vector-meta { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px; }
+.rte5-vector-desc { font-size:.79rem; color:var(--muted); line-height:1.58; margin-bottom:10px; }
+.rte5-vector-decision { border-left:2px solid var(--green); padding-left:10px; font-size:.80rem; color:var(--text); line-height:1.55; margin-top:9px; }
+.rte5-vector-risk { border-left:2px solid var(--amber); padding-left:10px; font-size:.78rem; color:var(--muted); line-height:1.52; margin-top:9px; }
+
+.rte5-capital-panel { display:grid; grid-template-columns:1.2fr .8fr; gap:16px; }
+.rte5-bars { display:flex; flex-direction:column; gap:12px; }
+.rte5-bar-row { display:grid; grid-template-columns:150px 1fr 62px; gap:10px; align-items:center; }
+.rte5-bar-label { font-size:.79rem; color:var(--text); font-weight:700; }
+.rte5-bar-bg { height:8px; background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden; }
+.rte5-bar-fill { height:100%; background:linear-gradient(90deg,var(--terra),var(--terra2)); border-radius:999px; width:calc(var(--w) * 100%); }
+.rte5-bar-level { font-family:'IBM Plex Mono',monospace; color:var(--muted); font-size:.66rem; text-align:right; }
+.rte5-facts { display:grid; grid-template-columns:1fr; gap:8px; }
+.rte5-fact { border:1px solid var(--line); background:rgba(255,255,255,.028); border-radius:10px; padding:10px; }
+.rte5-fact-value { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.95rem; font-weight:800; }
+.rte5-fact-context { font-size:.73rem; color:var(--muted); line-height:1.42; margin-top:3px; }
+
+.rte5-cluster { display:flex; flex-direction:column; }
+.rte5-cluster-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; }
+.rte5-cluster-name { font-size:.96rem; font-weight:850; letter-spacing:-.02em; line-height:1.34; margin-bottom:8px; }
+.rte5-cluster-tese { font-size:.81rem; color:var(--muted); line-height:1.62; }
+.rte5-signal-list { margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+.rte5-signal { display:flex; gap:7px; align-items:flex-start; font-size:.82rem; color:var(--muted); line-height:1.55; }
+.rte5-signal:before { content:'•'; color:var(--terra2); flex-shrink:0; }
+
+.rte5-scenario { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:16px; }
+.rte5-scenario-top { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+.rte5-scenario-num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; color:var(--c); border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.035); font-weight:800; flex-shrink:0; }
+.rte5-scenario-name { font-size:.97rem; font-weight:850; line-height:1.28; }
+.rte5-scenario-meta { font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--muted); margin-top:3px; }
+.rte5-scenario-text { font-size:.82rem; color:var(--muted); line-height:1.64; }
+.rte5-scenario-action { margin-top:12px; border:1px solid rgba(47,168,124,.22); border-left:3px solid var(--green); background:rgba(47,168,124,.07); border-radius:10px; padding:11px; font-size:.80rem; color:var(--text); line-height:1.56; }
+
+.rte5-briefing { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--terra2); border-radius:16px; padding:22px; width:100%; max-width:100%; }
+.rte5-brief-title { font-family:inherit !important; font-size:1.45rem; line-height:1.24; letter-spacing:-.025em; margin:0 0 6px; width:100%; max-width:100% !important; font-weight:800; }
+.rte5-brief-sub { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.75rem; margin-bottom:16px; width:100%; max-width:100% !important; }
+.rte5-brief-opening { font-size:.94rem; color:var(--text); line-height:1.78; margin:0 0 20px; width:100%; max-width:100% !important; display:block; }
+.rte5-brief-segment { border-top:1px solid var(--line); padding-top:16px; margin-top:16px; width:100%; max-width:100%; }
+.rte5-brief-horizon { display:inline-flex; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--amber); border:1px solid rgba(217,164,65,.28); background:rgba(217,164,65,.08); border-radius:999px; padding:3px 9px; margin-bottom:10px; }
+.rte5-brief-p { font-size:.90rem; color:var(--text); line-height:1.82; margin:0 0 12px; width:100%; max-width:100% !important; display:block; }
+.rte5-briefing p { width:100% !important; max-width:100% !important; }
+.rte5-decision-note { background:rgba(217,164,65,.08); border:1px solid rgba(217,164,65,.22); border-left:3px solid var(--amber); color:#F2D48A; border-radius:9px; padding:10px 12px; font-size:.82rem; line-height:1.55; margin:8px 0 0; width:100%; max-width:100% !important; box-sizing:border-box; }
+.rte5-cross { margin-top:18px; background:rgba(91,140,255,.08); border:1px solid rgba(91,140,255,.22); border-left:3px solid var(--terra2); border-radius:11px; padding:13px; font-size:.86rem; color:var(--text); line-height:1.65; width:100%; max-width:100% !important; box-sizing:border-box; }
+
+.rte5-footer { border-top:1px solid var(--line); margin-top:34px; padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; color:var(--weak); font-family:'IBM Plex Mono',monospace; font-size:.66rem; }
+
+@media(max-width:1080px) {
+  .rte5-situation, .rte5-map-wrap, .rte5-capital-panel { grid-template-columns:1fr; }
+  .rte5-thesis-points { grid-template-columns:1fr; }
+}
+@media(max-width:900px) {
+  .rte5-grid-4 { grid-template-columns:repeat(2,1fr); }
+  .rte5-grid-3, .rte5-grid-2, .rte5-mesa, .rte5-vector-cards { grid-template-columns:1fr; }
+  .rte5-cycle { text-align:left; }
+}
+@media(max-width:560px) {
+  .rte5 { padding:0 12px 40px; }
+  .rte5-situation { padding:18px; }
+  .rte5-grid-4 { grid-template-columns:1fr; }
+  .rte5-headline { font-family:inherit !important; font-size:clamp(42px,6vw,64px); line-height:1.02; font-weight:650; letter-spacing:-0.055em; margin:0 0 28px; max-width:13ch; }
+  .rte5-metrics { grid-template-columns:1fr 1fr; }
+  .rte5-bar-row { grid-template-columns:1fr; gap:5px; }
+  .rte5-bar-level { text-align:left; }
+}
+
+/* ── v7 Hero 2 cards ──────────────────────────────────────────────────────── */
+.rte5-hero { border:1px solid rgba(91,140,255,.20); border-radius:22px; background:radial-gradient(900px 500px at 72% 15%,rgba(91,140,255,.11),transparent 52%),linear-gradient(140deg,rgba(22,30,44,.99),rgba(12,17,27,.99)); padding:28px; margin-bottom:30px; box-shadow:0 24px 72px rgba(0,0,0,.32); overflow:hidden; position:relative; }
+.rte5-hero::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px); background-size:52px 52px; mask-image:linear-gradient(to right,rgba(0,0,0,.35),transparent 70%); pointer-events:none; }
+.rte5-hero-eyebrow { font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:12px; position:relative; z-index:1; }
+.rte5-hero-eyebrow::before { content:''; width:16px; height:1px; background:var(--terra2); display:inline-block; }
+.rte5-hero-grid { display:grid; grid-template-columns:1.35fr 0.65fr; gap:20px; position:relative; z-index:1; align-items:stretch; }
+.rte5-hero-card { border:1px solid rgba(255,255,255,.07); border-radius:16px; background:rgba(255,255,255,.022); padding:20px; display:flex; flex-direction:column; gap:12px; }
+.rte5-hero-card.left { background:rgba(91,140,255,.04); border-color:rgba(91,140,255,.16); }
+.rte5-hero-card.right { background:rgba(255,255,255,.018); border-color:rgba(255,255,255,.06); }
+.rte5-hero-xtech { display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(91,140,255,.32); background:rgba(91,140,255,.09); border-radius:999px; padding:3px 12px; font-family:'IBM Plex Mono',monospace; font-size:.65rem; color:var(--terra2); width:fit-content; }
+.rte5-hero-manchete { font-family:inherit !important; font-size:clamp(18px,1.9vw,28px); line-height:1.18; font-weight:750; letter-spacing:-.035em; margin:0; }
+.rte5-hero-texto { font-size:.83rem; color:var(--muted); line-height:1.76; flex:1; }
+.rte5-hero-right-title { font-family:'IBM Plex Mono',monospace; font-size:.62rem; text-transform:uppercase; letter-spacing:.11em; color:var(--weak); margin-bottom:4px; }
+.rte5-hero-chart { width:100%; flex:1; min-height:160px; }
+.rte5-hero-metrics { display:flex; flex-direction:column; gap:6px; border-top:1px solid rgba(255,255,255,.06); padding-top:10px; margin-top:auto; }
+.rte5-hero-metric-row { display:flex; justify-content:space-between; align-items:center; }
+.rte5-hero-metric-label { font-size:.72rem; color:var(--weak); }
+.rte5-hero-metric-val { font-family:'IBM Plex Mono',monospace; font-size:.80rem; font-weight:700; color:var(--text); }
+/* ── v7 extras ──────────────────────────────────────────────────────────── */
+.rte5-grid-2plus3 { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.rte5-cenario-card { background:#151F2E; border-radius:12px; padding:16px; }
+.rte5-cenario-titulo { font-size:.92rem; font-weight:700; color:#E6EDF3; margin-bottom:4px; line-height:1.4; }
+.rte5-cen-head:hover { opacity:.9; }
+
+/* ── v7 Cockpit ──────────────────────────────────────────────────────────── */
+.rte5-ck-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rte5-ck-num { border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); border-radius:10px; padding:10px 12px; }
+.rte5-ck-val { font-family:'IBM Plex Mono',monospace; font-size:1.18rem; font-weight:800; color:#79A3FF; line-height:1; margin-bottom:3px; }
+.rte5-ck-lbl { font-size:.66rem; color:#718096; line-height:1.3; }
+
+/* ── v7 Impacto xTech ───────────────────────────────────────────────────────── */
+.rte5-impacto-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.rte5-impacto-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--c); border-radius:14px; padding:14px; }
+.rte5-impacto-xtech { font-family:'IBM Plex Mono',monospace; font-size:.60rem; text-transform:uppercase; letter-spacing:.10em; color:var(--c); margin-bottom:8px; }
+.rte5-impacto-dir { font-size:1.3rem; font-weight:800; line-height:1; margin-bottom:6px; }
+.rte5-impacto-texto { font-size:.76rem; color:var(--muted); line-height:1.58; }
+.rte5-impacto-urg { font-family:'IBM Plex Mono',monospace; font-size:.62rem; margin-top:9px; padding-top:8px; border-top:1px solid var(--line); color:var(--weak); }
+
+/* ── v7 Graph anchor text ───────────────────────────────────────────────────── */
+.rte5-graph-anchor { font-size:.83rem; color:var(--muted); line-height:1.65; border-left:3px solid var(--terra2); padding:10px 14px; background:rgba(91,140,255,.05); border-radius:0 10px 10px 0; margin-bottom:14px; }
+
+/* ── v7 Score badge ─────────────────────────────────────────────────────────── */
+.rte5-score-badge { display:inline-flex; align-items:center; gap:5px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.055); border-radius:999px; padding:2px 9px; font-family:'IBM Plex Mono',monospace; font-size:.63rem; color:var(--muted); }
+
+/* ── v7 Fatos Duros ─────────────────────────────────────────────────────────── */
+.rte5-fatos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rte5-fato-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:14px 16px; }
+.rte5-fato-valor { font-family:'IBM Plex Mono',monospace; font-size:1.45rem; font-weight:800; color:var(--terra2); line-height:1; margin-bottom:6px; }
+.rte5-fato-contexto { font-size:.79rem; color:var(--muted); line-height:1.55; }
+.rte5-fato-xtech { margin-top:10px; }
+
+/* ── v8 Lente de Decisão ───────────────────────────────────────────────────── */
+.rte5-lente-card { border-left:3px solid var(--c); }
+.rte5-lente-perfil { font-family:'IBM Plex Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.12em; color:var(--c); margin-bottom:12px; }
+.rte5-lente-label { display:block; font-family:'IBM Plex Mono',monospace; font-size:.60rem; color:var(--weak); text-transform:uppercase; letter-spacing:.09em; margin-bottom:3px; }
+.rte5-lente-sinal, .rte5-lente-decisao, .rte5-lente-risco { font-size:.80rem; color:var(--text); line-height:1.55; margin-bottom:10px; padding-left:8px; border-left:2px solid rgba(255,255,255,.07); }
+.rte5-lente-risco { color:var(--muted); }
+
+/* ── v7 Cenários xTech tabs ─────────────────────────────────────────────────── */
+.rte5-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.rte5-tab-btn { font-family:'IBM Plex Mono',monospace; font-size:.68rem; padding:5px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.10); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; }
+.rte5-tab-btn.active { border-color:var(--terra2); background:rgba(91,140,255,.12); color:var(--terra2); font-weight:700; }
+.rte5-tab-panel { display:none; }
+.rte5-tab-panel.active { display:block; }
+.rte5-cenario-card { border:1px solid var(--line); background:var(--panel); border-left:3px solid var(--terra2); border-radius:14px; padding:18px; }
+.rte5-cenario-titulo { font-size:.96rem; font-weight:800; letter-spacing:-.018em; line-height:1.32; margin-bottom:6px; }
+.rte5-cenario-horizonte { font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--amber); display:inline-flex; border:1px solid rgba(217,164,65,.28); background:rgba(217,164,65,.07); border-radius:999px; padding:2px 9px; margin-bottom:12px; }
+.rte5-cenario-narrativa { font-size:.83rem; color:var(--muted); line-height:1.68; }
+.rte5-cenario-mem { margin-top:12px; font-size:.77rem; color:var(--weak); border-top:1px solid var(--line); padding-top:10px; font-style:italic; }
+
+/* ── v7 Convergência ────────────────────────────────────────────────────────── */
+.rte5-conv-card { border:1px solid var(--line); background:var(--panel); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+.rte5-conv-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.rte5-conv-titulo { font-size:.93rem; font-weight:800; letter-spacing:-.018em; line-height:1.3; }
+.rte5-conv-nivel { font-family:'IBM Plex Mono',monospace; font-size:.60rem; text-transform:uppercase; letter-spacing:.10em; }
+.rte5-conv-narrativa { font-size:.79rem; color:var(--muted); line-height:1.60; }
+.rte5-conv-sinais { font-size:.73rem; color:var(--muted); border-top:1px solid var(--line); padding-top:8px; }
+
+/* ── v7 CTA ─────────────────────────────────────────────────────────────────── */
+.rte5-cta-section { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.rte5-cta-card { border:1px solid var(--line); border-radius:18px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+.rte5-cta-card.empresa { background:rgba(47,168,124,.06); border-color:rgba(47,168,124,.28); }
+.rte5-cta-card.live { background:rgba(91,140,255,.06); border-color:rgba(91,140,255,.28); }
+.rte5-cta-kicker { font-family:'IBM Plex Mono',monospace; font-size:.64rem; text-transform:uppercase; letter-spacing:.13em; }
+.rte5-cta-card.empresa .rte5-cta-kicker { color:var(--green); }
+.rte5-cta-card.live .rte5-cta-kicker { color:var(--terra2); }
+.rte5-cta-headline { font-size:1.05rem; font-weight:800; letter-spacing:-.02em; line-height:1.32; }
+.rte5-cta-desc { font-size:.83rem; color:var(--muted); line-height:1.65; }
+.rte5-cta-btn { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:10px 22px; font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; text-decoration:none; cursor:pointer; border:none; }
+.rte5-cta-card.empresa .rte5-cta-btn { background:rgba(47,168,124,.18); color:var(--green); border:1px solid rgba(47,168,124,.40); }
+.rte5-cta-card.live .rte5-cta-btn { background:rgba(91,140,255,.18); color:var(--terra2); border:1px solid rgba(91,140,255,.40); }
+.rte5-cta-data { font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--weak); }
+
+@media(max-width:1080px) {
+  .rte5-hero, .rte5-cta-section { grid-template-columns:1fr; }
+  .rte5-impacto-grid { grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:900px) {
+  .rte5-impacto-grid { grid-template-columns:repeat(2,1fr); }
+  .rte5-fatos-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:560px) {
+  .rte5-impacto-grid, .rte5-fatos-grid { grid-template-columns:1fr; }
+  .rte5-hero-pills { flex-direction:column; }
+}
+
+/* ── Cabeçalhos de Horizonte (v9) ── */
+.radar-horizonte-header {
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 20px;
+  margin:40px 0 18px;
+  padding:14px 20px 14px 22px;
+  border-left:3px solid #5B8CFF;
+  background:linear-gradient(90deg, rgba(91,140,255,.10) 0%, rgba(91,140,255,.03) 60%, transparent 100%);
+  border-radius:0 12px 12px 0;
+}
+.horizonte-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.78rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.12em;
+  color:#79A3FF;
+  flex-shrink:0;
+}
+.horizonte-audiencia {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem; color:#A8B3C2;
+  flex-shrink:0;
+}
+.horizonte-pergunta {
+  font-size:.82rem; font-style:italic;
+  color:#E6EDF3; opacity:.75;
+  flex-grow:1;
+}
+@media(max-width:700px) {
+  .radar-horizonte-header { flex-direction:column; gap:5px; }
+}
+</style>
+
+<div class="rte5-header">
+  <div class="rte5-brand">
+    <div class="rte5-logo">⌁</div>
+    <div>
+      <div class="rte5-brand-title">Radar xTechs</div>
+      <div class="rte5-brand-sub">Painel de Inteligência das 5 Frentes Tecnológicas · efagundes.com</div>
+    </div>
+  </div>
+  <div class="rte5-cycle"><strong>Ciclo 2026-06-27</strong> · v27<br>59 sinais · 102 fontes monitoradas · 27 países</div>
+</div><div class="radar-horizonte-header"><span class="horizonte-label">Horizonte 1 · Operação e monitoramento</span><span class="horizonte-audiencia">Para: analistas, gestores, consultores</span><span class="horizonte-pergunta">&#8220;O que mudou hoje? O que devo monitorar?&#8221;</span></div>
+<section class="rte5-situation" id="sala-situacao">
+  <div class="rte5-sit-left">
+    <div class="rte5-eyebrow">Sala de Situação Executiva <span style="color:#718096;font-family:'IBM Plex Mono',monospace;font-size:.68rem;">· dados até 2026-06-27</span></div>
+    <h1 class="rte5-headline">A crise de reestruturação da Braskem, a consolidação do mercado livre e a explosão de data centers de IA redefinem simultaneamente os vetores de risco e oportunidade da infraestrutura energética e industrial brasileira.</h1>
+    <p class="rte5-subtitle" style="font-style:italic">A recusa dos credores à recuperação extrajudicial eleva o custo de capital de toda a cadeia química e pressiona fornecedores e investidores expostos ao ativo.</p>
+    <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px">A Braskem, maior produtora de plásticos das Américas, teve seu plano de recuperação extrajudicial rejeitado por credores em junho de 2026, sinalizando deterioração do perfil de crédito e risco de insolvência de um ativo estratégico para a indústria química brasileira. Em paralelo, a Dívida Pública Federal ultrapassou R$ 9 trilhões em maio de 2026, com avanço mensal de 2,66 por cento, restringindo o espaço de absorção pública de riscos privados. Conselheiros expostos à cadeia petroquímica devem mapear contrapartes e converter incerteza jurídica em provisão financeira imediata.</p>
+    
+    <div style="margin-top:14px"><span class="rte5-chip" style="--chip:#79A3FF">Crise de Reestruturação da Braskem e Risco Sistêmico Petroquímico</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (3)</summary><div style="margin-top:5px"><a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQTFdNUTAtMXYwOUpUX09XUUxNMnhYcUp5c2Npd21KZkVpQWNSM2ZDUkJydHZFZzE2dkJwb3lvdUhMcGFHX2Z0M2tvemRaSXlxeC1rblJGQUZRU3RMSmQwYjJKdFlWVnVuV0NpUEpkMUdSNlNuNW5iN2t2eXl6ekxiZWxIdmlaOHpheUxRM0sxOHhrTDFJ?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Braskem tem plano de reestruturação com recuperação extrajudicial rejeitado por credores</a><a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxNY3V4bVBzQ2RlQ1VKUDZmOWgwenVvcFFwQ2ZqWWk5R3l3U0JCOTZCR0xCaVNNZFZCeHIyOXJZNDRpMVJ1WExiRlpTamxhNXBRbkZrUkQ2QTFZNktiYzd0WmJBZ1c4bzZDUlhDWGhmZzhfNHBWSlZvVk1NRzNIN1JBZUJBNHExVkpHY2pZOVB2RGlGNkdFWTlhZmV1QQ?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Braskem busca proteção judicial contra credores</a><a href="https://agenciabrasil.ebc.com.br/economia/noticia/2026-06/divida-publica-sobe-266-em-maio-e-supera-r-9-trilhoes" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Dívida Pública sobe 2,66% em maio e supera R$ 9 trilhões</a></div></details><span class="rte5-chip" style="--chip:#79A3FF">Reconfiguração Estrutural do Mercado Livre de Energia no Brasil</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (5)</summary><div style="margin-top:5px"><a href="https://megawhat.uol.com.br/combustiveis/biocombustiveis/projeto-de-biometano-da-solvi-essencis-entra-no-reidi-e-reduz-custo-tributario-em-r-415-milhoes/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Projeto de biometano da Solvi Essencis entra no Reidi e reduz custo tributário em R$ 41,5 milhões</a><a href="https://megawhat.uol.com.br/economia-e-politica/com-mercado-livre-mais-complexo-pequenas-comercializadoras-devem-desaparecer/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Com mercado livre mais complexo, pequenas comercializadoras devem desaparecer, diz Mosna</a><a href="https://megawhat.uol.com.br/economia-e-politica/negocios/taesa-conclui-migracao-de-42-unidades-para-acl-em-parceria-com-a-lead-energy/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Taesa conclui migração de 42 unidades para o Ambiente de Contratação Livre em parceria com a Lead Energy</a><a href="https://megawhat.uol.com.br/podcasts/%f0%9f%8e%99%ef%b8%8fcopa-do-mundo-e-mmgd-acendem-alerta-e-gold-de-volta-a-aneel/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Copa do Mundo e Microgeração Distribuída acendem alerta e Gold retorna à Aneel</a><a href="https://megawhat.uol.com.br/destaques-do-diario/axia-e-edp-obtem-autorizacao-da-aneel-para-operar-usinas-solares-como-pie/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">GeraçãoAxia e EDP obtêm autorização da Aneel para operar usinas solares como Produtor Independente de Energia</a></div></details><span class="rte5-chip" style="--chip:#79A3FF">Armazenamento de Energia, BESS e Maturação da Transição Energética Global</span><details style="margin:5px 0 14px 0"><summary style="font-family:'IBM Plex Mono',monospace;font-size:.60rem;text-transform:uppercase;letter-spacing:.09em;color:#718096;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none"><span style="font-size:.55rem">▶</span> Fontes (4)</summary><div style="margin-top:5px"><a href="https://cleantechnica.com/2026/06/27/intersolar-europe-2026-key-takeaways/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">InterSolar Europe 2026 - Principais Conclusões</a><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNM0ppaXRkVUFEZmdwaTNNcEFEYnVIQnZ1WDdGSmE3WWNBeEt4Y2V3c24zT2swVERudnJRQk1IaG5HdUNvcUhfakVoOTBtMS1iQTFQSmNpN0ZGWldQV2pYcjQzN3NwTEZTUGNjSmhFSDJILUp5NDlUTGxVOUJvbVVKdg?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Resumo Executivo – Ampliação da Flexibilidade da Demanda – Análise</a><a href="https://cleantechnica.com/2026/06/27/energy-storage-sodium-ion-salt-battery-us-coalition/" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Armazenamento de Energia Emerge Como o Grande Equalizador, Independentemente da Administração Trump</a><a href="https://news.google.com/rss/articles/CBMivgFBVV95cUxQejFRSnNtX3VYd3pNclBuanhfRTVoaXM0UTcyTmJnOHNiQzJRS1FWMVZwLTR4UGpZY2lDR29FNGFmS1BTSkRWOWl5ZG5jcmFKcnIxQVlyVEhLX25rVkJqcmdFcGNXX3BKcU0xUGpQcmt4a2FnanpXYVU1SUFTbllSRktHU183WHBTY3dld1M3d2lTU29VVDhfMmVOZTh4OHFZTHNWeGZET3JUN3ZHN0I4Zk9sMkR0VldwZ2w3aFB3?oc=5" target="_blank" rel="noopener" style="display:block;font-size:.82rem;color:#718096;line-height:1.55;text-decoration:none;margin-top:2px;padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">Baterias rápidas, prazos lentos: O balanço da CATL sobre a PEG-5 da Guatemala</a></div></details></div>
+  </div>
+  <div class="rte5-sit-right">
+    <div class="rte5-metrics">
+      <div class="rte5-metric"><div class="rte5-metric-val">59</div><div class="rte5-metric-label">sinais monitorados</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">102</div><div class="rte5-metric-label">fontes ativas</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">27</div><div class="rte5-metric-label">países cobertos</div></div>
+      <div class="rte5-metric"><div class="rte5-metric-val">3.4</div><div class="rte5-metric-label"><span class="rte5-ips-wrap">IPS médio<span class="rte5-ips-icon" onclick="this.closest('.rte5-ips-wrap').classList.toggle('active')">ⓘ</span><span class="rte5-ips-tip">IPS médio considera o universo total de sinais monitorados. Os vetores exibidos são apenas os priorizados — por isso seus IPS individuais são mais altos que a média geral.</span></span></div></div>
+    </div>
+    
+  </div>
+</section><section class="rte5-section" id="lente-decisao"><div class="rte5-section-head"><h2 class="rte5-title">Lente de Decisão</h2><span class="rte5-note">Para quem este ciclo fala — e o que não pode esperar</span></div><div class="rte5-grid-3"><div class="rte5-card rte5-lente-card" style="--c:#D96C6C"><div class="rte5-lente-perfil">Gestor de Risco / CRO</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>Plano extrajudicial da Braskem foi rejeitado e a empresa pediu proteção judicial, ameaçando a continuidade de fornecimento de insumos petroquímicos.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Mapear em semanas a exposição contratual e de estoque à Braskem e ativar fornecedores alternativos de resinas e insumos.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>O contágio via cadeia petroquímica pode atingir clientes de segunda ordem ainda ausentes do mapa de concentração de fornecedores.</div></div><div class="rte5-card rte5-lente-card" style="--c:#79A3FF"><div class="rte5-lente-perfil">Empreendedor / Fundador</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>Pequenas comercializadoras de energia entram em rota de extinção enquanto agregadores de escala dominam o Ambiente de Contratação Livre.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Decidir agora entre vender, fundir ou buscar escala antes que a janela de consolidação feche e a avaliação despenque.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>Perda de poder de barganha como vendedor isolado num mercado que recompensa apenas plataformas com volume crítico.</div></div><div class="rte5-card rte5-lente-card" style="--c:#2FA87C"><div class="rte5-lente-perfil">Especialista Técnico / Engenheiro</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>Vulnerabilidades zero-day em sistemas OT e SCADA expõem infraestruturas críticas, com dependência de fornecedores sob restrição geopolítica.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Ativar em semanas os protocolos de resposta a zero-day e auditar dependências de ferramentas de segurança com risco geopolítico.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>Patches de fornecedores sancionados podem ser bloqueados, deixando sistemas SCADA sem suporte no momento de um incidente.</div></div><div class="rte5-card rte5-lente-card" style="--c:#D9A441"><div class="rte5-lente-perfil">Investidor / Alocador</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>Data centers de IA, como o projeto de 7,5 MW da Elea em Belém, avançam para Norte e Nordeste pressionando transmissão e contratos longos.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Reposicionar alocação para ativos de transmissão e geração fora do eixo Sudeste antes da precificação dos gargalos.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>Concentração de carga de IA em regiões com transmissão limitada pode gerar curtailment e contratos encalhados não modelados.</div></div><div class="rte5-card rte5-lente-card" style="--c:#5B8CFF"><div class="rte5-lente-perfil">Head de Compliance / ESG / Jurídico</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>A reestruturação judicial da Braskem cria credores conflitantes e exige coordenação regulatória federal para preservar a cadeia.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Revisar exposição jurídica a contratos da Braskem e formalizar engajamento com reguladores e credores nas próximas semanas.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>Cláusulas de cross-default e garantias cruzadas na cadeia petroquímica podem disparar obrigações fora do escopo de compliance atual.</div></div><div class="rte5-card rte5-lente-card" style="--c:#A78BFA"><div class="rte5-lente-perfil">Conselheiro / Executivo</div><div class="rte5-lente-sinal"><span class="rte5-lente-label">Sinal deste ciclo</span>Armazenamento BESS amadurece globalmente, abrindo janela de primeiros entrantes na remuneração de flexibilidade junto a ANEEL e ONS.</div><div class="rte5-lente-decisao"><span class="rte5-lente-label">Decisão que não pode esperar</span>Aprovar projetos-piloto de BESS em escala comercial agora para garantir posição antes da definição regulatória de flexibilidade.</div><div class="rte5-lente-risco"><span class="rte5-lente-label">Risco fora do seu modelo</span>Esperar o marco regulatório de BESS amadurecer pode entregar o mercado de flexibilidade a concorrentes pioneiros.</div></div></div></section>
+<section class="rte5-section" id="mapa-pressao">
+  <div class="rte5-section-head"><h2 class="rte5-title">Mapa de Pressão Estratégica × Janela de Decisão</h2></div>
+  <div class="rte5-map-wrap">
+    <div class="rte5-chart-card"><canvas id="rte5-vetores-canvas"></canvas></div>
+    <div class="rte5-map-side">
+        <div class="rte5-quad-stat" style="--c:#D96C6C">
+          <div class="rte5-quad-num">2</div>
+          <div class="rte5-quad-name">Mobilizar Agora</div>
+        </div>
+        
+        <div class="rte5-quad-stat" style="--c:#2FA87C">
+          <div class="rte5-quad-num">5</div>
+          <div class="rte5-quad-name">Capturar Vantagem</div>
+        </div>
+        
+        <div class="rte5-quad-stat" style="--c:#5B8CFF">
+          <div class="rte5-quad-num">1</div>
+          <div class="rte5-quad-name">Monitorar Vetores</div>
+        </div>
+        
+        <div class="rte5-quad-stat" style="--c:#718096">
+          <div class="rte5-quad-num">0</div>
+          <div class="rte5-quad-name">Ruído Operacional</div>
+        </div>
+        </div>
+  </div>
+  <div class="rte5-section-head" style="margin-top:18px"><h3 class="rte5-title">Vetores Prioritários do Mapa</h3></div>
+  <div class="rte5-vector-cards">
+<div class="rte5-vector-card" style="--c:#D96C6C">
+  <div class="rte5-vector-name">Crise de Reestruturação da Braskem e Risco Sistêmico Petroquímico</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#D96C6C">Mobilizar Agora</span><span class="rte5-chip" style="--chip:#D9A441">Pressão 6.8/10</span><span class="rte5-chip" style="--chip:#D9A441">Curta</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Crítico</span><span class="rte5-chip" style="--chip:#79A3FF">3 sinais</span></div>
+  <div class="rte5-vector-desc">A rejeição do plano de recuperação extrajudicial da Braskem e a busca por proteção judicial contra credores expõem a cadeia petroquímica nacional a risco de contração severa de oferta de resinas e polímeros. O canal de oferta de capital está adicionalmente comprimido pelo crescimento da dívida pública federal, que superou R$ 9 trilhões em maio de 2026 com alta de 2,66% no mês, elevando o prêmio de risco e encarecendo o refinanciamento corporativo. A convergência desses dois mecanismos — insolvência operacional e restrição macroeconômica de crédito — cria risco sistêmico para indústrias a jusante que dependem de insumos petroquímicos.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Mapear imediatamente a exposição contratual e de estoque a insumos petroquímicos da Braskem, ativar planos de contingência de fornecimento alternativo e engajar credores e reguladores federais para coordenar solução que preserve continuidade operacional da cadeia.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Empresas da cadeia a jusante enfrentam interrupção de fornecimento de resinas e polímeros sem alternativa doméstica de curto prazo, forçando importações emergenciais a custo elevado e expondo contratos de fornecimento a inadimplência em cascata.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (3) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQTFdNUTAtMXYwOUpUX09XUUxNMnhYcUp5c2Npd21KZkVpQWNSM2ZDUkJydHZFZzE2dkJwb3lvdUhMcGFHX2Z0M2tvemRaSXlxeC1rblJGQUZRU3RMSmQwYjJKdFlWVnVuV0NpUEpkMUdSNlNuNW5iN2t2eXl6ekxiZWxIdmlaOHpheUxRM0sxOHhrTDFJ?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Braskem tem plano de reestruturação com recuperação extrajudicial rejeitado por credores — XP Conteúdos</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxNY3V4bVBzQ2RlQ1VKUDZmOWgwenVvcFFwQ2ZqWWk5R3l3U0JCOTZCR0xCaVNNZFZCeHIyOXJZNDRpMVJ1WExiRlpTamxhNXBRbkZrUkQ2QTFZNktiYzd0WmJBZ1c4bzZDUlhDWGhmZzhfNHBWSlZvVk1NRzNIN1JBZUJBNHExVkpHY2pZOVB2RGlGNkdFWTlhZmV1QQ?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Braskem busca proteção judicial contra credores — Brasil Energia</a></div><div class="rte5-signal"><a href="https://agenciabrasil.ebc.com.br/economia/noticia/2026-06/divida-publica-sobe-266-em-maio-e-supera-r-9-trilhoes" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Dívida Pública sobe 2,66% em maio e supera R$ 9 trilhões — Agência Brasil</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#D96C6C">
+  <div class="rte5-vector-name">Segurança Cibernética em Infraestruturas Críticas e Soberania Digital</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#D96C6C">Mobilizar Agora</span><span class="rte5-chip" style="--chip:#5B8CFF">Pressão 5.9/10</span><span class="rte5-chip" style="--chip:#D9A441">Imediata</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Crítico</span><span class="rte5-chip" style="--chip:#79A3FF">2 sinais</span></div>
+  <div class="rte5-vector-desc">A distribuição anônima de vulnerabilidades zero-day em repositórios públicos reduz drasticamente o tempo de resposta de operadores de infraestrutura crítica — energia, telecomunicações e sistemas financeiros — antes que patches estejam disponíveis, criando janelas de exploração com potencial de impacto sistêmico. Simultaneamente, a decisão regulatória ad hoc nos EUA sobre acesso seletivo a modelos avançados de IA como o Mythos da Anthropic estabelece precedente de controle geopolítico sobre tecnologias habilitadoras críticas, expondo o Brasil a dependência assimétrica em ferramentas de defesa cibernética e automação de infraestrutura. A convergência desses dois sinais configura risco de segurança digital com horizonte imediato.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Ativar imediatamente protocolos de resposta a zero-day em sistemas OT e SCADA, revisar dependências de fornecedores de ferramentas de segurança cibernética com restrições geopolíticas e engajar o CSIRT setorial para coordenação de inteligência de ameaças.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Operadores de infraestrutura crítica sem planos de resposta a zero-day atualizados ficam expostos a interrupções operacionais não planejadas com potencial de cascata entre setores interdependentes, além de responsabilização regulatória crescente.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (2) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://github.com/bikini/exploitarium" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Conta anônima no GitHub distribuindo vulnerabilidades zero-day não divulgadas — Hacker News Tech</a></div><div class="rte5-signal"><a href="https://www.ft.com/content/4b578b5c-258a-48f5-a5e9-15eef5659573" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Administração Trump permite acesso parcial ao Mythos da Anthropic — Financial Times</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#2FA87C">
+  <div class="rte5-vector-name">Reconfiguração Estrutural do Mercado Livre de Energia no Brasil</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#2FA87C">Capturar Vantagem</span><span class="rte5-chip" style="--chip:#D9A441">Pressão 6.5/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Alto</span><span class="rte5-chip" style="--chip:#79A3FF">5 sinais</span></div>
+  <div class="rte5-vector-desc">A combinação de aumento de complexidade regulatória no Ambiente de Contratação Livre, incentivos fiscais via Reidi para projetos de biometano com redução tributária de R$ 41,5 milhões para a Solvi Essencis, autorização de novos geradores solares como Produtores Independentes de Energia e a migração de 42 unidades consumidoras pela Taesa para o ACL sinaliza uma reconfiguração estrutural acelerada do mercado de energia brasileiro. O mecanismo regulatório favorece players com escala, capacidade de compliance e acesso a capital, enquanto elimina comercializadoras de menor porte incapazes de absorver os custos fixos crescentes. Esse processo cria janelas de consolidação e diferenciação competitiva para agentes bem posicionados.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Avaliar oportunidades de consolidação de comercializadoras em processo de saída, revisar portfólio de contratos no ACL para incorporar fontes com vantagem tributária e investir em plataformas de compliance e gestão de risco regulatório.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Empresas que não reposicionarem sua estratégia comercial e operacional no ACL perderão clientes para agregadores com maior escala e perderão janelas de aquisição de comercializadoras menores em processo de saída do mercado.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (5) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://megawhat.uol.com.br/combustiveis/biocombustiveis/projeto-de-biometano-da-solvi-essencis-entra-no-reidi-e-reduz-custo-tributario-em-r-415-milhoes/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Projeto de biometano da Solvi Essencis entra no Reidi e reduz custo tributário em R$ 41,5 milhões — MegaWhat</a></div><div class="rte5-signal"><a href="https://megawhat.uol.com.br/economia-e-politica/com-mercado-livre-mais-complexo-pequenas-comercializadoras-devem-desaparecer/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Com mercado livre mais complexo, pequenas comercializadoras devem desaparecer, diz Mosna — MegaWhat</a></div><div class="rte5-signal"><a href="https://megawhat.uol.com.br/economia-e-politica/negocios/taesa-conclui-migracao-de-42-unidades-para-acl-em-parceria-com-a-lead-energy/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Taesa conclui migração de 42 unidades para o Ambiente de Contratação Livre em parceria com a Lead Energy — MegaWhat</a></div><div class="rte5-signal"><a href="https://megawhat.uol.com.br/podcasts/%f0%9f%8e%99%ef%b8%8fcopa-do-mundo-e-mmgd-acendem-alerta-e-gold-de-volta-a-aneel/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Copa do Mundo e Microgeração Distribuída acendem alerta e Gold retorna à Aneel — MegaWhat</a></div><div class="rte5-signal"><a href="https://megawhat.uol.com.br/destaques-do-diario/axia-e-edp-obtem-autorizacao-da-aneel-para-operar-usinas-solares-como-pie/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">GeraçãoAxia e EDP obtêm autorização da Aneel para operar usinas solares como Produtor Independente de Energia — MegaWhat</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#2FA87C">
+  <div class="rte5-vector-name">Armazenamento de Energia, BESS e Maturação da Transição Energética Global</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#2FA87C">Capturar Vantagem</span><span class="rte5-chip" style="--chip:#D9A441">Pressão 6.2/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Médio</span><span class="rte5-chip" style="--chip:#79A3FF">4 sinais</span></div>
+  <div class="rte5-vector-desc">As conclusões da InterSolar Europe 2026, a análise global sobre escalabilidade de flexibilidade de demanda e a emergência do armazenamento de energia como equalizador competitivo independente de fonte convergem para indicar que o ecossistema integrado solar-BESS-smart grid está atingindo maturidade comercial em mercados desenvolvidos, com redução de custos que pressiona a adoção no Brasil. O caso de atrasos em projeto de BESS na Guatemala evidencia que a execução operacional ainda representa risco relevante em mercados emergentes, sinalizando que a vantagem competitiva será capturada por agentes com capacidade de gestão de projetos complexos. A flexibilidade de demanda emerge como vetor regulatório e técnico prioritário para o ONS e a ANEEL.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Iniciar projetos-piloto de BESS em escala comercial, engajar ANEEL e ONS no desenho de mecanismos de remuneração de flexibilidade e desenvolver capacidade interna de gestão de projetos de armazenamento para capturar a janela de primeiros entrantes.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Agentes que não desenvolverem competência técnica e regulatória em BESS e flexibilidade de demanda perderão posição competitiva quando o marco regulatório brasileiro for atualizado, ficando dependentes de tecnologia e know-how importados a custo elevado.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (4) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://cleantechnica.com/2026/06/27/intersolar-europe-2026-key-takeaways/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">InterSolar Europe 2026 - Principais Conclusões — CleanTechnica</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNM0ppaXRkVUFEZmdwaTNNcEFEYnVIQnZ1WDdGSmE3WWNBeEt4Y2V3c24zT2swVERudnJRQk1IaG5HdUNvcUhfakVoOTBtMS1iQTFQSmNpN0ZGWldQV2pYcjQzN3NwTEZTUGNjSmhFSDJILUp5NDlUTGxVOUJvbVVKdg?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Resumo Executivo – Ampliação da Flexibilidade da Demanda – Análise — IEA</a></div><div class="rte5-signal"><a href="https://cleantechnica.com/2026/06/27/energy-storage-sodium-ion-salt-battery-us-coalition/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Armazenamento de Energia Emerge Como o Grande Equalizador, Independentemente da Administração Trump — CleanTechnica</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMivgFBVV95cUxQejFRSnNtX3VYd3pNclBuanhfRTVoaXM0UTcyTmJnOHNiQzJRS1FWMVZwLTR4UGpZY2lDR29FNGFmS1BTSkRWOWl5ZG5jcmFKcnIxQVlyVEhLX25rVkJqcmdFcGNXX3BKcU0xUGpQcmt4a2FnanpXYVU1SUFTbllSRktHU183WHBTY3dld1M3d2lTU29VVDhfMmVOZTh4OHFZTHNWeGZET3JUN3ZHN0I4Zk9sMkR0VldwZ2w3aFB3?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Baterias rápidas, prazos lentos: O balanço da CATL sobre a PEG-5 da Guatemala — Energía Estratégica</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#2FA87C">
+  <div class="rte5-vector-name">Explosão de Demanda por Energia em Data Centers e IA no Brasil</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#2FA87C">Capturar Vantagem</span><span class="rte5-chip" style="--chip:#D9A441">Pressão 6.2/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Alto</span><span class="rte5-chip" style="--chip:#79A3FF">3 sinais</span></div>
+  <div class="rte5-vector-desc">O anúncio do data center de 7,5 MW da Elea em Belém dedicado a cargas de inteligência artificial e o início da construção do campus da Ada Infrastructure em São Paulo evidenciam uma aceleração da demanda por energia elétrica, conectividade e água por parte da infraestrutura digital no Brasil. O mecanismo de transmissão é direto via canal de oferta: a concentração de cargas intensivas em regiões com infraestrutura de transmissão ainda em desenvolvimento pressiona o ONS e a ANEEL a antecipar reforços de rede. A interseção entre expansão de IA, eficiência hídrica corporativa e regulação ambiental cria um vetor de alta complexidade para operadores de infraestrutura crítica.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Engajar proativamente ONS e ANEEL para mapear gargalos de transmissão em regiões de expansão de data centers, estruturar PPAs de longo prazo com garantia de fornecimento ininterrupto e desenvolver soluções de eficiência hídrica alinhadas a padrões internacionais.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Operadores de transmissão e distribuidoras que não anteciparem os reforços de rede necessários enfrentarão restrições de conexão, multas regulatórias e perda de contratos com clientes de alto valor agregado do setor de tecnologia.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (3) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://teletime.com.br/26/06/2026/elea-data-center-75-mw-para-ia-belem/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Elea anuncia data center de 7,5 MW para demandas de inteligência artificial em Belém — Teletime</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOVkJiakk0b2UxVmZSR0pvekpkZnR0U2NZaGNNSjdSbkhQbGFwU2oyejBmVE9Gb0JWazV6dEloRTN2SjFtOEVBNmdqZGtZRUxwOG42Sm9ZM2xwa1hWWXFCWlZTSnVMRnNNcTZJVmdiU2Rrc2JtSlQ0aUh2b25PN0FJeGJqMjA1b2NGMHZ6dlVER1MzdFFUeXdzaUxJTlkwT0pEUk1ubnRibm5FUWR1eTRhVEZjNHNLZjFYaDFySktlUC0?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Ada Infrastructure inicia construção de campus de data centers em São Paulo, Brasil — Data Center Dynamics</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxOOF9hOFFLUFk2Nlc0Y0prdzA4LWVPdW1fR2hBaWxHWGE4UEJWSjJ6RlJsTG9oSEdsX3JuMm9jZFlnbXZockRPeEpCSU5ndGNJcFR2YjZFREdHRkRlSFEyV3Jfa3FRdDNFLXVocTRUVE01Uks4cktBdWJmMk1fRmJXS2taZFUtNWp5QkFYcldGOUY1T2hoRXo5Qk1IUXFpOTA0My1TeXA5N0VMRDg?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Microsoft afirma positividade hídrica em operações de data centers — Data Center Dynamics</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#2FA87C">
+  <div class="rte5-vector-name">IA, Automação e Disrupção do Mercado de Trabalho no Brasil</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#2FA87C">Capturar Vantagem</span><span class="rte5-chip" style="--chip:#5B8CFF">Pressão 6.0/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Alto</span><span class="rte5-chip" style="--chip:#79A3FF">2 sinais</span></div>
+  <div class="rte5-vector-desc">A adoção acelerada de inteligência artificial em processos produtivos e administrativos, amplificada por avanços em eficiência de inferência de modelos de linguagem via decodificação especulativa que reduzem o custo computacional por requisição, cria pressão estrutural sobre o mercado de trabalho brasileiro em segmentos de baixa e média qualificação. O mecanismo de transmissão opera via canal de oferta de trabalho: a redução de custo de automação torna a substituição de funções repetitivas economicamente viável em escala, enquanto a ausência de políticas públicas de requalificação profissional amplifica o risco de desemprego estrutural. Esse vetor tem implicações diretas para a competitividade industrial e para a demanda por infraestrutura de computação no Brasil.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Desenvolver roadmap de automação com plano integrado de requalificação profissional, engajar o conselho de administração na definição de política corporativa de IA responsável e mapear funções críticas com risco de substituição nos próximos 24 meses.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Empresas que não desenvolverem estratégias proativas de requalificação e reposicionamento de força de trabalho enfrentarão pressão regulatória crescente, conflitos trabalhistas e dano reputacional que comprometerão a licença social para operar em setores intensivos em automação.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (2) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxQeWI1RnBKSkxuTTVucm10V0ZGMmxjT3l3WFRybHB6YTRNYldwME92eXZYa0wzLU9oaEdQX0lKcnRUVWFWTUZHN2s4bklRNFRBQVY5QklIWGh1MnZlemFqR0VVbzlTbnVwaTNSSjdCYWVmWGhfSnVQR3lxbUJLNElWbHlTUTRWcE9xNnBxVjV3U21sUE8xQXfSAaYBQVVfeXFMTjNMbVRiRjluekZuQWh1NGM1ME9YTzQxVHN4Z1VGajhzcDJoOUkzSzVZa3N2eWltMUQwNkI0enFua09UMTNQRkhUUEZnY3VkczgzbUdZeGF4SWN3eHdaTVVfVkVkbEVGLXg4RGZTOEdMYmtjaENDaTdBVjZyVXQ5RlNQRnl1V2E2ZDhaOVJvOFV3Ti1ycGpKcGl6QkRrOTV5a202Y21pZw?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Mito: a inteligência artificial criará mais empregos do que destruirá — RethinkX</a></div><div class="rte5-signal"><a href="https://github.com/deepseek-ai/DeepSpec/blob/main/DSpark_paper.pdf" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">DSpark: Decodificação especulativa acelera inferência de modelos de linguagem de grande escala — Hacker News Tech</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#2FA87C">
+  <div class="rte5-vector-name">Regulação Ambiental, Emissões e Expansão da Fronteira de Exploração Energética</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#2FA87C">Capturar Vantagem</span><span class="rte5-chip" style="--chip:#5B8CFF">Pressão 5.7/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Alto</span><span class="rte5-chip" style="--chip:#79A3FF">3 sinais</span></div>
+  <div class="rte5-vector-desc">A concentração de mais de 50% das emissões de gases de efeito estufa do Brasil em sete estados cria foco regulatório e pressão de stakeholders sobre regiões específicas, enquanto a ANP indica 86 blocos adicionais na Margem Equatorial para leilão, expandindo a fronteira de exploração em área de alta sensibilidade ambiental e geopolítica. A tensão geopolítica nos mercados globais de energia, com pressões sobre importações de petróleo russo e riscos no Estreito de Ormuz, eleva o valor estratégico da autossuficiência energética brasileira via canal de preço, mas amplifica o escrutínio ambiental sobre novos projetos de exploração. A convergência desses mecanismos exige posicionamento estratégico que equilibre segurança energética e compromissos de descarbonização.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Estruturar estratégia integrada de participação nos leilões da Margem Equatorial com plano de gestão de riscos ambientais e sociais robusto, engajando reguladores ambientais e comunidades locais antes da submissão de propostas.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Empresas que não posicionarem estratégia integrada de exploração e descarbonização perderão janelas de licenciamento favoráveis e ficarão expostas a contestações regulatórias e ambientais que inviabilizarão projetos já em fase de desenvolvimento.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (3) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxQQW9UX18zcHVUMUExQnNfUFVINE5FVFpyWDM3N2NnZWVwdmhsekxKS1J3bE1nNUN4RF9tbkhvOUwzczVwQVRscHUzYUlGcWY4aG0wOFd3ZDl1Q01Kb1Fia0NMVlpyemV6dDhmYWYzaFZ2NTdkWS1fTm5qRDJBd0lla1ZCN0Z1em5QbVJPSndRQTlKZmZ3OWUtXw?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">ANP indica mais 86 blocos na Margem Equatorial para leilão — Brasil Energia</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxQUll4R013YlF1bnI1TTdEN3NjMXd6TncwTUVMd1RYcllKOEExTU10ZlA1bnF2d0RUOE8yS1B5V1p6WV9HQUYxMWc5S1g0a0ZORl9hYlJhNkV4S1VVLXZzZVM5ejRBSEFTeDBWX2w2RTU5b2ZrSUFfUEo1eHJwRWp4Z25lVTRfYTVtQXBNX3h5UWJZUk9NbmxaazR4T01GTV93UVlSRFNDZVJERjdYQ1NEYXUzRFViNW1NenZYY1M2MGw?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Sete estados concentram mais da metade das emissões de gases de efeito estufa do Brasil — Conexão Planeta</a></div><div class="rte5-signal"><a href="https://www.ft.com/content/573aa813-43c1-4c2c-aa1d-72f05af960ab" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Estados Bálticos pressionam UE para acelerar proibição de importações de petróleo russo — Financial Times</a></div></div></div>
+</details>
+</div>
+<div class="rte5-vector-card" style="--c:#5B8CFF">
+  <div class="rte5-vector-name">Geopolítica de Semicondutores, Cadeias de TI e Soberania Tecnológica</div>
+  <div class="rte5-vector-meta"><span class="rte5-chip" style="--chip:#5B8CFF">Monitorar Vetores</span><span class="rte5-chip" style="--chip:#5B8CFF">Pressão 4.8/10</span><span class="rte5-chip" style="--chip:#D9A441">Média</span><span class="rte5-chip" style="--chip:#D96C6C">Custo Médio</span><span class="rte5-chip" style="--chip:#79A3FF">3 sinais</span></div>
+  <div class="rte5-vector-desc">A busca da Apple por chips de memória de empresa chinesa na lista negra dos EUA expõe a fragilidade das cadeias globais de semicondutores a decisões regulatórias ad hoc que alteram custos e disponibilidade de componentes críticos para toda a indústria de tecnologia. O mecanismo de transmissão para o Brasil opera via canal cambial e canal de preço: a elevação de custo de semicondutores impacta diretamente o custo de equipamentos de TI, servidores para data centers e dispositivos de automação industrial, afetando a competitividade de projetos de infraestrutura digital e manufatura avançada. A ausência de capacidade doméstica de fabricação de chips amplifica a exposição brasileira a choques externos nessa cadeia.</div>
+  <div class="rte5-vector-decision"><strong>Decisão recomendada:</strong> Diversificar a base de fornecedores de equipamentos de TI e servidores, incorporar cláusulas de proteção contra choques de fornecimento em contratos de longo prazo e engajar o governo federal na agenda de política industrial para semicondutores e eletrônicos.</div>
+  <div class="rte5-vector-risk"><strong>Consequência da inação:</strong> Empresas que não diversificarem sua cadeia de fornecimento de equipamentos de TI e não desenvolverem estratégias de hedge de custo de semicondutores ficarão expostas a interrupções de fornecimento e elevação de capex em projetos de infraestrutura digital em momentos de escalada geopolítica.</div>
+  
+<details class="rte5-details ">
+  <summary>FONTES (3) <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal"><a href="https://www.ft.com/content/d72a25e2-7bde-4aa9-bd8d-0c4f3d6cb2cb" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Apple busca comprar chips de memória de empresa chinesa na lista negra — Financial Times</a></div><div class="rte5-signal"><a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNUzYtSlF1dWx2a2wxRUpWc1VCRE9tclRoM1NqSjY2b2htMDkwS2RFLS01ZzVpakxEMzdUbFVMZ0NXLTcxRkJHbGh6cExJRmNwUW42OFJBVDZaSDNUS1JSa0lyZWZ6WVBMWFgyalhLa0c1VjhLYjlPTHgwMlRscV9IYnZhQzkxSDN3N0hyUGN4dEZzRW01VkV2VXMxYXpFSGhqbkE?oc=5" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Benefícios Operacionais – Múltiplos Benefícios da Eficiência Energética para Negócios – Análise — IEA</a></div><div class="rte5-signal"><a href="https://cleantechnica.com/2026/06/27/climate-tech-claims-red-flags-money-policy/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">Afirmações de Tecnologias Climáticas Precisam de Validação Crítica Antes de Receber Financiamento — CleanTechnica</a></div></div></div>
+</details>
+</div></div>
+  <script>
+  (function() {
+    function loadChart(cb) {
+      if (window.Chart) { cb(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+      s.onload = cb;
+      document.head.appendChild(s);
+    }
+    loadChart(function() {
+      var ctx = document.getElementById('rte5-vetores-canvas');
+      if (!ctx || !window.Chart) return;
+      var quadrantPlugin = {
+        id:'rte5Quadrants',
+        beforeDatasetsDraw:function(chart) {
+          var ca = chart.chartArea, sx = chart.scales.x, sy = chart.scales.y, c = chart.ctx;
+          var midX = sx.getPixelForValue(0.5), midY = sy.getPixelForValue(5);
+          c.save();
+          c.fillStyle='rgba(91,140,255,.055)'; c.fillRect(ca.left, midY, midX-ca.left, ca.bottom-midY);
+          c.fillStyle='rgba(111,106,99,.05)'; c.fillRect(midX, midY, ca.right-midX, ca.bottom-midY);
+          c.fillStyle='rgba(47,168,124,.075)'; c.fillRect(ca.left, ca.top, midX-ca.left, midY-ca.top);
+          c.fillStyle='rgba(217,108,108,.08)'; c.fillRect(midX, ca.top, ca.right-midX, midY-ca.top);
+          c.font='11px IBM Plex Mono, monospace'; c.fillStyle='rgba(168,179,194,.72)';
+          c.fillText('Monitorar Vetores', ca.left+8, ca.bottom-10);
+          c.fillText('Ruído Operacional', midX+8, ca.bottom-10);
+          c.fillText('Capturar Vantagem', ca.left+8, ca.top+18);
+          c.fillText('Mobilizar Agora', midX+8, ca.top+18);
+          c.restore();
+        }
+      };
+      new Chart(ctx, {
+        type:'bubble',
+        data: { datasets: [{"label": "Risco Regulatório", "data": [{"x": 0.662, "y": 6.76, "r": 10.5, "nome": "Crise de Reestruturação da Braskem e Risco Sistêmico Petroquímico", "quadrante": "Mobilizar Agora", "janela": "Curta", "custo": "Crítico", "sinais": 3}, {"x": 0.88, "y": 5.89, "r": 9.0, "nome": "Segurança Cibernética em Infraestruturas Críticas e Soberania Digital", "quadrante": "Mobilizar Agora", "janela": "Imediata", "custo": "Crítico", "sinais": 2}], "backgroundColor": "#D96C6C99", "borderColor": "#D96C6C", "borderWidth": 1.5, "hitRadius": 10}, {"label": "Misto", "data": [{"x": 0.438, "y": 6.5, "r": 13.5, "nome": "Reconfiguração Estrutural do Mercado Livre de Energia no Brasil", "quadrante": "Capturar Vantagem", "janela": "Média", "custo": "Alto", "sinais": 5}, {"x": 0.402, "y": 5.68, "r": 10.5, "nome": "Regulação Ambiental, Emissões e Expansão da Fronteira de Exploração Energética", "quadrante": "Capturar Vantagem", "janela": "Média", "custo": "Alto", "sinais": 3}], "backgroundColor": "#A8B3C299", "borderColor": "#A8B3C2", "borderWidth": 1.5, "hitRadius": 10}, {"label": "Sinal Tecnológico", "data": [{"x": 0.402, "y": 6.21, "r": 12.0, "nome": "Armazenamento de Energia, BESS e Maturação da Transição Energética Global", "quadrante": "Capturar Vantagem", "janela": "Média", "custo": "Médio", "sinais": 4}, {"x": 0.438, "y": 5.97, "r": 9.0, "nome": "IA, Automação e Disrupção do Mercado de Trabalho no Brasil", "quadrante": "Capturar Vantagem", "janela": "Média", "custo": "Alto", "sinais": 2}], "backgroundColor": "#5B8CFF99", "borderColor": "#5B8CFF", "borderWidth": 1.5, "hitRadius": 10}, {"label": "Oportunidade de Mercado", "data": [{"x": 0.42, "y": 6.19, "r": 10.5, "nome": "Explosão de Demanda por Energia em Data Centers e IA no Brasil", "quadrante": "Capturar Vantagem", "janela": "Média", "custo": "Alto", "sinais": 3}], "backgroundColor": "#2FA87C99", "borderColor": "#2FA87C", "borderWidth": 1.5, "hitRadius": 10}, {"label": "Choque Geopolítico", "data": [{"x": 0.42, "y": 4.79, "r": 10.5, "nome": "Geopolítica de Semicondutores, Cadeias de TI e Soberania Tecnológica", "quadrante": "Monitorar Vetores", "janela": "Média", "custo": "Médio", "sinais": 3}], "backgroundColor": "#D9A44199", "borderColor": "#D9A441", "borderWidth": 1.5, "hitRadius": 10}] },
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins: {
+            legend: { labels: { color:'#A8B3C2', font:{ family:'IBM Plex Mono', size:11 } } },
+            tooltip: {
+              displayColors:false,
+              callbacks: {
+                title:function(items) { return items[0] ? items[0].raw.nome : ''; },
+                label:function(context) {
+                  var d=context.raw;
+                  return ['Quadrante: '+d.quadrante, 'Pressão: '+d.y.toFixed(1)+'/10 · Janela: '+d.janela, 'Custo de espera: '+d.custo+' · '+d.sinais+' sinais'];
+                }
+              }
+            }
+          },
+          scales: {
+            x: { min:0, max:1, title:{ display:true, text:'Janela de Decisão — direita = mais urgente', color:'#A8B3C2' }, ticks:{ color:'#A8B3C2', callback:function(v){ return v>=.80?'Imediata':v>=.55?'Curta':v>=.28?'Média':v>=.09?'Longa':''; } }, grid:{ color:'rgba(255,255,255,.06)' } },
+            y: { min:0, max:10, title:{ display:true, text:'Pressão Estratégica — 0 a 10', color:'#A8B3C2' }, ticks:{ color:'#A8B3C2' }, grid:{ color:'rgba(255,255,255,.06)' } }
+          }
+        },
+        plugins:[quadrantPlugin]
+      });
+    });
+  })();
+  </script>
+  <div style="font-size:.70rem;color:#718096;font-family:'IBM Plex Mono',monospace;padding:4px 0 0 2px">Período coberto: 2026-06-27</div>
+</section><div class="radar-horizonte-header"><span class="horizonte-label">Horizonte 2 · Planejamento estratégico</span><span class="horizonte-audiencia">Para: diretores, C-level, comitês de estratégia</span><span class="horizonte-pergunta">&#8220;Qual é a tendência de 6–18 meses? Onde estão os riscos?&#8221;</span></div><style>.rte5-filter-btn{font-family:"IBM Plex Mono",monospace;font-size:.68rem;padding:6px 12px;border-radius:999px;border:1px solid rgba(91,140,255,.35);cursor:pointer;transition:transform .16s,box-shadow .16s,background .16s;}.rte5-filter-btn:hover{transform:translateY(-1px);}.rte5-filter-active{font-weight:700;box-shadow:0 0 0 2px currentColor;}</style>
+<section class="rte5-section" id="intel-graph">
+  <div class="rte5-section-head">
+    <h2 class="rte5-title">Grafo de Inteligência — 5 Frentes xTechs</h2>
+    <span class="rte5-note">Zoom · Drag · Movimento contínuo · Clique para detalhes</span>
+  </div>
+  <p style="font-size:.84rem;color:#A8B3C2;line-height:1.70;margin:0 0 14px;width:100%;max-width:100%;box-sizing:border-box;display:block;">O Grafo de Inteligência processa cinco frentes tecnológicas simultaneamente. <strong style="color:#E6EDF3">Nós maiores = frentes xTech</strong>. <span style="color:#B48EFF">● Roxos = Memórias Estratégicas</span> — padrões acumulados em múltiplos ciclos; a <em>espessura da conexão</em> reflete o <strong>peso (strength)</strong> da memória: linhas mais largas indicam padrões de maior força e persistência histórica. <span style="color:#79A3FF">● Azuis = Zettels</span> — sínteses de alta precisão com janela de ação definida; linhas tracejadas indicam conexão indireta via memória-pai. <span style="color:#D96C6C">● Vermelhos = Entidades regulatórias</span> que condicionam o ambiente de cada frente. Clique em qualquer nó para ver a análise e o peso de conexão.</p>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;"><button class="rte5-filter-btn rte5-filter-active" style="border-color:#79A3FF55;background:#79A3FF18;color:#AFC4FF;" onclick="rte5GrFilter(null,this)">Todas as frentes</button><button class="rte5-filter-btn" style="border-color:#2FA87C55;background:#2FA87C18;color:#2FA87C;" onclick="rte5GrFilter('EnergyTech',this)">EnergyTech</button><button class="rte5-filter-btn" style="border-color:#5DCAA555;background:#5DCAA518;color:#5DCAA5;" onclick="rte5GrFilter('CleanTech',this)">CleanTech</button><button class="rte5-filter-btn" style="border-color:#7AB64855;background:#7AB64818;color:#7AB648;" onclick="rte5GrFilter('AgriTech',this)">AgriTech</button><button class="rte5-filter-btn" style="border-color:#5B8CFF55;background:#5B8CFF18;color:#5B8CFF;" onclick="rte5GrFilter('DeepTech',this)">DeepTech</button><button class="rte5-filter-btn" style="border-color:#D9A44155;background:#D9A44118;color:#D9A441;" onclick="rte5GrFilter('FinTech',this)">FinTech</button></div>
+  </div>
+  <div class="rte5-card" style="padding:0;overflow:hidden;border-radius:10px;background:radial-gradient(circle at 50% 50%,rgba(91,140,255,.08),transparent 45%),#0F1722;">
+    <svg id="rte5-gr-svg" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid meet"
+         style="width:100%;height:auto;max-height:460px;display:block;cursor:grab;">
+      <g id="rte5-gr-g"></g>
+    </svg>
+  </div>
+  <div style="font-size:.70rem;color:#718096;text-align:right;margin-top:4px;font-family:'IBM Plex Mono',monospace;">
+    scroll para zoom · arraste para mover · movimento contínuo · clique no nó para detalhes · duplo clique centraliza
+  </div>
+  <div id="rte5-gr-info" style="margin-top:10px;padding:14px 16px;background:#131D2B;border-radius:12px;font-size:.84rem;color:#A8B3C2;line-height:1.65;min-height:78px;border:1px solid rgba(255,255,255,.06);">
+    <span style="color:#718096;font-family:'IBM Plex Mono',monospace;font-size:.75rem;">▸ Clique em qualquer nó para ver detalhes.</span>
+  </div>
+<script>
+(function() {
+  const detail = {"frente_EnergyTech": {"label": "EnergyTech", "type": "frente", "color": "#2FA87C", "sinais": 820, "fatos": 38, "desc": "Frente mais densa do banco — 820+ sinais acumulados. Cobre geração, transmissão, BESS, mercado livre e regulação setorial.", "analise": "EnergyTech concentra os temas de maior impacto no ciclo atual: BESS em decolagem regulatória (ANEEL autorizou primeira unidade), Data Centers como novo vetor de demanda elétrica (201 sinais, score 4.48 em queda pós-pico), insegurança jurídica no mercado livre (LRCap homologado apesar de liminar estadual) e modernização do ONS com ferramentas eletroenergéticas. O sub-tema mais crítico é a coexistência entre segurança regulatória federal e contestação judicial local — risco que se converteu de abstrato para concreto com a suspensão cautelar no caso Electra.", "acao": "Mapear exposição de contratos CCEE a liminares ativas; estruturar SPE para leilão BESS 2026-27; incluir prêmio de risco jurídico nos modelos de CAPEX."}, "frente_CleanTech": {"label": "CleanTech", "type": "frente", "color": "#5DCAA5", "sinais": 310, "fatos": 14, "desc": "Transição energética limpa — H₂ verde, lítio, mobilidade elétrica e descarbonização industrial.", "analise": "Score caiu de 8.75 (W18) para 5.75 (W23) — a tese do H₂ verde continua válida mas a janela de política industrial está se fechando. MME realizou intercâmbio técnico sobre lítio (abr/2026) mas portaria com roadmap H₂ verde ainda pendente. Custo LFP caiu 40% desde 2022, tornando BESS competitivo mesmo sem subsídio. Mobilidade elétrica pressiona por infraestrutura de carga — integração com smart grid (V2G) é o diferencial competitivo emergente.", "acao": "Pressionar por portaria MME com cronograma H₂ verde antes de Q1 2027; articular linha BNDES específica; modelar V2G para frotas."}, "frente_AgriTech": {"label": "AgriTech", "type": "frente", "color": "#7AB648", "sinais": 185, "fatos": 9, "desc": "Agronegócio digital — precision farming, crédito rural open finance, sensores IoT e monitoramento climático.", "analise": "SELIC elevada comprime crédito rural convencional, criando oportunidade para fintechs de crédito agrícola baseadas em Open Finance. Embrapa Carbon+ abre nova vertente de monetização de carbono no agro. Satélites LEO (Starlink) desbloqueiam IoT em regiões remotas sem cobertura 5G. Risco climático crescente aumenta demanda por modelos preditivos de produtividade — janela para SaaS agro premium.", "acao": "Mapear editais de parceria Embrapa; avaliar Embrapa Carbon+ para créditos de carbono; piloto de crédito rural via Open Finance Phase 4."}, "frente_DeepTech": {"label": "DeepTech", "type": "frente", "color": "#5B8CFF", "sinais": 420, "fatos": 18, "desc": "Tecnologias profundas — IA aplicada, 5G industrial, computação de borda, cibersegurança e regulação digital.", "analise": "IA em infraestrutura crítica é o sub-tema mais denso (201 sinais). Score de DCs caiu 47% em 7 semanas por pressão tributária e tarifária — estrutural, não pontual. 5G industrial avança em corredores logísticos (Anatel liberou faixas em 2025). PL de IA em fase final no Congresso — aprovação esperada 2026-27. Cibersegurança em infraestrutura crítica volta à agenda após incidentes internacionais. Antecipação regulatória é o diferencial competitivo.", "acao": "Engajar processo legislativo do PL IA; preparar framework de governança de IA; piloto 5G industrial em corredor logístico prioritário."}, "frente_FinTech": {"label": "FinTech", "type": "frente", "color": "#D9A441", "sinais": 255, "fatos": 11, "desc": "Finanças digitais — Open Finance, tokenização de ativos energéticos, crédito alternativo e infraestrutura de pagamentos.", "analise": "Pix atingiu 9 bilhões de transações/mês — infraestrutura de pagamentos madura. Open Finance Phase 4 (dados de investimentos) desbloqueará casos de uso de wealth management e crédito rural personalizado. CVM avaliando sandbox para tokens de utilidade energética e RECs tokenizados — aprovação esperada 2026-27. SELIC acima de 13% cria spread bancário elevado que favorece fintechs de crédito alternativo. BCB mantém postura pró-inovação.", "acao": "Acompanhar Open Finance Phase 4; preparar estrutura jurídica para tokens de utilidade energética; monitorar sandbox CVM."}, "mem_1": {"label": "Segurança Jurídica Setor Elétrico", "type": "memory", "color": "#9B7BC4", "forca": 9.0, "sinais": 28, "fatos": 4, "desc": "Risco jurídico como fator estrutural de precificação no setor elétrico.", "analise": "A homologação do LRCap pela ANEEL apesar de liminar estadual no Ceará (jun/2026) criou precedente: a regulação federal resiste, mas o mecanismo de contestação local permanece aberto. Suspensão cautelar de R$ 14,875 mi em pagamento à Continental Comercializadora mostra que contratos CCEE podem ser travados individualmente por decisão judicial. Efeito: prêmio de risco jurídico embutido em novos projetos de geração e transmissão.", "acao": "Auditoria de contratos CCEE ativos; incluir cláusulas de proteção contra suspensão cautelar em novos contratos antes do próximo ciclo de liquidação."}, "mem_2": {"label": "Data Centers & IA — Demanda Elétrica", "type": "memory", "color": "#9B7BC4", "forca": 9.0, "sinais": 201, "fatos": 8, "desc": "Maior vetor de nova demanda elétrica 2025-30 — 201 sinais, o tema mais denso do banco.", "analise": "Score caiu de 8.38 (W15) para 4.48 (W22) — queda de 47% em 7 semanas. Pressões concretas: ISS municipal elevado, tarifa industrial acima da média global, gargalos na rede de transmissão, falta de mão de obra. Mas a demanda estrutural não vai recuar: cada cluster de GPUs consome 50-100 MW contínuos. Brasil com energia renovável barata pode ser competitivo SE resolver tarifas e infraestrutura.", "acao": "Pressão regulatória por tarifa especial para DCs junto à ANEEL; parcerias com transmissoras para conexão direta; monitorar regime tributário ISS."}, "mem_3": {"label": "Transição Solar, BESS & Smart Grid", "type": "memory", "color": "#9B7BC4", "forca": 8.0, "sinais": 72, "fatos": 11, "desc": "BESS como ponto de inflexão do sistema elétrico — maior densidade de fatos verificados do banco.", "analise": "72 sinais sobre BESS, 11 fatos canônicos. ANEEL autorizou primeira unidade armazenadora (mai/2026). Portaria de leilão BESS publicada. Custo LFP caiu 40% desde 2022. Modelo de negócio claro: arbitragem de ponta + suporte de frequência. ONS criou área de ferramentas eletroenergéticas (jun/2026) — smart grid saindo do gatilho tecnológico.", "acao": "Estruturar projetos BESS para o primeiro leilão específico (previsto 2026-27); modelar receita combinada de ancilares + arbitragem + capacidade firme."}, "mem_4": {"label": "Esgotamento Fiscal & Custo de Capital", "type": "memory", "color": "#9B7BC4", "forca": 8.0, "sinais": 42, "fatos": 3, "desc": "Compressão estrutural de margem de investimento afeta todas as 5 frentes.", "analise": "Ciclo fiscal exaurido comprime capacidade de subsídio governamental para transição energética. SELIC elevada (>13% a.a.) torna custo de capital de projetos renováveis 40-60% mais caro que Europa. Agências internacionais revisaram rating de empresas do setor energético. Decisões de CAPEX nos próximos 90 dias vão carregar esse prêmio embutido.", "acao": "Priorizar projetos com financiamento BNDES já aprovado; evitar estruturas com alta alavancagem em dólar; renegociar spreads de financiamento existentes."}, "mem_5": {"label": "H₂ Verde — Janela de 18 Meses", "type": "memory", "color": "#9B7BC4", "forca": 7.0, "sinais": 40, "fatos": 2, "desc": "Oportunidade com prazo definido — janela se fechando sem política industrial federal.", "analise": "40 sinais. Score caiu de 8.75 (W18) para 5.75 (W23). Brasil tem potencial competitivo real: menor custo de eletricidade renovável do mundo. Mas sem dutos de escoamento, sem contratos firmes com importadores europeus e sem subsídio federal definido, projetos migram para outros países (Portugal, Marrocos, Austrália). Se o MME não publicar portaria com cronograma concreto até Q1 2027, a janela fecha.", "acao": "Pressão por portaria MME com roadmap H₂; engajar BNDES para linha específica; conectar com compradores europeus via mecanismo CBAM."}, "zet_101": {"label": "Ciclo Fiscal Exaurido & Compressão Capital", "type": "zettel", "color": "#5B8CFF", "forca": 8.5, "sinais": 15, "desc": "Zettel multifacetado — compressão de margem afeta 4 frentes simultaneamente.", "analise": "SELIC + fiscal exaurido + câmbio comprimem espaço para investimento público-privado em infraestrutura. No agro: crédito rural mais caro cria demanda por precisão digital. Em energia: projetos marginais deixam de fechar sem garantias. Em FinTech: spread bancário elevado cria oportunidade para crédito alternativo via Open Finance. Confirmado por revisão de rating soberano.", "acao": "Priorizar projetos com garantias firmes de receita (PPA de longo prazo, contratos regulados)."}, "zet_102": {"label": "Modernização da Rede Elétrica via BESS", "type": "zettel", "color": "#5B8CFF", "forca": 8.2, "sinais": 12, "desc": "Brasil pode liderar BESS na América Latina até 2028.", "analise": "ANEEL reconhece insuficiência do modelo atual e está aberta a marcos inovadores para armazenamento. Custo LFP tornou BESS competitivo sem subsídio em mercados com spread de ponta acima de R$ 200/MWh — Brasil tem esse spread. Primeiro leilão específico BESS previsto para 2026-27 vai definir o modelo de receita. Software de smart grid e automação de rede são gargalos regulatórios, não tecnológicos.", "acao": "Estruturar SPE para BESS antes do leilão; modelar receita combinada: ancilares + arbitragem + capacidade firme."}, "zet_103": {"label": "H₂ Verde: Janela Crítica de Política Industrial", "type": "zettel", "color": "#5B8CFF", "forca": 7.5, "sinais": 9, "desc": "Ação federal coordenada Tesouro-BNDES-MME é pré-requisito para capturar a oportunidade.", "analise": "A eficácia de garantias soberanas para mobilizar capital privado em transição energética é comprovada (Austrália, Chile). Sem coordenação federal, o capital migra para jurisdições com marcos claros. A urgência da transição global cria oportunidades concentradas em janelas de 3-5 anos — janela atual vai até 2027.", "acao": "Articular coalizão setorial para pressão por portaria MME; modelar estrutura de garantia soberana para H₂ verde."}, "zet_104": {"label": "Infraestrutura de Mobilidade Elétrica & 5G", "type": "zettel", "color": "#5B8CFF", "forca": 7.2, "sinais": 8, "desc": "5G industrial + V2G como diferencial competitivo para cadeias automotivas.", "analise": "Fragmentação de cadeias pós-USMCA cria janelas para jurisdições com infraestrutura digital integrada. 5G industrial em corredores logísticos gera retorno multiplicador via manufatura de alto valor. V2G (vehicle-to-grid) pode transformar frotas de EV em storage distribuído — modelo de negócio emergindo. Integração entre política de mobilidade elétrica, regulação e planejamento de infraestrutura é pré-requisito.", "acao": "Engajar Anatel para licenciamento 5G industrial; mapear corredores logísticos para projetos piloto V2G."}, "zet_105": {"label": "Insegurança Jurídica no Setor Elétrico", "type": "zettel", "color": "#5B8CFF", "forca": 7.0, "sinais": 7, "desc": "Prêmio de risco jurídico desestimula renováveis e transmissão.", "analise": "O precedente LRCap mostrou que a homologação federal resiste, mas o risco mudou: de risco de regra para risco de execução contratual caso a caso. Esse tipo é mais difícil de precificar porque depende do contrato, foro e contraparte. Bancos e fundos estão reprecificando spread de financiamento no setor elétrico. Projetos marginais que dependiam de custo de capital baixo podem não fechar mais.", "acao": "Mapear exposição de contratos CCEE a liminares ativas; incluir prêmio de risco jurídico explícito nos modelos de CAPEX e captação."}, "zet_106": {"label": "Regulação Digital & Tributação de IA", "type": "zettel", "color": "#5B8CFF", "forca": 6.5, "sinais": 11, "desc": "Janela regulatória ainda aberta — quem antecipa, lidera por 18-24 meses.", "analise": "PL de IA em fase final no Congresso — aprovação esperada 2026-27. OCDE pressionando harmonização tributária para plataformas digitais antes de legislação doméstica. CVM avaliando sandbox para tokens de utilidade energética. Antecipação regulatória reduz custos de adaptação: empresas que modelarem conformidade agora terão vantagem competitiva significativa.", "acao": "Engajar processo legislativo do PL IA com análise de impacto setorial; preparar framework interno de governança de IA."}, "ent_201": {"label": "ANEEL", "type": "entity", "color": "#D96C6C", "forca": 9.5, "sinais": 120, "fatos": 9, "desc": "Agência Nacional de Energia Elétrica — principal ator regulatório do setor.", "analise": "Decisões recentes de alto impacto: autorização da primeira unidade de armazenamento por baterias (mai/2026), homologação do LRCap apesar de liminar estadual (jun/2026), portaria regulamentando leilões de BESS. A revisão tarifária periódica das distribuidoras e os leilões de transmissão são os dois maiores vetores de CAPEX do setor.", "acao": "Monitorar calendário de leilões ANEEL 2026-27; acompanhar revisão tarifária de distribuidoras chave."}, "ent_202": {"label": "ONS", "type": "entity", "color": "#D96C6C", "forca": 9.2, "sinais": 85, "fatos": 6, "desc": "Operador Nacional do Sistema — ator central no despacho e gestão da rede.", "analise": "Em junho/2026, o ONS criou área dedicada ao desenvolvimento de ferramentas eletroenergéticas — sinal de modernização institucional e abertura para digital twin do SIN. É o ator central no despacho de geração e gestão de restrições de transmissão. Decisões do ONS sobre despacho térmico afetam diretamente o PLD e a competitividade de BESS.", "acao": "Acompanhar publicações técnicas do ONS sobre ferramentas eletroenergéticas e modelos de operação com BESS."}, "ent_203": {"label": "BNDES", "type": "entity", "color": "#D96C6C", "forca": 8.8, "sinais": 60, "fatos": 5, "desc": "Banco Nacional de Desenvolvimento — principal financiador de renováveis e infraestrutura.", "analise": "Taxas padronizadas (TLP + spread setorial) são referência para modelagem de projetos. Linhas específicas para BESS e smart grid ainda em discussão interna — aprovação esperada até Q4 2026. Ator-chave para viabilização do H₂ verde (linha de garantia soberana necessária). BNDES Agro Digital em consulta pública.", "acao": "Acompanhar lançamento de linha BNDES para BESS; engajar gerência de energia para H₂ verde e AgriTech Digital."}, "ent_204": {"label": "MME", "type": "entity", "color": "#D96C6C", "forca": 8.5, "sinais": 70, "fatos": 5, "desc": "Ministério de Minas e Energia — ator-chave para política industrial de H₂ e lítio.", "analise": "O MME realizou intercâmbio técnico internacional sobre cadeia de valor do lítio (abr/2026). É o ator-chave para definição da política industrial do H₂ verde — portaria com roadmap ainda pendente. O Plano Decenal de Energia (PDE) define os leilões de expansão de capacidade para os próximos 10 anos. Coordena a posição do Brasil nas negociações do CBAM com a União Europeia.", "acao": "Acompanhar PDE 2034; monitorar portaria H₂ verde; engajar GTI Lítio do MME."}, "ent_205": {"label": "BCB", "type": "entity", "color": "#D96C6C", "forca": 8.3, "sinais": 45, "fatos": 4, "desc": "Banco Central do Brasil — indutor do Open Finance e do Pix.", "analise": "O BCB é o arquiteto do ecossistema de Open Finance — compartilhamento de dados com consentimento gerando casos reais de crédito rural personalizado e scoring alternativo para MEI. Avança com Open Insurance e Open Investments. A SELIC acima de 13% é o principal fator de custo de capital para projetos de energia. Decisões de política monetária impactam diretamente a viabilidade de projetos de infraestrutura.", "acao": "Monitorar reuniões COPOM; acompanhar evolução do Open Finance Phase 4 (dados de investimentos)."}, "ent_206": {"label": "CVM", "type": "entity", "color": "#D96C6C", "forca": 7.9, "sinais": 22, "fatos": 2, "desc": "Comissão de Valores Mobiliários — reguladora de tokens de energia e RECs.", "analise": "A CVM está avaliando sandbox regulatório para tokens de utilidade energética e ativos tokenizados — decisão esperada para 2026-27. A aprovação desbloquearia um mercado de tokenização de créditos de carbono, RECs (Renewable Energy Certificates) e contratos bilaterais de energia em blockchain. Score médio de 9.0 nos sinais relacionados reflete alta expectativa do mercado.", "acao": "Acompanhar sandbox CVM; preparar estrutura jurídica para emissão de tokens de utilidade energética."}, "ent_207": {"label": "Embrapa", "type": "entity", "color": "#D96C6C", "forca": 7.6, "sinais": 18, "fatos": 2, "desc": "Empresa Brasileira de Pesquisa Agropecuária — âncora de inovação no AgriTech.", "analise": "A Embrapa é a principal âncora de transferência tecnológica para o agronegócio brasileiro. Parcerias com startups agritech para validação de sensores IoT e modelos preditivos de produtividade. A Embrapa Carbon+ é iniciativa relevante para monetização de créditos de carbono no agro. Sua rede de 42 unidades espalhadas pelo Brasil facilita adoção tecnológica em regiões remotas.", "acao": "Mapear editais de parceria Embrapa para startups; avaliar Embrapa Carbon+ para créditos de carbono agropecuários."}, "ent_208": {"label": "Anatel", "type": "entity", "color": "#D96C6C", "forca": 7.4, "sinais": 29, "fatos": 3, "desc": "Agência Nacional de Telecomunicações — reguladora do 5G industrial.", "analise": "A Anatel liberou faixas de frequência para redes privativas industriais (3.5 GHz / 26 GHz) em 2025. É o ator-chave para o licenciamento de redes 5G industriais em portos, mineração e corredores logísticos. O avanço da Anatel na regulação de satélites LEO (Starlink, OneWeb) abre novas aplicações para infraestrutura elétrica em regiões remotas.", "acao": "Monitorar editais Anatel para redes privativas 5G; avaliar uso de satélites LEO para monitoramento de linhas de transmissão."}};
+  const nodesRaw = [{"id": "frente_EnergyTech", "label": "EnergyTech", "slabel": "EnergyTech", "type": "frente", "color": "#2FA87C", "r": 26, "fronts": ["EnergyTech"]}, {"id": "frente_CleanTech", "label": "CleanTech", "slabel": "CleanTech", "type": "frente", "color": "#5DCAA5", "r": 26, "fronts": ["CleanTech"]}, {"id": "frente_AgriTech", "label": "AgriTech", "slabel": "AgriTech", "type": "frente", "color": "#7AB648", "r": 26, "fronts": ["AgriTech"]}, {"id": "frente_DeepTech", "label": "DeepTech", "slabel": "DeepTech", "type": "frente", "color": "#5B8CFF", "r": 26, "fronts": ["DeepTech"]}, {"id": "frente_FinTech", "label": "FinTech", "slabel": "FinTech", "type": "frente", "color": "#D9A441", "r": 26, "fronts": ["FinTech"]}, {"id": "mem_1", "label": "Segurança Jurídica Setor Elétrico", "slabel": "Segurança Jurídica", "type": "memory", "color": "#9B7BC4", "r": 18, "fronts": ["EnergyTech", "FinTech"]}, {"id": "mem_2", "label": "Data Centers & IA — Demanda Elétrica", "slabel": "Data Centers & IA", "type": "memory", "color": "#9B7BC4", "r": 18, "fronts": ["EnergyTech", "DeepTech"]}, {"id": "mem_3", "label": "Transição Solar, BESS & Smart Grid", "slabel": "Transição Solar, BESS", "type": "memory", "color": "#9B7BC4", "r": 18, "fronts": ["EnergyTech", "DeepTech"]}, {"id": "mem_4", "label": "Esgotamento Fiscal & Custo de Capital", "slabel": "Esgotamento Fiscal", "type": "memory", "color": "#9B7BC4", "r": 18, "fronts": ["CleanTech", "FinTech"]}, {"id": "mem_5", "label": "H₂ Verde — Janela de 18 Meses", "slabel": "H₂ Verde", "type": "memory", "color": "#9B7BC4", "r": 18, "fronts": ["CleanTech", "FinTech"]}, {"id": "zet_101", "label": "Ciclo Fiscal Exaurido & Compressão Capital", "slabel": "Ciclo Fiscal Exaurido", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["EnergyTech", "AgriTech", "DeepTech", "FinTech"]}, {"id": "zet_102", "label": "Modernização da Rede Elétrica via BESS", "slabel": "Rede Elétrica via BESS", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["EnergyTech", "DeepTech"]}, {"id": "zet_103", "label": "H₂ Verde: Janela Crítica de Política Industrial", "slabel": "H₂ Verde", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["CleanTech", "DeepTech", "FinTech"]}, {"id": "zet_104", "label": "Infraestrutura de Mobilidade Elétrica & 5G", "slabel": "Mobilidade Elétrica & 5G", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["DeepTech", "EnergyTech"]}, {"id": "zet_105", "label": "Insegurança Jurídica no Setor Elétrico", "slabel": "Insegurança Jurídica", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["EnergyTech"]}, {"id": "zet_106", "label": "Regulação Digital & Tributação de IA", "slabel": "Regulação Digital", "type": "zettel", "color": "#5B8CFF", "r": 12, "fronts": ["DeepTech"]}, {"id": "ent_201", "label": "ANEEL", "slabel": "ANEEL", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["EnergyTech"]}, {"id": "ent_202", "label": "ONS", "slabel": "ONS", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["EnergyTech"]}, {"id": "ent_203", "label": "BNDES", "slabel": "BNDES", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["EnergyTech", "FinTech"]}, {"id": "ent_204", "label": "MME", "slabel": "MME", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["EnergyTech", "CleanTech"]}, {"id": "ent_205", "label": "BCB", "slabel": "BCB", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["FinTech"]}, {"id": "ent_206", "label": "CVM", "slabel": "CVM", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["FinTech"]}, {"id": "ent_207", "label": "Embrapa", "slabel": "Embrapa", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["AgriTech"]}, {"id": "ent_208", "label": "Anatel", "slabel": "Anatel", "type": "entity", "color": "#D96C6C", "r": 14, "fronts": ["DeepTech"]}];
+  const linksRaw = [{"source": "mem_1", "target": "frente_EnergyTech", "weak": false, "weight": 9.0}, {"source": "mem_1", "target": "frente_FinTech", "weak": false, "weight": 9.0}, {"source": "mem_2", "target": "frente_EnergyTech", "weak": false, "weight": 9.0}, {"source": "mem_2", "target": "frente_DeepTech", "weak": false, "weight": 9.0}, {"source": "mem_3", "target": "frente_EnergyTech", "weak": false, "weight": 8.0}, {"source": "mem_3", "target": "frente_DeepTech", "weak": false, "weight": 8.0}, {"source": "mem_4", "target": "frente_CleanTech", "weak": false, "weight": 8.0}, {"source": "mem_4", "target": "frente_FinTech", "weak": false, "weight": 8.0}, {"source": "mem_5", "target": "frente_CleanTech", "weak": false, "weight": 7.0}, {"source": "mem_5", "target": "frente_FinTech", "weak": false, "weight": 7.0}, {"source": "zet_101", "target": "frente_EnergyTech", "weak": false, "weight": 8.5}, {"source": "zet_101", "target": "frente_AgriTech", "weak": false, "weight": 8.5}, {"source": "zet_101", "target": "frente_DeepTech", "weak": false, "weight": 8.5}, {"source": "zet_101", "target": "frente_FinTech", "weak": false, "weight": 8.5}, {"source": "zet_102", "target": "frente_EnergyTech", "weak": false, "weight": 8.2}, {"source": "zet_102", "target": "frente_DeepTech", "weak": false, "weight": 8.2}, {"source": "zet_103", "target": "frente_CleanTech", "weak": false, "weight": 7.5}, {"source": "zet_103", "target": "frente_DeepTech", "weak": false, "weight": 7.5}, {"source": "zet_103", "target": "frente_FinTech", "weak": false, "weight": 7.5}, {"source": "zet_104", "target": "frente_DeepTech", "weak": false, "weight": 7.2}, {"source": "zet_104", "target": "frente_EnergyTech", "weak": false, "weight": 7.2}, {"source": "zet_105", "target": "frente_EnergyTech", "weak": false, "weight": 7.0}, {"source": "zet_106", "target": "frente_DeepTech", "weak": false, "weight": 6.5}, {"source": "ent_201", "target": "frente_EnergyTech", "weak": false, "weight": 9.5}, {"source": "ent_202", "target": "frente_EnergyTech", "weak": false, "weight": 9.2}, {"source": "ent_203", "target": "frente_EnergyTech", "weak": false, "weight": 8.8}, {"source": "ent_203", "target": "frente_FinTech", "weak": false, "weight": 8.8}, {"source": "ent_204", "target": "frente_EnergyTech", "weak": false, "weight": 8.5}, {"source": "ent_204", "target": "frente_CleanTech", "weak": false, "weight": 8.5}, {"source": "ent_205", "target": "frente_FinTech", "weak": false, "weight": 8.3}, {"source": "ent_206", "target": "frente_FinTech", "weak": false, "weight": 7.9}, {"source": "ent_207", "target": "frente_AgriTech", "weak": false, "weight": 7.6}, {"source": "ent_208", "target": "frente_DeepTech", "weak": false, "weight": 7.4}, {"source": "frente_EnergyTech", "target": "frente_FinTech", "weak": false, "weight": 0.5}, {"source": "frente_EnergyTech", "target": "frente_DeepTech", "weak": false, "weight": 0.5}, {"source": "frente_CleanTech", "target": "frente_FinTech", "weak": false, "weight": 0.5}];
+
+  const W = 960, H = 460;
+  const nodeById = Object.fromEntries(nodesRaw.map(n => [n.id, n]));
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function breathingForce() {
+    if (prefersReducedMotion) return;
+    const t = performance.now() * 0.001;
+    nodesRaw.forEach((d, i) => {
+      if (d.fx != null || d.fy != null) return;
+      const amp = d.type === "frente" ? 0.018 : 0.030;
+      d.vx += Math.sin(t * 0.75 + i * 1.91) * amp;
+      d.vy += Math.cos(t * 0.62 + i * 1.37) * amp;
+    });
+  }
+
+  // Posição inicial — hubs em pentágono, sub-nós ao redor do hub pai
+  const hubOrder = ["EnergyTech","DeepTech","FinTech","CleanTech","AgriTech"];
+  const hubR = 205;
+  hubOrder.forEach((fr, i) => {
+    const n = nodeById["frente_" + fr];
+    const ang = -Math.PI/2 + 2*Math.PI*i/5;
+    if (n) { n.x = W/2 + hubR * Math.cos(ang); n.y = H/2 + hubR * Math.sin(ang); }
+  });
+  nodesRaw.forEach(n => {
+    if (n.type === "frente") return;
+    const hub = nodeById["frente_" + (n.fronts[0] || "EnergyTech")];
+    const a = Math.random() * Math.PI * 2;
+    const dist = 75 + Math.random() * 75;
+    n.x = (hub?.x || W/2) + dist * Math.cos(a);
+    n.y = (hub?.y || H/2) + dist * Math.sin(a);
+  });
+
+  window._efLoadD3 = window._efLoadD3 || function(cb) {
+    if (window.d3) { cb(); return; }
+    window._efD3Queue = window._efD3Queue || [];
+    window._efD3Queue.push(cb);
+    if (window._efD3Loading) return;
+    window._efD3Loading = true;
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js";
+    s.onload = function() {
+      window._efD3Loading = false;
+      (window._efD3Queue || []).forEach(f => { try { f(); } catch(e) {} });
+      window._efD3Queue = [];
+    };
+    document.head.appendChild(s);
+  };
+
+  window._efLoadD3(function() {
+    const svg  = d3.select("#rte5-gr-svg");
+    const root = d3.select("#rte5-gr-g");
+
+    const zoom = d3.zoom().scaleExtent([0.25, 5])
+      .on("zoom", ev => { root.attr("transform", ev.transform); });
+    svg.call(zoom).on("dblclick.zoom", null);
+    svg.on("dblclick", () => svg.transition().duration(450).call(zoom.transform, d3.zoomIdentity));
+
+    const links = linksRaw.map(l => ({ ...l }));
+
+    const link = root.append("g").selectAll("line")
+      .data(links).enter().append("line")
+      .attr("class", "rte5-gr-link")
+      .attr("data-fronts", d => linkFronts(d).join(","))
+      .attr("data-weight", d => (d.weight||0.5).toFixed(2))
+      .attr("stroke-width", d => {
+        if (isHubLink(d)) return 1.1;
+        const w = d.weight || 0.5;
+        return Math.max(0.7, Math.min(4.2, w * 4.5));
+      })
+      .attr("stroke-dasharray", d => isHubLink(d) ? "5,5" : (d.weak ? "3,4" : null))
+      .attr("stroke", d => {
+        const s = nodeById[typeof d.source==="object" ? d.source.id : d.source];
+        const t = nodeById[typeof d.target==="object" ? d.target.id : d.target];
+        if (isHubLink({source:s,target:t})) return "rgba(255,255,255,.18)";
+        return s?.type === "frente" ? s.color : t?.color;
+      })
+      .attr("opacity", d => {
+        if (isHubLink(d)) return 0.18;
+        const w = d.weight || 0.5;
+        return Math.max(0.12, Math.min(0.65, 0.12 + w * 0.55));
+      });
+
+    const node = root.append("g").selectAll("g")
+      .data(nodesRaw).enter().append("g")
+      .attr("class", "rte5-gr-node")
+      .attr("data-fronts", d => d.fronts.join(","))
+      .style("cursor", "pointer")
+      .on("click", (ev, d) => window.rte5GrInfo(d.id))
+      .on("mouseenter", (ev, d) => highlightNeighborhood(d, true))
+      .on("mouseleave", (ev, d) => highlightNeighborhood(d, false))
+      .call(d3.drag()
+        .on("start", dragStarted)
+        .on("drag",  dragged)
+        .on("end",   dragEnded)
+      );
+
+    node.append("circle")
+      .attr("r",            d => d.r)
+      .attr("fill",         d => d.color)
+      .attr("fill-opacity", d => d.type === "frente" ? .92 : .84)
+      .attr("stroke",       d => d.type === "frente" ? d.color : "#0F1722")
+      .attr("stroke-width", d => d.type === "frente" ? 2.8 : 1.8)
+      .style("filter",      d => d.type === "frente" ? `drop-shadow(0 0 10px ${d.color}66)` : "none");
+
+    node.filter(d => d.type === "frente").append("text")
+      .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+      .attr("font-size", "10.5").attr("font-weight", "800")
+      .attr("font-family", "IBM Plex Mono,monospace")
+      .attr("fill", "#E6EDF3").attr("pointer-events", "none")
+      .text(d => d.label);
+
+    const sub = node.filter(d => d.type !== "frente");
+    sub.append("text").attr("class", "rte5-gr-label")
+      .attr("font-size", "8.5").attr("font-weight", "600")
+      .attr("font-family", "Inter,sans-serif")
+      .attr("fill", "#E6EDF3").attr("fill-opacity", .92)
+      .attr("pointer-events", "none")
+      .each(function(d) {
+        const lbl = d.slabel || d.label;
+        const words = lbl.split(" ");
+        const el = d3.select(this);
+        if (lbl.length <= 16 || words.length <= 2) {
+          el.text(lbl);
+        } else if (lbl.length <= 32 || words.length <= 4) {
+          // 2 linhas
+          const mid = Math.ceil(words.length / 2);
+          el.append("tspan").attr("x", 0).attr("dy", "-0.65em").text(words.slice(0, mid).join(" "));
+          el.append("tspan").attr("x", 0).attr("dy", "1.20em").text(words.slice(mid).join(" "));
+        } else {
+          // 3 linhas para labels mais longos
+          const t1 = Math.ceil(words.length / 3);
+          const t2 = Math.ceil(2 * words.length / 3);
+          el.append("tspan").attr("x", 0).attr("dy", "-1.15em").text(words.slice(0, t1).join(" "));
+          el.append("tspan").attr("x", 0).attr("dy", "1.20em").text(words.slice(t1, t2).join(" "));
+          el.append("tspan").attr("x", 0).attr("dy", "1.20em").text(words.slice(t2).join(" "));
+        }
+      });
+
+    // Grau de cada nó (nº de links) — usado para escalar repulsão de hubs sobrecarregados
+    const nodeDegree = {};
+    links.forEach(l => {
+      const tid = typeof l.target === "object" ? l.target.id : l.target;
+      nodeDegree[tid] = (nodeDegree[tid] || 0) + 1;
+    });
+
+    const simulation = d3.forceSimulation(nodesRaw)
+      .force("link", d3.forceLink(links).id(d => d.id)
+        .distance(d => isHubLink(d) ? 340 : 120)
+        .strength(d => isHubLink(d) ? .03 : .42))
+      .force("charge", d3.forceManyBody()
+        .strength(d => {
+          if (d.type !== "frente") return -280;
+          // Escala repulsão pelo grau: hubs com muitos links recebem carga maior
+          const deg = nodeDegree[d.id] || 1;
+          return -600 - deg * 28;
+        })
+        .distanceMax(500))
+      .force("center", d3.forceCenter(W/2, H/2))
+      .force("x", d3.forceX(W/2).strength(.03))
+      .force("y", d3.forceY(H/2).strength(.03))
+      .force("collision", d3.forceCollide().radius(d => d.type === "frente" ? d.r + 38 : d.r + 18).strength(1.0))
+      .force("breathing", breathingForce)
+      .velocityDecay(.28)
+      .alphaDecay(.003)
+      .alphaTarget(prefersReducedMotion ? 0 : .035);
+
+    simulation.on("tick", () => {
+      link
+        .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+      node.attr("transform", d => `translate(${d.x},${d.y})`);
+      sub.each(function(d) {
+        const hub = nodeById["frente_" + (d.fronts[0] || "EnergyTech")];
+        const dx = d.x - (hub?.x || W/2), dy = d.y - (hub?.y || H/2);
+        const dist = Math.max(Math.sqrt(dx*dx+dy*dy), 1);
+        const ux = dx/dist, uy = dy/dist;
+        const lx = ux*(d.r+13), ly = uy*(d.r+13);
+        const anchor = Math.abs(ux)<.22 ? "middle" : (ux>0 ? "start" : "end");
+        const lel = d3.select(this).select(".rte5-gr-label");
+        lel.attr("x",lx).attr("y",ly+4).attr("text-anchor",anchor);
+        lel.selectAll("tspan").attr("x",lx);
+      });
+    });
+
+    function isHubLink(d) {
+      const s = typeof d.source==="object" ? d.source : nodeById[d.source];
+      const t = typeof d.target==="object" ? d.target : nodeById[d.target];
+      return s?.type==="frente" && t?.type==="frente";
+    }
+    function linkFronts(d) {
+      const s = typeof d.source==="object" ? d.source : nodeById[d.source];
+      const t = typeof d.target==="object" ? d.target : nodeById[d.target];
+      return Array.from(new Set([...(s?.fronts||[]), ...(t?.fronts||[])]));
+    }
+    function dragStarted(ev, d) {
+      if (!ev.active) simulation.alphaTarget(.25).restart();
+      d.fx = d.x; d.fy = d.y;
+    }
+    function dragged(ev, d) { d.fx = ev.x; d.fy = ev.y; }
+    function dragEnded(ev, d) {
+      if (!ev.active) simulation.alphaTarget(prefersReducedMotion ? 0 : .035);
+      d.fx = null; d.fy = null;
+    }
+    function highlightNeighborhood(d, on) {
+      if (!on) {
+        node.select("circle").attr("stroke-width", n => n.type==="frente" ? 2.8 : 1.8);
+        link.attr("opacity", l => {
+          if (isHubLink(l)) return 0.18;
+          const w = l.weight || 0.5;
+          return Math.max(0.12, Math.min(0.65, 0.12 + w * 0.55));
+        });
+        return;
+      }
+      const connected = new Set([d.id]);
+      const connWeights = {};
+      links.forEach(l => {
+        const s = l.source.id || l.source, t = l.target.id || l.target;
+        if (s===d.id) { connected.add(t); connWeights[t] = l.weight||0.5; }
+        if (t===d.id) { connected.add(s); connWeights[s] = l.weight||0.5; }
+      });
+      node.select("circle").attr("stroke-width", n => connected.has(n.id) ? 4 : (n.type==="frente" ? 2.8 : 1.8));
+      link.attr("opacity", l => {
+        const s = l.source.id||l.source, t = l.target.id||l.target;
+        if (s===d.id || t===d.id) return 0.85;
+        return 0.04;
+      });
+    }
+  });
+
+  // Info panel
+  window.rte5GrInfo = function(id) {
+    const n = detail[id];
+    const box = document.getElementById("rte5-gr-info");
+    if (!n || !box) return;
+    const typeLabel = {frente:"Frente xTech",memory:"Memória Estratégica",zettel:"Zettel / Nota",entity:"Entidade Regulatória"}[n.type] || n.type;
+    let meta = "";
+    if (n.type==="frente")       meta = `${n.sinais||0} sinais · ${n.fatos||0} fatos canônicos`;
+    else if (n.type==="memory")  meta = `Força ${(+(n.forca||0)).toFixed(2)} · ${n.sinais||0} sinais · ${n.fatos||0} fatos`;
+    else if (n.type==="zettel")  meta = `${n.sinais||0} sinais · score ${(+(n.forca||0)).toFixed(2)}`;
+    else meta = `${n.sinais||0} sinais · ${n.fatos||0} fatos verificados · importância ${(+(n.forca||0)).toFixed(2)}`;
+    // Exibe peso máximo das conexões deste nó
+    const connLinks = linksRaw.filter(l => l.source===id || l.target===id);
+    if (connLinks.length > 0 && n.type !== "frente") {
+      const maxW = Math.max(...connLinks.map(l => l.weight||0));
+      const avgW = connLinks.reduce((s,l)=>s+(l.weight||0),0)/connLinks.length;
+      meta += ` · peso de conexão ${avgW.toFixed(2)} (máx ${maxW.toFixed(2)})`;
+    }
+    box.innerHTML = `
+      <div><strong style="color:${n.color};font-size:.92rem;">${esc(n.label)}</strong> <span style="color:#657386;font-family:'IBM Plex Mono',monospace;font-size:.72rem;">[${typeLabel}]</span></div>
+      <div style="color:#8090A3;font-family:'IBM Plex Mono',monospace;font-size:.72rem;margin:4px 0 8px;">${esc(meta)}</div>
+      ${n.desc ? `<div style="color:#A8B3C2;margin-bottom:6px;">${esc(n.desc)}</div>` : ""}
+      ${n.analise ? `<div style="color:#8B99A8;line-height:1.75;margin-bottom:8px;">${esc(n.analise)}</div>` : ""}
+      ${n.acao ? `<div style="border-left:2px solid ${n.color};padding:8px 11px;margin-top:10px;background:rgba(255,255,255,.035);border-radius:0 8px 8px 0;"><span style="color:#A8B3C2;">▸ Ação: </span>${esc(n.acao)}</div>` : ""}
+    `;
+  };
+
+  // Filter
+  window.rte5GrFilter = function(frente, btn) {
+    document.querySelectorAll(".rte5-filter-btn").forEach(b => b.classList.remove("rte5-filter-active"));
+    if (btn) btn.classList.add("rte5-filter-active");
+    document.querySelectorAll(".rte5-gr-node").forEach(el => {
+      const frs = (el.getAttribute("data-fronts")||"").split(",");
+      el.style.opacity = !frente || frs.includes(frente) ? "1" : ".08";
+      el.style.transition = "opacity .2s";
+    });
+    document.querySelectorAll(".rte5-gr-link").forEach(el => {
+      const frs = (el.getAttribute("data-fronts")||"").split(",");
+      el.style.opacity = !frente || frs.includes(frente) ? ".28" : ".025";
+      el.style.transition = "opacity .2s";
+    });
+  };
+
+  function esc(s) {
+    return String(s).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#039;",'"':"&quot;"}[c]));
+  }
+})();
+</script>
+</section>
+<section class="rte5-section" id="convergencia">
+  <div class="rte5-section-head"><h2 class="rte5-title">Motor de Convergência Estratégica</h2></div>
+  <div class="rte5-grid-3">
+<div class="rte5-card rte5-cluster">
+  <div class="rte5-cluster-head">
+    <div class="rte5-mini-label">Convergência Alta</div>
+    <span class="rte5-chip" style="--chip:#79A3FF">5 sinais</span>
+  </div>
+  <div class="rte5-cluster-name">Reestruturação do Mercado Livre de Energia</div>
+  <div class="rte5-cluster-tese">A complexidade crescente do Ambiente de Contratação Livre, combinada com incentivos fiscais como o Reidi para biometano e a consolidação de comercializadoras, sinaliza uma reconfiguração estrutural do mercado de energia brasileiro que favorece players com escala e capacidade regulatória, abrindo espaço para modelos de negócio mais sofisticados e eliminando agentes de menor porte.</div>
+  
+<details class="rte5-details ">
+  <summary>Listar sinais relacionados <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal">Taesa conclui migração de 42 unidades para o Ambiente de Contratação Livre em parceria com a Lead Energy</div><div class="rte5-signal">Projeto de biometano da Solvi Essencis entra no Reidi e reduz custo tributário em R$ 41,5 milhões</div><div class="rte5-signal">Com mercado livre mais complexo, pequenas comercializadoras devem desaparecer, diz Mosna</div><div class="rte5-signal">Benefícios Operacionais – Múltiplos Benefícios da Eficiência Energética para Negócios – Análise</div><div class="rte5-signal">Resumo Executivo – Ampliação da Flexibilidade da Demanda – Análise</div></div></div>
+</details>
+</div>
+<div class="rte5-card rte5-cluster">
+  <div class="rte5-cluster-head">
+    <div class="rte5-mini-label">Convergência Alta</div>
+    <span class="rte5-chip" style="--chip:#79A3FF">4 sinais</span>
+  </div>
+  <div class="rte5-cluster-name">Risco Fiscal, Petroquímica e Infraestrutura Crítica</div>
+  <div class="rte5-cluster-tese">A crise de reestruturação da Braskem, amplificada pelo canal de oferta de capital restringido pelo crescimento da dívida pública acima de R$ 9 trilhões, ameaça a cadeia petroquímica nacional e expõe vulnerabilidades em infraestruturas críticas industriais, exigindo resposta coordenada entre reguladores federais e credores para evitar contágio sistêmico.</div>
+  
+<details class="rte5-details ">
+  <summary>Listar sinais relacionados <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal">Braskem busca proteção judicial contra credores</div><div class="rte5-signal">Braskem tem plano de reestruturação com recuperação extrajudicial rejeitado por credores</div><div class="rte5-signal">Dívida Pública sobe 2,66% em maio e supera R$ 9 trilhões</div><div class="rte5-signal">ANP indica mais 86 blocos na Margem Equatorial para leilão</div></div></div>
+</details>
+</div>
+<div class="rte5-card rte5-cluster">
+  <div class="rte5-cluster-head">
+    <div class="rte5-mini-label">Convergência Média</div>
+    <span class="rte5-chip" style="--chip:#79A3FF">3 sinais</span>
+  </div>
+  <div class="rte5-cluster-name">Segurança Digital, IA e Transição Tecnológica</div>
+  <div class="rte5-cluster-tese">A distribuição anônima de vulnerabilidades zero-day em repositórios públicos, combinada com avanços em inferência de modelos de linguagem via decodificação especulativa e as conclusões da InterSolar Europe 2026 sobre integração de BESS e smart grid, convergem para um cenário em que a segurança cibernética e a capacidade de processamento de IA tornam-se habilitadores críticos da transição energética e da infraestrutura digital brasileira.</div>
+  
+<details class="rte5-details ">
+  <summary>Listar sinais relacionados <span>+</span></summary>
+  <div class="rte5-details-body"><div class="rte5-signal-list"><div class="rte5-signal">Conta anônima no GitHub distribuindo vulnerabilidades zero-day não divulgadas</div><div class="rte5-signal">DSpark: Decodificação especulativa acelera inferência de modelos de linguagem de grande escala</div><div class="rte5-signal">InterSolar Europe 2026 - Principais Conclusões</div></div></div>
+</details>
+</div></div>
+</section><div class="radar-horizonte-header"><span class="horizonte-label">Horizonte 3 · Desenvolvimento de projetos</span><span class="horizonte-audiencia">Para: empreendedores, consultores, equipes de consultoria</span><span class="horizonte-pergunta">&#8220;Qual oportunidade posso capturar? Quais competências preciso?&#8221;</span></div><section class="rte5-section" id="curva-convergencia">
+  <div class="rte5-section-head">
+    <h2 class="rte5-title">Curva de Maturidade da Convergência Tecnológica — xTechs</h2>
+    <span class="rte5-note">21 tecnologias · 7 estágios · valor sistêmico</span>
+  </div>
+  <div class="rte5-card" style="padding:16px 20px 18px;">
+<div style="margin-bottom:14px;padding:13px 16px;background:#131D2B;border-left:3px solid #79A3FF;border-radius:0 10px 10px 0;font-size:.83rem;color:#A8B3C2;line-height:1.7;"><strong style="color:#E6EDF3;">Leitura executiva:</strong> esta curva acompanha a passagem de tecnologias de sinais fracos para infraestrutura econômica crítica e, por fim, commoditização. O posicionamento combina volume acumulado de sinais, score médio, tendência semanal, fricção regulatória, disponibilidade de capital, maturidade operacional e evidência de adoção econômica. <strong style="color:#E6EDF3;">Nota:</strong> maturidade de infraestrutura de mercado (posição na curva) é independente de pressão estratégica do ciclo (IPS). Uma frente como FinTech pode liderar em maturidade operacional e ter IPS baixo — porque a tecnologia já é infraestrutura consolidada, não emergência. EnergyTech pode ter IPS alto por pressão regulatória e de mercado mesmo com tecnologias em estágios intermediários da curva.</div>    <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
+      <svg id="rte5-ctc-svg" viewBox="0 0 1060 520" preserveAspectRatio="xMidYMid meet"
+           style="display:block;width:100%;height:auto;background:#0F1722;"></svg>
+    </div>
+    <div style="font-size:.70rem;color:#718096;text-align:right;margin-top:5px;font-family:'IBM Plex Mono',monospace;">passe o mouse ou clique em uma tecnologia para ver o racional analítico</div>
+    <div id="rte5-ctc-detail" style="margin-top:10px;padding:14px 16px;background:#131D2B;border-radius:12px;font-size:.84rem;color:#A8B3C2;line-height:1.65;min-height:96px;border:1px solid rgba(255,255,255,.06);">
+      <span style="color:#718096;font-family:'IBM Plex Mono',monospace;font-size:.75rem;">▸ Selecione uma tecnologia para ver o sinal analítico, a fase e a implicação estratégica.</span>
+    </div>
+  </div>
+<script>
+(function(){
+  const TECHS = [{"id": "Geotermia", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.04, "n": 2, "score": 8.5, "trend": "→", "signal": "<strong>Fase: Sinal Emergente.</strong> Apenas 2 sinais monitorados, mas score 8.5 — o mais alto dessa fase. A geotermia desperta interesse científico global como fonte de geração contínua (baseload) sem emissões, porém no Brasil a ausência de mapeamento geológico detalhado e de quadro regulatório específico mantém o tema no estágio de pesquisa. Sem leilão, sem investimento, sem roadmap. Catalisador esperado: política de diversificação de matriz pós-2030.", "phase": "Sinal Emergente", "above": true, "updated": false}, {"id": "AgriTech Digital", "frente": "AgriTech", "color": "#7AB648", "x": 0.07, "n": 5, "score": 3.3, "trend": "↗", "signal": "<strong>Fase: Sinal Emergente (acelerando ↗).</strong> 5 sinais registrados desde W23, score baixo (3.3) reflete cobertura ainda exploratória. A pressão de custo de capital no agronegócio brasileiro — crédito rural mais caro, margem comprimida por câmbio — está criando demanda por precisão digital: sensores IoT, drones de pulverização, modelagem preditiva de produtividade. Tendência de aceleração: startups agritech captando rodadas semente em 2026.", "phase": "Sinal Emergente", "above": false, "updated": false}, {"id": "CCS / Carbon Capture", "frente": "CleanTech", "color": "#5DCAA5", "x": 0.1, "n": 1, "score": 9.0, "trend": "→", "signal": "<strong>Fase: Sinal Emergente.</strong> 1 sinal com score excepcional 9.0 — remoção de carbono via mineralização acelerada e captura direta do ar (DAC). Tecnologia validada em escala piloto no exterior, sem tração no Brasil. Obstáculo estrutural: inexistência de mercado de carbono regulado e precificação de carbono que viabilize o CAPEX. Janela: se o Brasil antecipar a agenda europeia de carbono — CBAM (fase definitiva 2026), CORSIA, mandatos de combustíveis renováveis e rastreabilidade de cadeias — esse gatilho muda de fase rapidamente. Exigência de certificação sobe para biocombustíveis, siderurgia e cadeias de baixo carbono.", "phase": "Sinal Emergente", "above": true, "updated": false}, {"id": "Smart Grid", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.14, "n": 2, "score": 8.0, "trend": "↗", "signal": "<strong>Fase: Narrativa Exponencial (acelerando ↗).</strong> Em junho/2026, o ONS criou formalmente uma área dedicada ao desenvolvimento de ferramentas eletroenergéticas — sinal direto de que a operação da rede precisa de inteligência digital. O tema permeia 200+ sinais de transmissão sem ser nomeado como 'smart grid'. A regulação de medição inteligente (AMI) pela ANEEL é o próximo catalisador esperado para mover esse ponto no gráfico.", "phase": "Narrativa Exponencial", "above": false, "updated": false}, {"id": "Blockchain Energia", "frente": "FinTech", "color": "#D9A441", "x": 0.17, "n": 3, "score": 9.0, "trend": "↗", "signal": "<strong>Fase: Narrativa Exponencial (acelerando ↗).</strong> 3 sinais com score médio 9.0 — tokenização de créditos de carbono, certificados de energia renovável (REC) e contratos bilaterais de energia em blockchain. A ausência de regulação da CVM para tokens de utilidade energética é o gargalo principal. Movimento esperado: se a CVM avançar com sandbox regulatório para ativos tokenizados em 2026-27, esse tema escala rapidamente para o Pico de Especulação.", "phase": "Narrativa Exponencial", "above": true, "updated": false}, {"id": "Lítio & Mineração", "frente": "CleanTech", "color": "#5DCAA5", "x": 0.21, "n": 20, "score": 7.44, "trend": "↗", "signal": "<strong>Fase: Narrativa Exponencial (acelerando ↗).</strong> 20 sinais, score 7.44 em alta. O MME realizou intercâmbio técnico internacional sobre cadeia de valor do lítio (abr/2026), sinalizando que o governo reconhece o ativo estratégico. O Brasil detém a 5ª maior reserva mundial de lítio mas ainda extrai < 1% da capacidade. Projetos de beneficiamento em MG e BA em fase de licenciamento. O movimento global de nearshoring de baterias pode criar demanda por lítio brasileiro antes de 2028.", "phase": "Narrativa Exponencial", "above": false, "updated": false}, {"id": "Satélites LEO", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.26, "n": 34, "score": 5.4, "trend": "↗", "signal": "<strong>Fase: Narrativa Exponencial (acelerando ↗).</strong> 34 sinais, score 5.4 crescente. A conectividade via satélite de órbita baixa (Starlink, OneWeb, Amazon Kuiper) está criando casos de uso concretos para o Brasil: monitoramento de linhas de transmissão em áreas remotas, precisão agrícola no cerrado sem cobertura 4G/5G, e comunicação em emergências climáticas. O custo por terminal caiu 60% em 2 anos. Barreira regulatória da Anatel ainda limita operação autônoma.", "phase": "Narrativa Exponencial", "above": true, "updated": false}, {"id": "Digital Twin", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.3, "n": 10, "score": 8.1, "trend": "↗", "signal": "<strong>Fase: Pico de Especulação (acelerando ↗).</strong> 10 sinais com score elevado 8.1. Gêmeos digitais de subestações e sistemas de transmissão estão sendo adotados por grandes transmissoras para simular falhas e otimizar manutenção preditiva. No agro, modelos digitais de lavoura integram dados de solo, clima e preço. Poucos casos em escala no Brasil, mas pipeline de projetos crescendo. O ONS está avaliando digital twin do Sistema Interligado Nacional (SIN) — se aprovado, move esse ponto rapidamente.", "phase": "Pico de Especulação", "above": false, "updated": false}, {"id": "Nuclear / SMR", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.35, "n": 42, "score": 6.21, "trend": "↘", "signal": "<strong>Fase: Pico de Especulação (desacelerando ↘).</strong> 42 sinais, mas score caiu de 8.0 (W14) para 3.25 (W23) — queda de 59% em dois meses. Globalmente, SMRs (Small Modular Reactors) recebem bilhões em P&D (NuScale, Rolls-Royce, Westinghouse). No Brasil, a realidade é diferente: Angra 3 segue sem prazo de conclusão, o custo da energia nuclear permanece 3–4x superior às renováveis, e o quadro regulatório da CNEN não foi atualizado para SMRs. Expectativas globais altas, implementação local indefinida.", "phase": "Pico de Especulação", "above": true, "updated": false}, {"id": "IA Generativa", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.38, "n": 116, "score": 4.83, "trend": "↘", "signal": "<strong>Fase: Pico de Especulação (desacelerando ↘).</strong> 116 sinais — volume expressivo, mas score declina. O ciclo clássico: 2023-24 foram de euforia (todos os setores anunciando projetos de IA generativa), 2025-26 mostram a ressaca — ROI difícil de medir, alucinações em contextos críticos, custo de inferência mais alto que o esperado. No Brasil, regulação pelo MJ avança e o PL de IA está em fase final. Empresas de energia e agro testam pilotos; poucos chegaram à produção.", "phase": "Pico de Especulação", "above": false, "updated": false}, {"id": "Data Centers IA", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.43, "n": 201, "score": 6.47, "trend": "↘", "signal": "<strong>Fase: Pico de Especulação (desacelerando ↘).</strong> 201 sinais — tema mais denso do banco de dados. Score caiu de 8.38 (W15) para 4.48 (W22), queda de 47% em 7 semanas. O modelo de negócio dos hyperscale data centers no Brasil encontrou obstáculos concretos: ISS municipal elevado, tarifas de energia industrial acima da média global, gargalos na rede de transmissão e falta de mão de obra especializada. Anúncios de investimento continuam, mas execução está abaixo das promessas. Ponto de inflexão: resolução da tarifa de energia para DCs.", "phase": "Pico de Especulação", "above": true, "updated": false}, {"id": "Robótica Industrial", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.47, "n": 53, "score": 6.65, "trend": "↘", "signal": "<strong>Fase: Fricção Operacional (desacelerando ↘).</strong> 53 sinais, score 6.65 em queda. A robótica industrial brasileira avança em setores de alta margem (automotivo, petroquímica), mas encontra barreira de custo de capital para PMEs industriais. A queda do câmbio BRL/USD elevou o custo de robôs importados 25–30% em 2025-26. Casos de automação em frigoríficos e colheita agrícola mecanizada existem, mas adoção em escala ainda é lenta. Reenergização esperada com programas de crédito BNDES para automação industrial em 2027.", "phase": "Fricção Operacional", "above": false, "updated": false}, {"id": "H₂ Verde", "frente": "CleanTech", "color": "#5DCAA5", "x": 0.52, "n": 40, "score": 7.16, "trend": "↘", "signal": "<strong>Fase: Fricção Operacional (desacelerando ↘).</strong> 40 sinais, score caiu de 8.75 (W18) para 5.75 (W23). O Brasil tem potencial competitivo real em H₂ verde (custo de eletricidade renovável mais baixo do mundo), mas a janela de 18 meses para definir política industrial está se fechando. A falta de infraestrutura de escoamento (dutos, terminais de amônia), a ausência de contrato de venda firme com importadores europeus e a indefinição de subsídio federal estão mantendo projetos em standby. Sem portaria do MME com cronograma concreto, esse ponto continua descendo.", "phase": "Fricção Operacional", "above": true, "updated": false}, {"id": "EV / Mobilidade Elétrica", "frente": "CleanTech", "color": "#5DCAA5", "x": 0.57, "n": 56, "score": 7.31, "trend": "↘", "signal": "<strong>Fase: Fricção Operacional (desacelerando ↘).</strong> 56 sinais. O Brasil cresce 9% em vendas de EVs contra 30% na média global — gap estrutural. Os obstáculos são conhecidos: infraestrutura de recarga escassa fora das capitais, preço médio de EV > R$ 150 mil (vs. R$ 80 mil do flex), ausência de V2G (vehicle-to-grid) e lentidão na isenção de IPVA em todos os estados. O mercado de frotas corporativas e ônibus elétricos municipais avança mais que o varejo — esse subsetor pode puxar o tema de volta para Escala Econômica mais cedo que o esperado.", "phase": "Fricção Operacional", "above": false, "updated": false}, {"id": "Semicondutores Brasil", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.61, "n": 22, "score": 5.43, "trend": "→", "signal": "<strong>Fase: Fricção Operacional (estável →).</strong> 22 sinais, score 5.43 sem tendência clara. O debate global sobre soberania de semicondutores (CHIPS Act EUA, EU Chips Act) não encontrou resposta industrial equivalente no Brasil. A CEITEC S.A. foi mantida mas sem plano de escala. Design de chips nacionais existe (CESAR, CNPEM), mas fabricação local é economicamente inviável sem subsídio de escala. Sem catalisador governamental de R$ 10B+ em política industrial, esse ponto permanece estagnado na fricção por 2–3 anos.", "phase": "Fricção Operacional", "above": true, "updated": false}, {"id": "BESS", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.68, "n": 72, "score": 7.56, "trend": "↗", "signal": "<strong>Fase: Escala Econômica (acelerando ↗).</strong> 72 sinais, 11 fatos canônicos — maior densidade de fatos verificados do banco. O ponto de inflexão foi preciso: a ANEEL autorizou a primeira unidade de armazenamento por baterias no Brasil (mai/2026) e publicou portaria regulamentando leilões de BESS. Custo de BESS caiu 40% desde 2022 (LFP dominante). A regulação entrou em fase de consolidação: avanço em revenue stacking, dupla tarifação e serviços ancilares está em discussão, mas ainda não oferece previsibilidade econômica plena para financiamento de longo prazo. Próximo catalisador: primeiro leilão específico de BESS previsto para 2026-27.", "phase": "Escala Econômica", "above": false, "updated": false}, {"id": "5G Industrial", "frente": "DeepTech", "color": "#5B8CFF", "x": 0.73, "n": 29, "score": 6.74, "trend": "↗", "signal": "<strong>Fase: Escala Econômica (acelerando ↗).</strong> 29 sinais com tendência de alta. O 5G industrial (redes privativas 3.5GHz / 26GHz) começa a ter casos reais no Brasil: corredores logísticos em portos, automação de mineração e comunicação entre subestações. Diferente do 5G consumidor, o industrial tem ROI mensurável em redução de latência e substituição de cabos industriais. A Anatel liberou faixas industriais em 2025. Empresas como Ericsson e Nokia reportam pipeline de projetos industriais crescendo 35% a.a. no Brasil.", "phase": "Escala Econômica", "above": true, "updated": false}, {"id": "Open Finance / Pix", "frente": "FinTech", "color": "#D9A441", "x": 0.79, "n": 40, "score": 4.33, "trend": "→", "signal": "<strong>Pix: Infraestrutura Crítica. Open Finance: Escala Econômica (estável →).</strong> 40 sinais. O Pix atingiu maturidade plena: 9 bilhões de transações/mês, 160 milhões de usuários, custo zero para pessoa física. Já é infraestrutura crítica, não inovação. O Open Finance está na escala: compartilhamento de dados bancários com consentimento está gerando casos reais de crédito rural personalizado, scoring alternativo para MEI e propostas de seguro parametrizado. O BCB avança com Open Insurance e Open Investments — esse vetor ainda vai subir antes de estabilizar.", "phase": "Infraestrutura Crítica", "above": false, "updated": false}, {"id": "Transmissão Elétrica", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.83, "n": 70, "score": 8.0, "trend": "→", "signal": "<strong>Fase: Infraestrutura Crítica (estável →).</strong> 70 sinais com score médio 8.0 — o mais alto score sustentado do banco de dados ao longo de todas as semanas monitoradas. A expansão da malha de transmissão é condição necessária para integrar as renováveis do Nordeste e Centro-Oeste ao sudeste consumidor. Os leilões de transmissão da ANEEL são regulares, o BNDES financia com condições padronizadas e os retornos são previsíveis. Risco monitorado: conflitos fundiários e licenciamento ambiental que atrasam obras em 18–36 meses.", "phase": "Infraestrutura Crítica", "above": true, "updated": false}, {"id": "Solar GD", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.88, "n": 447, "score": 7.05, "trend": "→", "signal": "<strong>Fase: Infraestrutura Crítica (estável →).</strong> 447 sinais — maior volume absoluto do banco. 25 fatos canônicos validados. Custo atual: BRL 2,45/W (-7% a.a.). A Lei 15.269/2025 consolidou o marco regulatório da geração distribuída. O Brasil tem 38 GW de capacidade instalada de solar GD — dobrou em 3 anos. Tecnologia completamente matura: financiamento bancário direto ao consumidor, instalação padronizada, retorno em 4–6 anos. Próxima fronteira: integração com BESS residencial e V2G.", "phase": "Infraestrutura Crítica", "above": false, "updated": false}, {"id": "Eólica Onshore", "frente": "EnergyTech", "color": "#2FA87C", "x": 0.93, "n": 88, "score": 7.12, "trend": "→", "signal": "<strong>Fase: Commoditização (estável →).</strong> 88 sinais. Tecnologia de referência de maturidade no portfólio xTechs. Leilões regulares da ANEEL com volumes crescentes, cadeia fornecedora local consolidada (torres, pás, nacelles), financiamento BNDES com critérios e taxas padronizadas. Custo nivelado (LCOE) de BRL 100–140/MWh — competitivo sem subsídio. A eólica offshore está no Sinal Emergente: o marco regulatório foi aprovado em 2023, mas os primeiros projetos só entram em operação após 2030.", "phase": "Commoditização", "above": true, "updated": false}];
+  const CURVE_PTS = [[0.0, 0.08], [0.08, 0.18], [0.16, 0.34], [0.24, 0.58], [0.32, 0.78], [0.4, 0.88], [0.48, 0.56], [0.56, 0.34], [0.64, 0.42], [0.72, 0.58], [0.8, 0.72], [0.88, 0.76], [0.96, 0.62], [1.0, 0.52]];
+  const STAGES = [{"x": 0.0, "label": "Sinal Emergente", "sub": "sinais fracos"}, {"x": 0.14, "label": "Narrativa Exponencial", "sub": "tese ganha mercado"}, {"x": 0.3, "label": "Pico de Especula\u00e7\u00e3o", "sub": "capital antecipa ROI"}, {"x": 0.45, "label": "Fric\u00e7\u00e3o Operacional", "sub": "CAPEX \u00b7 regula\u00e7\u00e3o \u00b7 legado"}, {"x": 0.62, "label": "Escala Econ\u00f4mica", "sub": "casos repet\u00edveis"}, {"x": 0.78, "label": "Infra. Cr\u00edtica", "sub": "depend\u00eancia sist\u00eamica"}, {"x": 0.91, "label": "Commodity", "sub": "efici\u00eancia e custo"}];
+
+  const W=1060, H=520, margin={top:58,right:34,bottom:96,left:46};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  const fills=[
+    'rgba(47,168,124,.07)','rgba(91,140,255,.09)','rgba(217,164,65,.09)',
+    'rgba(217,108,108,.08)','rgba(93,202,165,.07)','rgba(121,163,255,.07)','rgba(113,128,150,.07)'
+  ];
+
+  window._efLoadD3 = window._efLoadD3 || function(cb) {
+    if (window.d3) { cb(); return; }
+    window._efD3Queue = window._efD3Queue || [];
+    window._efD3Queue.push(cb);
+    if (window._efD3Loading) return;
+    window._efD3Loading = true;
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js";
+    s.onload = function() {
+      window._efD3Loading = false;
+      (window._efD3Queue||[]).forEach(f => { try{f();}catch(e){} });
+      window._efD3Queue = [];
+    };
+    document.head.appendChild(s);
+  };
+
+  window._efLoadD3(function() {
+    const svg = d3.select("#rte5-ctc-svg");
+    const g   = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const detail = document.getElementById("rte5-ctc-detail");
+
+    const x = d3.scaleLinear().domain([0,1]).range([0,iw]);
+    const y = d3.scaleLinear().domain([0,1]).range([ih,0]);
+
+    function curveY(cx) {
+      for (let i=0; i<CURVE_PTS.length-1; i++) {
+        const a=CURVE_PTS[i], b=CURVE_PTS[i+1];
+        if (cx>=a[0]&&cx<=b[0]) { const t=(cx-a[0])/(b[0]-a[0]); return a[1]+t*(b[1]-a[1]); }
+      }
+      return CURVE_PTS[CURVE_PTS.length-1][1];
+    }
+
+    // Faixas de estágio
+    STAGES.forEach((s,i) => {
+      const x0=x(s.x), x1=i+1<STAGES.length?x(STAGES[i+1].x):x(1);
+      g.append("rect").attr("x",x0).attr("y",0).attr("width",x1-x0).attr("height",ih).attr("fill",fills[i]);
+      g.append("line").attr("x1",x0).attr("x2",x0).attr("y1",0).attr("y2",ih).attr("stroke","rgba(255,255,255,.07)");
+      g.append("text").attr("x",x0+7).attr("y",ih+30)
+        .attr("fill","#A8B3C2").attr("font-size","10px").attr("font-family","IBM Plex Mono,monospace")
+        .attr("font-weight","600").text(s.label);
+      g.append("text").attr("x",x0+7).attr("y",ih+46)
+        .attr("fill","#718096").attr("font-size","8px").attr("font-family","IBM Plex Mono,monospace")
+        .text(s.sub);
+    });
+
+    // Linha de base
+    g.append("line").attr("x1",0).attr("x2",iw).attr("y1",ih).attr("y2",ih).attr("stroke","rgba(255,255,255,.13)");
+
+    // Eixos
+    g.append("text").attr("x",iw/2).attr("y",ih+75).attr("text-anchor","middle")
+      .attr("fill","#718096").attr("font-size","10px").attr("font-family","IBM Plex Mono,monospace")
+      .text("Maturidade de mercado e integração infraestrutural");
+    g.append("text").attr("transform","rotate(-90)").attr("x",-ih/2).attr("y",-30).attr("text-anchor","middle")
+      .attr("fill","#718096").attr("font-size","10px").attr("font-family","IBM Plex Mono,monospace")
+      .text("Valor sistêmico e pressão estratégica");
+
+    // Curva principal + halo
+    const line = d3.line().x(d=>x(d[0])).y(d=>y(d[1])).curve(d3.curveCatmullRom.alpha(.55));
+    g.append("path").datum(CURVE_PTS).attr("d",line)
+      .attr("fill","none").attr("stroke","rgba(121,163,255,.18)").attr("stroke-width",10).attr("opacity",.6)
+      .style("filter","drop-shadow(0 0 9px rgba(121,163,255,.28))");
+    g.append("path").datum(CURVE_PTS).attr("d",line)
+      .attr("fill","none").attr("stroke","#79A3FF").attr("stroke-width",3).attr("opacity",.82);
+
+    // Tecnologias
+    TECHS.forEach(t => {
+      t.px = x(t.x);
+      t.py = y(curveY(t.x));
+      t.r  = Math.min(8.5, 3.4 + Math.log10(t.n+1)*2.55);
+    });
+
+    const item = g.selectAll("g.ctc-tech").data(TECHS).enter().append("g").attr("class","ctc-tech");
+
+    item.append("line")
+      .attr("x1",d=>d.px).attr("x2",d=>d.px)
+      .attr("y1",d=>d.py).attr("y2",d=>d.above?d.py-25:d.py+29)
+      .attr("stroke",d=>d.color).attr("stroke-width",1).attr("opacity",.45);
+
+    item.append("circle")
+      .attr("cx",d=>d.px).attr("cy",d=>d.py).attr("r",d=>d.r)
+      .attr("fill",d=>d.color).attr("fill-opacity",.9)
+      .attr("stroke","#0F1722").attr("stroke-width",1.8)
+      .style("cursor","pointer")
+      .style("filter","drop-shadow(0 0 8px rgba(91,140,255,.18))")
+      .on("mouseover", show).on("click", show);
+
+    item.append("text")
+      .attr("x",d=>d.px).attr("y",d=>d.above?d.py-31:d.py+43)
+      .attr("fill",d=>d.color).attr("text-anchor","middle")
+      .attr("font-size","9px").attr("font-weight","600")
+      .attr("font-family","IBM Plex Mono,monospace")
+      .style("cursor","pointer")
+      .text(d=>d.id+" "+({"↗":"+","↘":"-","→":"="}[d.trend]||d.trend))
+      .on("mouseover", show).on("click", show);
+
+    function show(ev, d) {
+      if (!detail) return;
+      detail.innerHTML =
+        `<strong style="color:${d.color};font-size:.92rem;">${d.id}</strong>`
+        + ` &nbsp;<span style="color:#718096;font-family:'IBM Plex Mono',monospace;">${d.trend} · ${d.frente}</span>`
+        + `<br><span style="color:#718096;font-family:'IBM Plex Mono',monospace;font-size:.75rem;">`
+        + `Fase: ${d.phase} · ${d.n} sinais · score ${d.score}</span>`
+        + `<br>${d.signal}`;
+    }
+  });
+})();
+</script>
+</section>
+<section class="rte5-section" id="cta">
+  <div style="background:linear-gradient(135deg,rgba(47,168,124,.07),rgba(91,140,255,.05));border:1px solid rgba(47,168,124,.22);border-radius:20px;padding:40px 36px;max-width:620px;margin:0 auto;text-align:center">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.14em;color:#2FA87C;margin-bottom:14px">efagundes.com · Think Tank</div>
+    <div style="font-size:1.18rem;font-weight:700;color:#E6EDF3;line-height:1.38;margin-bottom:12px">Quer aplicar esta análise nas decisões da sua empresa?</div>
+    <div style="font-size:.86rem;color:#A8B3C2;line-height:1.7;margin-bottom:28px">O Radar xTech é atualizado a cada ciclo de inteligência.<br>Entre em contato para transformar sinal em decisão.</div>
+    <a href="https://efagundes.com/contato/"
+       style="display:inline-block;background:#2FA87C;color:#fff;font-weight:700;font-size:.92rem;padding:13px 32px;border-radius:10px;text-decoration:none;letter-spacing:.02em">
+      Entrar em contato →
+    </a>
+  </div>
+</section>
+<div class="rte5-footer">
+  <span>Efagundes Intelligence Engine · Radar xTechs</span>
+  <span>Ciclo 2026-06-27 · Gerado em 2026-06-27T19:13:49.335892+00:00</span>
+</div></div>

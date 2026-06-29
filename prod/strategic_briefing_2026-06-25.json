@@ -1,0 +1,91 @@
+{
+  "insight_executivo": "Selic real a 9,62% e PLD pressionado por Brent em queda de 22,63% colidem com nova rodada regulatória (Fator X, tarifas de transmissão) que redefine quem captura valor no setor elétrico.",
+  "correlacao_mercado": "O vetor 'Mobilizar Agora' (pressão 7,34) opera sob custo real de capital de 9,62% — muito acima dos 6% que tornam infraestrutura marginal — o que penaliza qualquer projeto greenfield de geração e BESS dependente de CAPEX. A queda de 22,63% no Brent derruba o combustível das termelétricas e o PLD, esvaziando a receita de spot e reforçando que só ativos com PPA longo ou contrato de disponibilidade fecham conta. Enquanto o Ibovespa cai 3,44%, o proxy elétrico CPFE3 sobe 1,79%: o capital está rotacionando para infraestrutura defensiva regulada, não para risco de mercado.",
+  "pergunta_estrategica": "Com Selic real a 9,62% e PLD em queda, seu portfólio depende de receita de spot ou de contratos de disponibilidade de longo prazo — e quanto dele você consegue blindar nos próximos 90 dias?",
+  "contexto_pergunta": "A pergunta surge da confluência entre o custo real de capital de 9,62% e a fala da Hitachi de que data centers buscam infraestrutura disponível, não preço.",
+  "sinais_atencao": [
+    {
+      "titulo": "Data centers priorizam infraestrutura disponível, não preço (Hitachi)",
+      "contexto": "Desloca o valor de quem tem MW e conexão pronta agora; com Selic real a 9,62%, esperar para construir é mais caro que adquirir capacidade existente.",
+      "tipo": "oportunidade"
+    },
+    {
+      "titulo": "Aneel deve reformular Fator X por impacto da MMGD nas distribuidoras",
+      "contexto": "Revisão muda a equação de receita das distribuidoras justo quando CPFE3 sobe contra o Ibovespa — janela para reprecificar exposição ao setor regulado.",
+      "tipo": "ruptura"
+    },
+    {
+      "titulo": "Ação do MPF ameaça travar licenças hidrelétricas no Madeira",
+      "contexto": "Risco de governança hídrica eleva incerteza sobre ativos de geração no momento em que PLD baixo já comprime a margem de spot.",
+      "tipo": "risco"
+    }
+  ],
+  "ciclo": "2026-06-25",
+  "gerado_em": "2026-06-25T08:09:31.218044-03:00",
+  "modelo": "claude-opus-4-8",
+  "market_data": {
+    "Selic": {
+      "valor": 14.25,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo de capital para projetos de infraestrutura e P&D",
+      "unidade": "% a.a."
+    },
+    "Selic Real": {
+      "valor": 9.62,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Custo real de capital; acima de 6% torna projetos de infraestrutura marginais inviáveis",
+      "unidade": "calculado"
+    },
+    "IPCA": {
+      "valor": 0.58,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão sobre contratos de energia, insumos e reajustes tarifários",
+      "unidade": "% a.m."
+    },
+    "Brent": {
+      "valor": 72.95,
+      "variacao_30d_pct": -22.63,
+      "variacao_7d_pct": -8.64,
+      "relevancia": "Referência global de preço de energia; pressão sobre PLD e termelétricas",
+      "unidade": "USD/barril"
+    },
+    "Cobre": {
+      "valor": 6.093,
+      "variacao_30d_pct": -3.36,
+      "variacao_7d_pct": -4.42,
+      "relevancia": "Sinal de eletrificação e infraestrutura; BESS, transmissão, EVs",
+      "unidade": "USD/lb"
+    },
+    "Ibovespa": {
+      "valor": 170507.0,
+      "variacao_30d_pct": -3.44,
+      "variacao_7d_pct": 1.32,
+      "relevancia": "Humor do mercado brasileiro; base para força relativa setorial",
+      "unidade": "pontos"
+    },
+    "IEE proxy (CPFE3)": {
+      "valor": 44.37,
+      "variacao_30d_pct": 1.79,
+      "variacao_7d_pct": 0.82,
+      "relevancia": "Proxy do setor elétrico B3; CPFL Energia — distribuição, geração e transmissão",
+      "unidade": "BRL/ação"
+    },
+    "UTIL (Utilidades)": {
+      "valor": 18439.4902,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Percepção de infraestrutura defensiva; saneamento, energia, concessões",
+      "unidade": "pontos"
+    },
+    "Brent Tendência 30d": {
+      "valor": -22.63,
+      "variacao_30d_pct": null,
+      "variacao_7d_pct": null,
+      "relevancia": "Pressão energética global: queda — impacta PLD e competitividade de renováveis",
+      "unidade": "calculado"
+    }
+  }
+}
