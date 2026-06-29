@@ -1,0 +1,37 @@
+reasoning_model:
+  name: nMentors Knowledge Engine Lite
+  version: "0.1"
+  purpose: orientar o Radar xTech a transformar sinais em inteligência decisória
+
+  reasoning_chain:
+    - detect_signal
+    - map_to_known_pattern
+    - infer_strategic_theme
+    - identify_drivers
+    - assess_business_impact
+    - define_decision_window
+    - generate_executive_implications
+
+  principles:
+    - evidence_before_conclusion
+    - context_before_recommendation
+    - decision_before_description
+    - neutrality_in_public_outputs
+    - preserve_existing_radar_structure
+
+  output_namespace: nke_lite
+  output_fields:
+    strategic_theme: string        # tema estratégico inferido
+    inferred_pattern: string       # padrão reconhecido no sinal
+    business_impact: string        # impacto no negócio (1 frase)
+    decision_window: string        # janela de decisão (ex: "30-60 dias")
+    decision_pressure: string      # baixa | média | alta | crítica
+    confidence_score: number       # 0.0 a 1.0
+
+  safety:
+    feature_flag: NKE_LITE_ENABLED
+    default: false
+    fallback_on_error: true
+    no_commercial_content: true
+    no_html_changes: true
+    no_schema_changes: true

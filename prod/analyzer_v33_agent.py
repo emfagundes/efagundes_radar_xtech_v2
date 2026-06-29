@@ -76,6 +76,15 @@ DEFAULT_DB = Path(__file__).resolve().parent.parent / "db" / "intel.sqlite"
 
 MODELO_ENRIQUECIMENTO = "claude-sonnet-4-6"
 
+# ── NKE Lite — feature flag ───────────────────────────────────────────────────
+NKE_LITE_ENABLED = os.environ.get("NKE_LITE_ENABLED", "false").strip().lower() == "true"
+
+_NKE_LITE_INSTRUCTION = (
+    "Raciocine segundo o nMentors Knowledge Engine Lite. "
+    "Não resuma apenas eventos. Transforme sinais em hipóteses estratégicas. "
+    "Toda conclusão deve seguir a cadeia: evidência → interpretação → impacto → decisão."
+)
+
 XTECHS = ["EnergyTech", "CleanTech", "FinTech", "DeepTech", "AgriTech"]
 
 # ── Mapeamento xTech ──────────────────────────────────────────────────────────
@@ -1334,6 +1343,100 @@ def _auditar_enriquecimento(output: dict) -> dict:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# NKE Lite — 6.5.15 (executado apenas se NKE_LITE_ENABLED=true)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_NKE_SYSTEM = (
+    "Você é analista estratégico do Radar xTech. "
+    + _NKE_LITE_INSTRUCTION + " "
+    "Retorne APENAS JSON válido, sem markdown, sem texto fora do JSON. "
+    "Acentuação correta do português brasileiro."
+)
+
+_NKE_EMPTY: dict = {
+    "strategic_theme": "",
+    "inferred_pattern": "",
+    "business_impact": "",
+    "decision_window": "",
+    "decision_pressure": "",
+    "confidence_score": 0.0,
+}
+
+
+def gerar_nke_lite(client: anthropic.Anthropic, output: dict) -> dict:
+    """6.5.15 — Enriquecimento NKE Lite (executado apenas se NKE_LITE_ENABLED=true).
+
+    Gera o namespace nke_lite a partir dos sinais e vetores do ciclo.
+    Completamente aditivo: não altera nenhum campo existente.
+    """
+    print("  -> [6.5.15] NKE Lite — nMentors Knowledge Engine Lite (Sonnet)...")
+
+    # Resumo compacto do ciclo para o prompt
+    hero     = output.get("hero") or {}
+    vetores  = output.get("vetores_estrategicos") or []
+    conv     = output.get("convergencia") or []
+    manchete = hero.get("manchete") or ""
+    briefing = (hero.get("briefing") or "")[:400]
+
+    top_vetores = [
+        f"[{v.get('quadrante_executivo','')}] {v.get('nome','')} — pressão {v.get('pressao_estrategica',0):.1f}"
+        for v in vetores[:5]
+    ]
+    top_conv = [c.get("titulo", "") for c in conv[:3]]
+
+    user = f"""Ciclo: {HOJE_ISO}
+Manchete dominante: {manchete}
+Briefing: {briefing}
+
+Vetores estratégicos:
+{chr(10).join(top_vetores) or "Não disponível."}
+
+Convergências identificadas:
+{chr(10).join(top_conv) or "Não disponível."}
+
+Com base nesses sinais, gere o namespace nke_lite para o ciclo.
+Siga a cadeia: evidência → interpretação → impacto → decisão.
+
+Retorne EXATAMENTE este JSON:
+{{
+  "strategic_theme": "Tema estratégico central inferido dos sinais (5-10 palavras)",
+  "inferred_pattern": "Padrão reconhecido — ex: 'Regulação antecipada comprime janela de entrada' (1 frase)",
+  "business_impact": "Impacto direto no negócio de um executivo setorial (1 frase, máx 25 palavras)",
+  "decision_window": "Janela de decisão — ex: '30-60 dias', 'Q3 2026', 'próximas 2 semanas'",
+  "decision_pressure": "baixa | média | alta | crítica",
+  "confidence_score": 0.0
+}}
+
+Para confidence_score: use 0.9 se há pelo menos 3 fatos duros; 0.7 se 1-2 fatos; 0.5 se inferência; 0.3 se especulativo.
+"""
+
+    try:
+        texto = _chamar_sonnet(client, _NKE_SYSTEM, user, max_tokens=512)
+        resultado = json.loads(_reparar_json(_extrair_json(texto)))
+        # Garante que todos os campos obrigatórios existem
+        for k, v in _NKE_EMPTY.items():
+            resultado.setdefault(k, v)
+        # Garante tipos corretos
+        try:
+            resultado["confidence_score"] = float(resultado["confidence_score"])
+        except (ValueError, TypeError):
+            resultado["confidence_score"] = 0.0
+        if resultado.get("decision_pressure") not in ("baixa", "média", "alta", "crítica"):
+            resultado["decision_pressure"] = "média"
+        resultado["gerado_em"] = datetime.now(timezone.utc).isoformat()
+        resultado["enabled_by"] = "NKE_LITE_ENABLED=true"
+        print(
+            f"     [OK] NKE Lite — tema: '{resultado.get('strategic_theme','')}' | "
+            f"pressão: {resultado.get('decision_pressure','')} | "
+            f"confiança: {resultado.get('confidence_score',0):.2f}"
+        )
+        return resultado
+    except Exception as exc:
+        print(f"  ⚠ [6.5.15] NKE Lite falhou: {exc}. Usando fallback vazio.")
+        return {**_NKE_EMPTY, "fallback": True, "erro": str(exc)}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Fase 6.5 — Orquestrador do enriquecimento
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1456,6 +1559,16 @@ def fase_65_enriquecimento_radar_xtech(client: anthropic.Anthropic, db_path: Pat
         )
     else:
         print(f"     [OK] Enriquecimento: {_eq} ({_fc} fallbacks).")
+
+    # 6.5.15 NKE Lite — executado apenas se NKE_LITE_ENABLED=true
+    if NKE_LITE_ENABLED:
+        try:
+            output["nke_lite"] = gerar_nke_lite(client, output)
+        except Exception as _nke_exc:
+            print(f"  ⚠ [6.5.15] NKE Lite falhou de forma inesperada: {_nke_exc}. Pipeline continua normalmente.")
+            output["nke_lite"] = {**_NKE_EMPTY, "fallback": True, "erro": str(_nke_exc)}
+    else:
+        print("  · [6.5.15] NKE Lite desativado (NKE_LITE_ENABLED=false) — pulando.")
 
     # Atualiza versão e salva
     output["versao"] = "v33-xtech-horizons-partial"  # fase 6.6 atualiza para v33-xtech-horizons
