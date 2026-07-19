@@ -29,6 +29,7 @@ import json
 from pathlib import Path
 
 import scenario_tracker_v1 as st
+import scenario_calibration_v1 as calibration
 
 ROOT_DIR = Path(__file__).resolve().parent
 DEFAULT_ARCHIVE_DIR = ROOT_DIR.parent / "arquivo"
@@ -84,15 +85,25 @@ def rodar_backfill(archive_dir: Path, db_path: Path, dry_run: bool = False) -> d
             hero     = data.get("hero") or {}
             fatos    = data.get("fatos_canonicos") or []
 
-            n_snap = st.persist_snapshots(conn, cenarios, matriz, ciclo_id)
+            # Mesma regra do pipeline: a função de recalibração usada para os
+            # cenários deste ciclo é sempre de um ciclo anterior (processados
+            # em ordem cronológica, então "anterior" aqui é sempre um ciclo já
+            # visto nesta mesma passada do backfill).
+            funcao_recal = calibration.carregar_ultima_funcao_recalibracao(conn, ciclo_id)
+            n_snap = st.persist_snapshots(conn, cenarios, matriz, ciclo_id,
+                                           funcao_recalibracao=funcao_recal)
             n_eval = st.evaluate_open_scenarios(conn, ciclo_id, vetores, hero, fatos)
+            calib = calibration.run_calibration_cycle(conn, ciclo_id)
             total_snap += n_snap
             total_eval += n_eval
-            print(f"    {ciclo_id}  +{n_snap} snapshot(s)  +{n_eval} avaliação(ões)")
+            ece_str = f"{calib['ece']:.3f}" if calib["ece"] is not None else "n/d"
+            print(f"    {ciclo_id}  +{n_snap} snapshot(s)  +{n_eval} avaliação(ões)  "
+                  f"ECE={ece_str}")
 
         print(f"\n  ✓ Total: {total_snap} snapshots, {total_eval} avaliações "
               f"em {len(ciclos)} ciclos processados")
         resumo = st.build_scenario_tracking_summary(conn)
+        resumo["auto_calibracao"] = calibration.build_auto_calibracao_summary(conn)
     finally:
         conn.close()
 
@@ -123,6 +134,13 @@ def main() -> int:
               f"{resumo['dias_medios_antecedencia_confirmados']}")
         print(f"  Calibração: {resumo['calibracao']}")
         print(f"  Não-materializados: {len(resumo['nao_materializados'])}")
+
+        ac = resumo.get("auto_calibracao") or {}
+        print(f"\n  AUTO-CALIBRAÇÃO (Seção 7 — {ac.get('n_ciclos_historico', 0)} ciclo(s) em calibration_history)")
+        print(f"  {'─' * 60}")
+        print(f"  ECE atual: {ac.get('ece_atual')}  (anterior: {ac.get('ece_anterior')})")
+        print(f"  Separação atual: {ac.get('separacao_atual')}  (anterior: {ac.get('separacao_anterior')})")
+        print(f"  {ac.get('ajuste_aplicado', '')}")
 
         if args.update_live_intel_output:
             intel_path = Path(args.update_live_intel_output)

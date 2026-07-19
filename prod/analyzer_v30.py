@@ -877,19 +877,45 @@ Retorne EXATAMENTE este JSON (sem texto fora do JSON):
       "narrativa_macro": "Parágrafo rico detalhando o cenário, acentuação impecável, SEM NEGRITO. Mínimo 3 frases.",
       "descricao_expandida": "Explicação detalhada em 3-5 frases: o que acontece, por que, e quais as implicações para o Brasil. SEM NEGRITO.",
       "diretriz_acao_brasil": "Ação estratégica concreta para o Brasil, acentuação correta, SEM NEGRITO.",
-      "probabilidade": 35,
-      "impacto": "Muito Alto",
-      "tipo": "Risco",
+      "probabilidade": 15,
+      "impacto": "Alto",
+      "tipo": "Oportunidade",
       "pos_x": 0.75,
       "pos_y": 0.25,
       "ids_sinais": [0, 1, 2]
+    }},
+    {{
+      "numero": 2,
+      "titulo_cenario": "...",
+      "narrativa_macro": "...",
+      "descricao_expandida": "...",
+      "diretriz_acao_brasil": "...",
+      "probabilidade": 35,
+      "impacto": "Muito Alto",
+      "tipo": "Risco",
+      "pos_x": 0.30,
+      "pos_y": 0.70,
+      "ids_sinais": [3, 4]
+    }},
+    {{
+      "numero": 3,
+      "titulo_cenario": "...",
+      "narrativa_macro": "...",
+      "descricao_expandida": "...",
+      "diretriz_acao_brasil": "...",
+      "probabilidade": 45,
+      "impacto": "Moderado",
+      "tipo": "Misto",
+      "pos_x": 0.55,
+      "pos_y": 0.45,
+      "ids_sinais": [1, 5]
     }}
   ]
 }}
 
 REGRAS:
 - numero: sequencial 1, 2, 3
-- probabilidade: inteiro 0-100 (os 3 cenários devem somar ≤ 100)
+- probabilidade: inteiro 0-100 (os 3 cenários devem somar ≤ 100). USE A ESCALA COMPLETA — os valores 15/35/45 acima são ILUSTRATIVOS DE FORMATO, não uma faixa a copiar. Não ancore nesses números nem os repita ciclo após ciclo. A diferença entre o cenário mais provável e o menos provável DEVE ser MAIOR QUE 15 pontos. Atribua < 20 quando o mecanismo causal for especulativo ou depender de várias condições encadeadas ainda não observadas; atribua > 40 quando houver evidência direta e sinais convergentes já presentes nos itens analisados deste ciclo.
 - impacto: "Muito Alto" | "Alto" | "Moderado" | "Baixo"
 - tipo: "Risco" | "Oportunidade" | "Misto"
 - pos_x e pos_y: floats 0.0-1.0 em quadrantes diferentes

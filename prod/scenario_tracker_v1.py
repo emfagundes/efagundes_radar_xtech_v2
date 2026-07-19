@@ -50,6 +50,8 @@ try:
 except ImportError:
     pass
 
+import scenario_calibration_v1 as calibration
+
 BRASILIA = timezone(timedelta(hours=-3))
 
 ROOT_DIR      = Path(__file__).resolve().parent
@@ -109,6 +111,7 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.execute(DDL_EVALUATIONS)
     conn.execute(DDL_INDEX)
     conn.commit()
+    calibration.ensure_calibration_schema(conn)
 
 
 # ─── Extração de palavras-chave do mecanismo causal ────────────────────────
@@ -304,7 +307,14 @@ def persist_snapshots(
     matriz_incertezas: dict,
     ciclo_id: str,
     horizonte_dias: int = HORIZONTE_DIAS_DEFAULT,
+    funcao_recalibracao: dict | None = None,
 ) -> int:
+    """funcao_recalibracao (opcional) é a função derivada num ciclo ANTERIOR
+    por scenario_calibration_v1 — nunca a do próprio ciclo_id sendo
+    persistido agora (essa só existe depois, calculada sobre avaliações que
+    ainda vão rodar). probabilidade_bruta grava o que o modelo gerou;
+    probabilidade_inicial grava o valor calibrado exibido (igual à bruta
+    quando ainda não há função de recalibração disponível)."""
     matriz_incertezas = matriz_incertezas or {}
     eixo_x_nome = (matriz_incertezas.get("eixo_x") or {}).get("nome", "")
     eixo_y_nome = (matriz_incertezas.get("eixo_y") or {}).get("nome", "")
@@ -314,17 +324,19 @@ def persist_snapshots(
         cid = c.get("id") or c.get("numero") or (i + 1)
         uid = scenario_uid(ciclo_id, cid)
         mecanismo_kws = extrair_mecanismo_kws(c.get("narrativa_macro", ""))
+        prob_bruta = int(c.get("probabilidade") or 0)
+        prob_calibrada = calibration.aplicar_calibracao(prob_bruta, funcao_recalibracao)
         cur = conn.execute(
             """
             INSERT OR IGNORE INTO scenario_snapshots
               (scenario_uid, data_emissao, titulo_cenario, tipo, probabilidade_inicial,
-               impacto, pos_x, pos_y, eixo_x_nome, eixo_y_nome, gatilhos, mecanismo_kws,
-               horizonte_dias)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+               probabilidade_bruta, impacto, pos_x, pos_y, eixo_x_nome, eixo_y_nome,
+               gatilhos, mecanismo_kws, horizonte_dias)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 uid, ciclo_id, c.get("titulo_cenario", ""), c.get("tipo", "Misto"),
-                int(c.get("probabilidade") or 0), c.get("impacto", "Alto"),
+                prob_calibrada, prob_bruta, c.get("impacto", "Alto"),
                 float(c.get("pos_x") or 0.5), float(c.get("pos_y") or 0.5),
                 eixo_x_nome, eixo_y_nome,
                 json.dumps(c.get("gatilhos") or [], ensure_ascii=False),
@@ -504,11 +516,24 @@ def run_scenario_tracker(
         if dry_run:
             print(f"  [dry-run] {len(cenarios)} cenário(s) seriam persistidos para o ciclo {ciclo_id}")
         else:
-            n_snap = persist_snapshots(conn, cenarios, matriz, ciclo_id, horizonte_dias_default)
+            # A função de recalibração usada aqui é sempre de um ciclo ANTERIOR
+            # (carregar_ultima_funcao_recalibracao exclui o ciclo_id atual) —
+            # nenhum cenário é calibrado com dado do próprio ciclo em que nasce.
+            funcao_recal = calibration.carregar_ultima_funcao_recalibracao(conn, ciclo_id)
+            n_snap = persist_snapshots(conn, cenarios, matriz, ciclo_id, horizonte_dias_default,
+                                        funcao_recalibracao=funcao_recal)
             print(f"  ✓ scenario_snapshots — {n_snap} novo(s) cenário(s) (ciclo {ciclo_id})")
             n_eval = evaluate_open_scenarios(conn, ciclo_id, vetores, hero, fatos)
             print(f"  ✓ scenario_evaluations — {n_eval} avaliação(ões) registrada(s)")
+
+            calib = calibration.run_calibration_cycle(conn, ciclo_id)
+            ece_str = f"{calib['ece']:.3f}" if calib["ece"] is not None else "n/d"
+            sep_str = f"{calib['separacao']:.3f}" if calib["separacao"] is not None else "n/d"
+            print(f"  ✓ calibration_history — ECE={ece_str} separação={sep_str} "
+                  f"(n={calib['n_cenarios_avaliados']})")
+
         tracking = build_scenario_tracking_summary(conn)
+        tracking["auto_calibracao"] = calibration.build_auto_calibracao_summary(conn)
     finally:
         conn.close()
 
