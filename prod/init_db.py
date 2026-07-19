@@ -236,6 +236,40 @@ DDL = [
         criado_em           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """,
+    # scenario_tracker_v1 — rastreador de cenários prospectivos (snapshot imutável + avaliação)
+    """
+    CREATE TABLE IF NOT EXISTS scenario_snapshots (
+        scenario_uid             TEXT PRIMARY KEY,
+        data_emissao             TEXT NOT NULL,
+        titulo_cenario           TEXT NOT NULL,
+        tipo                     TEXT,
+        probabilidade_inicial    INTEGER,
+        impacto                  TEXT,
+        pos_x                    REAL,
+        pos_y                    REAL,
+        eixo_x_nome              TEXT,
+        eixo_y_nome              TEXT,
+        gatilhos                 TEXT,
+        mecanismo_kws            TEXT,
+        horizonte_dias           INTEGER DEFAULT 30,
+        criado_em                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS scenario_evaluations (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        scenario_uid        TEXT NOT NULL,
+        data_avaliacao      TEXT NOT NULL,
+        gatilhos_acionados  TEXT,
+        fracao_confirmada   REAL,
+        evidencia           TEXT,
+        status              TEXT NOT NULL,
+        criado_em           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(scenario_uid, data_avaliacao),
+        FOREIGN KEY(scenario_uid) REFERENCES scenario_snapshots(scenario_uid)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_scenario_eval_uid ON scenario_evaluations(scenario_uid)",
     # Índices para queries frequentes
     "CREATE INDEX IF NOT EXISTS idx_raw_items_cycle    ON raw_items(cycle_date)",
     "CREATE INDEX IF NOT EXISTS idx_raw_items_hash     ON raw_items(hash)",

@@ -15,6 +15,7 @@ Fluxo simplificado (engine core preservado):
   5d.  Contradições detect_contradictions.py
   5.5  Hype Cycle        hype_cycle_updater.py
   5.6  Strategic Briefing strategic_briefing_v1.py  → strategic_briefing injeta em intel_output.json
+  5.7  Scenario Tracker  scenario_tracker_v1.py     → scenario_tracking injeta em intel_output.json
   6.   Radar + Hero      gerar_radar_xtechs_v11.py  → radar-xtechs-{ciclo}.html + hero-{ciclo}.html + hero-nmentors-{ciclo}.html
   7.   Backup       backup_db.py
 
@@ -37,6 +38,7 @@ Uso:
   python run_pipeline_v3.py --skip-market    # pula coleta de sinais quantitativos
   python run_pipeline_v3.py --only-market    # executa apenas market_collector
   python run_pipeline_v3.py --skip-briefing  # pula Strategic Briefing (sem pergunta estratégica)
+  python run_pipeline_v3.py --skip-scenario-tracker  # pula o Rastreador de Cenários Prospectivos
 """
 
 from __future__ import annotations
@@ -89,6 +91,7 @@ DETECT_CONTRADICTIONS = "detect_contradictions.py"
 RADAR                 = "gerar_radar_xtechs_v11.py"
 HYPE_CYCLE_UPDATER    = "hype_cycle_updater.py"
 STRATEGIC_BRIEFING    = "strategic_briefing_v1.py"
+SCENARIO_TRACKER      = "scenario_tracker_v1.py"
 BACKUP_DB             = "backup_db.py"
 
 
@@ -335,6 +338,19 @@ def etapa_strategic_briefing() -> None:
         warn(f"strategic_briefing_v1 falhou: {exc} — heroes serão gerados sem pergunta estratégica")
 
 
+def etapa_scenario_tracker() -> None:
+    header("5.7/7", f"Scenario Tracker — {SCENARIO_TRACKER}")
+    exigir(INTEL_OUTPUT)
+    if not as_path(SCENARIO_TRACKER).exists():
+        warn(f"{SCENARIO_TRACKER} não encontrado — etapa ignorada (sem scenario_tracking no JSON)")
+        return
+    garantir_banco()
+    mod = carregar_modulo(SCENARIO_TRACKER, "scenario_tracker_pipeline")
+    t0 = time.time()
+    run_main(mod, [SCENARIO_TRACKER, "--input", INTEL_OUTPUT, "--db", str(DEFAULT_DB)])
+    ok(f"Scenario Tracker concluído em {duracao(time.time() - t0)}")
+
+
 def etapa_radar() -> None:
     header("6/7", f"Radar xTech HTML + Hero — {RADAR}")
     exigir(INTEL_OUTPUT)
@@ -419,6 +435,7 @@ def main() -> None:
     skip_critic    = has_flag(argv, "--skip-critic")
     skip_market    = has_flag(argv, "--skip-market")
     skip_briefing  = has_flag(argv, "--skip-briefing")
+    skip_scenario_tracker = has_flag(argv, "--skip-scenario-tracker")
     only_docs    = has_flag(argv, "--only-docs")
     only_radar   = has_flag(argv, "--only-radar")
     only_memory  = has_flag(argv, "--only-memory")
@@ -455,10 +472,13 @@ def main() -> None:
         return
 
     if only_radar:
-        info("Modo --only-radar: Strategic Briefing + Radar xTech HTML + Heroes")
+        info("Modo --only-radar: Strategic Briefing + Scenario Tracker + Radar xTech HTML + Heroes")
         if not skip_briefing:
             try: etapa_strategic_briefing()
             except Exception as e: warn(f"Strategic Briefing falhou: {e}")
+        if not skip_scenario_tracker:
+            try: etapa_scenario_tracker()
+            except Exception as e: warn(f"Scenario Tracker falhou: {e}")
         try: etapa_radar()
         except Exception as e: warn(f"Radar falhou: {e}")
         imprimir_resumo(time.time() - t0)
@@ -499,6 +519,11 @@ def main() -> None:
         info("--skip-briefing: Strategic Briefing ignorado (heroes sem pergunta estratégica)")
     else:
         etapas.append((etapa_strategic_briefing, "Strategic Briefing + Pergunta do Mentor"))
+
+    if skip_scenario_tracker:
+        info("--skip-scenario-tracker: Rastreador de Cenários Prospectivos ignorado")
+    else:
+        etapas.append((etapa_scenario_tracker, "Scenario Tracker"))
 
     etapas.append((etapa_radar, "Radar xTech HTML + Heroes"))
 
