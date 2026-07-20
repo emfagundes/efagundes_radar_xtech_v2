@@ -603,6 +603,60 @@ def build_track_record(conn: sqlite3.Connection, ciclo_id: str) -> list[dict]:
     return itens
 
 
+# ─── Cenários ainda em formação (Horizonte 1) ──────────────────────────────
+
+N_EM_FORMACAO_DESTAQUE = 6
+
+
+def build_scenarios_em_formacao(conn: sqlite3.Connection, ciclo_id: str, limite: int = N_EM_FORMACAO_DESTAQUE) -> list[dict]:
+    """Cenários ainda ATIVOS — status atual em_aberto ou em_formacao, nunca
+    resolvidos. Para o H1 (o que está acontecendo AGORA): só o marcador de
+    emissão (âmbar) faz sentido aqui, nunca o de confirmação — ainda não
+    aconteceu. O arco completo emissão→confirmação (os dois marcadores)
+    é conteúdo de auditoria retrospectiva e mora no Track Record (H2),
+    não no estado atual do H1."""
+    latest: dict[str, tuple[str, float, str]] = {}
+    for uid, status, fracao, data_avaliacao in conn.execute(
+        "SELECT scenario_uid, status, fracao_confirmada, data_avaliacao FROM scenario_evaluations "
+        "ORDER BY data_avaliacao ASC"
+    ):
+        latest[uid] = (status, fracao, data_avaliacao)  # última linha (ASC) vence
+
+    rows = conn.execute(
+        "SELECT scenario_uid, titulo_cenario, tipo, data_emissao, mecanismo_kws FROM scenario_snapshots"
+    ).fetchall()
+
+    itens = []
+    for uid, titulo, tipo, data_emissao, kws_json in rows:
+        st = latest.get(uid)
+        if not st or st[0] not in ("em_aberto", "em_formacao"):
+            continue
+        status, fracao, _data_avaliacao = st
+        kws = json.loads(kws_json or "[]")
+        fim_curva, semanas_curva = _janela_relativa_ao_cenario(data_emissao, ciclo_id)
+        curva = fc.curva_formacao_semanal(conn, kws, fim_curva, semanas=semanas_curva)
+        itens.append({
+            "scenario_uid": uid,
+            "titulo": titulo,
+            "tipo": tipo or "Misto",
+            "status": status,
+            "data_emissao": data_emissao,
+            "data_confirmacao": None,
+            "dias_em_formacao": (_parse_date(ciclo_id) - _parse_date(data_emissao)).days,
+            "fracao_confirmada": fracao or 0.0,
+            "curva_formacao": curva,
+            "idx_emissao": fc.indice_semana_para_data(fim_curva, semanas_curva, data_emissao) if curva else None,
+            "idx_confirmacao": None,  # nunca — cenário ainda não confirmado
+        })
+
+    # Curadoria: prioriza quem já mostra alguma fração de gatilhos acionados
+    # (sinal real de movimento em direção à confirmação) sobre quem ainda
+    # está em zero; empate por mais tempo acumulando sinal.
+    candidatos = [it for it in itens if it["curva_formacao"] is not None]
+    candidatos.sort(key=lambda it: (it["fracao_confirmada"], it["dias_em_formacao"]), reverse=True)
+    return candidatos[:limite]
+
+
 # ─── Curva de formação do vetor #1 (Horizonte 1) ───────────────────────────
 
 def _sort_vetores_prioridade(vetores: list[dict]) -> list[dict]:
@@ -703,6 +757,7 @@ def run_scenario_tracker(
         tracking = build_scenario_tracking_summary(conn)
         tracking["auto_calibracao"] = calibration.build_auto_calibracao_summary(conn)
         tracking["track_record"] = build_track_record(conn, ciclo_id)
+        tracking["em_formacao"] = build_scenarios_em_formacao(conn, ciclo_id)
         if not dry_run:
             aplicar_curva_formacao_vetor1(conn, intel, ciclo_id)
     finally:

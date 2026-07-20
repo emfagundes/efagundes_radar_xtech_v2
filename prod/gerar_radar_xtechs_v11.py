@@ -691,6 +691,19 @@ def type_badge(kind: str) -> str:
     return f'<span class="rte5-type-badge" style="color:{color};border-color:{color}">{label}</span>'
 
 
+def bridge_badge() -> str:
+    """Selo 'PONTE' — único bloco híbrido H1→H2 (spec de layout v34, Seção 4,
+    decisão do cliente fechada): o Mapa de Pressão×Janela pega a urgência
+    detectada no presente (eixo pressão) e a traduz em janela de decisão
+    (eixo janela). Visualmente distinto de DADO/LEITURA — borda tracejada,
+    âmbar, nunca confundido com a taxonomia dado/decisão."""
+    return (
+        f'<span class="rte5-type-badge" style="color:{C_AMBER};border-color:{C_AMBER};'
+        f'border-style:dashed" title="Ponte H1→H2: traduz a urgência do presente em janela de decisão">'
+        f'H1 → H2 · PONTE</span>'
+    )
+
+
 def section_head_open(kind: str) -> str:
     """Abre o <div class="rte5-section-head"> com acento de borda dado/leitura.
     Mantém o prefixo `<div class="rte5-section-head"` — _with_anchor() casa por
@@ -1171,7 +1184,7 @@ def _css() -> str:
 
 .rte5-situation {{ position:relative; overflow:hidden; border:1px solid rgba(91,140,255,.24); border-radius:20px; background:radial-gradient(760px 420px at 86% 20%, rgba(91,140,255,.18), transparent 58%), linear-gradient(135deg, rgba(29,36,48,.97), rgba(15,17,21,.99)); padding:28px; display:grid; grid-template-columns:1.25fr .95fr; gap:22px; box-shadow:0 24px 70px rgba(0,0,0,.28); margin-bottom:30px; }}
 .rte5-situation:before {{ content:''; position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size:44px 44px; mask-image:linear-gradient(to right, rgba(0,0,0,.55), transparent 82%); }}
-.rte5-sit-left, .rte5-sit-right {{ position:relative; z-index:1; }}
+.rte5-sit-left, .rte5-sit-right {{ position:relative; z-index:1; min-width:0; }}
 .rte5-eyebrow {{ font-family:'IBM Plex Mono',monospace; color:var(--terra2); font-size:.66rem; letter-spacing:.13em; text-transform:uppercase; margin-bottom:12px; }}
 .rte5-headline {{ font-family:inherit !important; font-size:clamp(34px,3.4vw,52px); line-height:1.06; font-weight:650; letter-spacing:-0.045em; margin:0 0 24px; max-width:18ch; }}
 .rte5-subtitle {{ font-size:1.0rem; color:var(--muted); line-height:1.65; max-width:820px; margin:0 0 14px; }}
@@ -1222,6 +1235,12 @@ def _css() -> str:
 .rte5-details summary::-webkit-details-marker {{ display:none; }}
 .rte5-details[open] summary span {{ transform:rotate(45deg); }}
 .rte5-details-body {{ margin-top:8px; }}
+
+/* Rodapé metodológico (spec de layout v34, Seção 8) — bloco discreto,
+   recolhido por padrão, único lugar com os fundamentos acadêmicos nomeados. */
+.rte5-metodologia {{ margin:34px 0 0; padding:18px 22px; border:1px solid {C_LINE};
+  border-left:3px solid {C_TERRA}; background:{C_BG2}; border-radius:0 12px 12px 0; }}
+.rte5-metodologia summary {{ font-size:.68rem; }}
 
 .rte5-pressure-card {{ border-left:3px solid var(--c); }}
 .rte5-pressure-score {{ font-family:'IBM Plex Mono',monospace; font-size:2rem; font-weight:800; color:var(--c); line-height:1; }}
@@ -1519,9 +1538,9 @@ def _css() -> str:
   background:linear-gradient(90deg, rgba(91,140,255,.09) 0%, rgba(91,140,255,.02) 65%, transparent 100%);
   border-radius:0 14px 14px 0;
 }}
-.rte5-manifesto-lead {{ font-size:.94rem; color:{C_TEXT}; line-height:1.5; font-weight:700; letter-spacing:-.01em; }}
+.rte5-manifesto-lead {{ font-size:1.32rem; color:{C_TEXT}; line-height:1.3; font-weight:700; letter-spacing:-.015em; margin-bottom:6px; }}
 .rte5-manifesto-lead strong {{ color:{C_TERRA_LIGHT}; font-weight:800; }}
-.rte5-manifesto-sub {{ font-size:.80rem; color:{C_MUTED}; line-height:1.55; margin-top:5px; max-width:62ch; font-weight:400; }}
+.rte5-manifesto-sub {{ font-size:.83rem; color:{C_MUTED}; line-height:1.6; margin-top:5px; max-width:62ch; font-weight:400; }}
 .rte5-manifesto-memory {{ flex-shrink:0; text-align:right; border-left:1px solid {C_LINE2}; padding-left:20px; }}
 .rte5-manifesto-memory-num {{ font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:800; color:{C_TERRA_LIGHT}; line-height:1; }}
 .rte5-manifesto-memory-label {{ font-family:'IBM Plex Mono',monospace; font-size:.63rem; color:{C_MUTED}; text-transform:uppercase; letter-spacing:.08em; margin-top:6px; line-height:1.5; }}
@@ -1618,10 +1637,11 @@ def render_manifesto(data: Dict[str, Any], hist_data: Dict[str, Any] | None = No
     return (
         f'<div class="rte5-manifesto">'
         f'<div>'
-        f'<div class="rte5-manifesto-lead">Isto não é um dashboard. É um <strong>radar</strong>.</div>'
-        f'<div class="rte5-manifesto-sub">Dashboards explicam o dado que sua organização já capturou. '
-        f'Este radar captura o que está mudando no ambiente externo — regulação, tecnologia, capital, '
-        f'geopolítica — antes de virar dado em qualquer sistema interno.</div>'
+        f'<div class="rte5-manifesto-lead">Isto é um <strong>radar</strong>, não um painel.</div>'
+        f'<div class="rte5-manifesto-sub">Um painel mostra o que você já mediu. Um radar vasculha o que '
+        f'ainda não virou número — sinais fracos, movimentos de mercado, mudanças de regra — e devolve '
+        f'leitura, não gráfico. Todo dia, sobre cinco frentes de inovação. E lembra: cada sinal capturado '
+        f'fica, formando uma memória que cresce a cada ciclo.</div>'
         f'</div>'
         f'{memory_block}'
         f'</div>'
@@ -1847,49 +1867,6 @@ _TECH_KEYWORDS: Dict[str, List[str]] = {
 
 _TREND_COLOR = {"↗": C_GREEN, "↘": C_DANGER, "→": "#718096"}
 
-# Rampa ordinal de maturidade comercial (Hype Cycle, 7 fases) — mesma cor
-# estrutural do design system (C_TERRA), variando só a opacidade do claro ao
-# forte. Ordinal, não categórica: a cor não muda por fase, só a intensidade —
-# reforça que é uma progressão em UMA escala, não 7 rótulos independentes.
-_MATURITY_PHASES = [
-    "Sinal Emergente", "Narrativa Exponencial", "Pico de Especulação",
-    "Fricção Operacional", "Escala Econômica", "Infraestrutura Crítica", "Comoditização",
-]
-_MATURITY_OPACITY = [0.22, 0.35, 0.48, 0.60, 0.72, 0.85, 1.0]
-
-
-def _maturity_badge(phase: str, trend: str, signal: str) -> str:
-    """Selo de fase de maturidade comercial + seta de tendência, com tooltip
-    explicando a fase (campo `signal` de hype_cycle_live). Sem match/fase
-    desconhecida: traço neutro, nunca quebra a linha."""
-    if not phase or phase not in _MATURITY_PHASES:
-        return '<span style="color:#4A5568;font-size:.62rem;">—</span>'
-    opacity = _MATURITY_OPACITY[_MATURITY_PHASES.index(phase)]
-    trend = trend or "→"
-    trend_glyph = trend + "︎"
-    trend_color = _TREND_COLOR.get(trend, "#718096")
-    tip = h(re.sub(r"<[^>]+>", "", signal or ""))
-    return (
-        f'<span title="{tip}" style="display:inline-flex;align-items:center;gap:4px;'
-        f'background:rgba(91,140,255,{opacity});border-radius:10px;padding:2px 7px;'
-        f'font-size:.60rem;color:#fff;white-space:nowrap;cursor:help;">'
-        f'{h(phase)}<span style="color:{trend_color};font-weight:700">{trend_glyph}</span>'
-        f'</span>'
-    )
-
-
-def _maturity_legend() -> str:
-    steps = "".join(
-        f'<span style="display:inline-block;width:14px;height:8px;border-radius:2px;'
-        f'background:rgba(91,140,255,{op});margin-right:1px" title="{h(ph)}"></span>'
-        for ph, op in zip(_MATURITY_PHASES, _MATURITY_OPACITY)
-    )
-    return (
-        f'<div style="font-size:.56rem;color:#718096;margin-top:4px;display:flex;align-items:center;gap:5px">'
-        f'<span>Maturidade:</span><span style="display:inline-flex">{steps}</span>'
-        f'<span>Sinal Emergente → Comoditização</span></div>'
-    )
-
 
 def _render_tech_matrix(data: Dict[str, Any]) -> str:
     """Matriz Tecnologia × xTech — quais tecnologias tocam quais frentes, e em
@@ -1917,10 +1894,6 @@ def _render_tech_matrix(data: Dict[str, Any]) -> str:
     scores = hist.get("tech_scores") or {}
     growth = hist.get("tech_growth") or {}
     static_frente = {t["id"]: t["frente"] for t in HYPE_TECHS}
-    # Maturidade comercial — join por id com hype_cycle_live (dinâmico, 21
-    # techs vs. as 15 de tech_signals). Nem toda linha tem match; tratado com
-    # "—" na própria _maturity_badge, nunca quebra a linha (Mudança 3).
-    maturidade_by_id = {t.get("id"): t for t in (hist.get("hype_cycle_live") or []) if t.get("id")}
 
     registros = (hist.get("memories") or []) + (hist.get("zettels") or [])
     corpora = [
@@ -1981,37 +1954,86 @@ def _render_tech_matrix(data: Dict[str, Any]) -> str:
             f'background:{c if f in row["frentes"] else "rgba(255,255,255,.08)"};"></span></td>'
             for f, c in FRONTES
         )
-        mat = maturidade_by_id.get(row["id"])
-        maturidade_cell = (
-            f'<td style="text-align:left;padding:3px 6px;">'
-            f'{_maturity_badge(mat.get("phase"), mat.get("trend"), mat.get("signal")) if mat else _maturity_badge(None, None, None)}'
-            f'</td>'
-        )
         rows_html.append(
             f'<tr style="border-top:1px solid rgba(255,255,255,.05);">'
             f'<td style="padding:4px 8px 4px 0;font-size:.68rem;color:#C3CCD6;white-space:nowrap;">{h(row["id"])}{derivado_tag}</td>'
             f'<td style="padding:4px 6px;font-size:.64rem;color:#8B99A8;text-align:right;">{row["volume"]}</td>'
             f'{velocidade_cell}'
             f'{cells}'
-            f'{maturidade_cell}'
             f'</tr>'
         )
 
     return f"""<div>
   <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:#79A3FF;margin-bottom:2px;">Tecnologias em foco por xTech</div>
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#8B99A8;margin-bottom:8px;">● tecnologia com sinais relevantes em mais de uma frente xTech &nbsp;·&nbsp; velocidade = sinais dos últimos 14 dias vs. 14 dias anteriores</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#8B99A8;margin-bottom:8px;">● tecnologia com sinais relevantes em mais de uma frente xTech &nbsp;·&nbsp; velocidade = sinais dos últimos 14 dias vs. 14 dias anteriores &nbsp;·&nbsp; maturidade comercial de cada uma está na curva do Horizonte 3</div>
   <table style="width:100%;border-collapse:collapse;">
     <thead><tr>
       <th style="text-align:left;padding:4px 8px 4px 0;font-size:.56rem;color:#8B99A8;">TECNOLOGIA</th>
       <th style="text-align:right;padding:4px 6px;font-size:.56rem;color:#8B99A8;">SINAIS</th>
       <th style="text-align:center;padding:4px 6px;font-size:.56rem;color:#8B99A8;white-space:nowrap;">VELOCIDADE</th>
       {header_cells}
-      <th style="text-align:left;padding:4px 6px;font-size:.56rem;color:#8B99A8;white-space:nowrap;">MATURIDADE COMERCIAL</th>
     </tr></thead>
     <tbody>{''.join(rows_html)}</tbody>
   </table>
-  {_maturity_legend()}
 </div>"""
+
+
+_NATUREZA_ALERTA_COLOR = {
+    "Risco": C_DANGER, "Oportunidade": C_GREEN, "Ruído": C_MUTED, "não avaliada": C_MUTED,
+}
+
+
+def render_alertas_aceleracao(data: Dict[str, Any]) -> str:
+    """Alertas de Aceleração — Nível 3 de Endsley (projeção: "para onde vai"),
+    spec de layout v34 Seção 3. Fonte: alertas_aceleracao (acceleration_alerts_v1),
+    já com o teto de K=4 aplicado no pipeline. Degradação graciosa: sem a
+    chave (ciclo em que a etapa não rodou) ou sem alertas, não renderiza —
+    nunca quebra o Horizonte 1 (spec Seção 0 / regras transversais)."""
+    bloco = data.get("alertas_aceleracao") or {}
+    alertas = bloco.get("alertas") or []
+    if not alertas:
+        return ""
+
+    cards = []
+    for a in alertas[:4]:
+        natureza = a.get("natureza") or "não avaliada"
+        cor = _NATUREZA_ALERTA_COLOR.get(natureza, C_MUTED)
+        momento = a.get("momento")
+        momento_chip = chip(momento, C_AMBER) if momento else ""
+        mitigacao_html = ""
+        if natureza == "Risco" and (a.get("acao_mitigacao") or a.get("consequencia_inacao")):
+            partes = []
+            if a.get("acao_mitigacao"):
+                partes.append(f'<div style="margin-bottom:5px"><span style="color:#718096">Mitigação:</span> {h(a["acao_mitigacao"])}</div>')
+            if a.get("consequencia_inacao"):
+                partes.append(f'<div><span style="color:#718096">Custo da inação:</span> {h(a["consequencia_inacao"])}</div>')
+            mitigacao_html = details_block("Ver ação recomendada", "".join(partes))
+        cards.append(
+            f'<div style="background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+            f'border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid {cor}">'
+            f'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px">'
+            f'<div style="font-size:.72rem;font-weight:700;color:{C_TEXT};line-height:1.3">{h(a.get("theme"))}</div>'
+            f'<span style="font-size:.56rem;color:{cor};border:1px solid {cor};border-radius:8px;'
+            f'padding:1px 6px;white-space:nowrap;flex-shrink:0">{h(natureza)}</span>'
+            f'</div>'
+            f'<div style="font-size:.74rem;color:#A8B3C2;line-height:1.5;margin-bottom:6px">{h(a.get("enredo") or "")}</div>'
+            f'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">{momento_chip}</div>'
+            f'{mitigacao_html}'
+            f'</div>'
+        )
+
+    enquadramento = bloco.get("enquadramento") or ""
+    return (
+        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+        f'border-radius:12px;padding:14px;">'
+        f'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">'
+        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#79A3FF;">Alertas de Aceleração</span>{type_badge("leitura")}'
+        f'</div>'
+        f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:10px">{h(enquadramento)}</div>'
+        f'{"".join(cards)}'
+        f'</div>'
+    )
 
 
 def render_situation_room_v8(data: Dict[str, Any]) -> str:
@@ -2194,13 +2216,28 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     # substitui o antigo sparkline "IPS por frente"
     _tech_matrix_block = _render_tech_matrix(data)
 
-    # Track Record (4 destaques) abaixo do radar setorial — decisão do
-    # cliente: substitui o card único de curva do vetor #1 (repetir o
-    # mesmo conteúdo aqui e no H2 é aceitável). Fallback pro card de
-    # vetor #1 se ainda não houver destaques (ex.: base de cenários vazia).
+    # Cenários ainda em formação (não resolvidos) abaixo do radar setorial —
+    # H1 é o estado ATUAL, então só o marcador de emissão aparece, nunca o
+    # de confirmação (isso é retrospectiva, mora no Track Record do H2).
+    # Fallback pro card de curva do vetor #1 se não houver nenhum cenário
+    # em formação ainda (ex.: base de cenários vazia).
     _vetor1_curva_block = (
-        _render_h1_track_record_destaques(data)
+        _render_h1_em_formacao(data)
         or _render_vetor1_curva_block(vetores[0] if vetores else None)
+    )
+
+    # Alertas de Aceleração — Nível 3 (projeção). Degradação graciosa: string
+    # vazia se o ciclo não gerou alertas (etapa não rodou / funil vazio).
+    _alertas_block = render_alertas_aceleracao(data)
+
+    # Nível 3 (Endsley: projeção) — mesmo separador neutro da coluna
+    # esquerda, sem nomear a teoria. Só aparece se houver algo de fato a
+    # mostrar nessa camada (alertas ou cenários em formação).
+    _grupo_projecao_right = (
+        f'<div style="margin-top:22px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.08);'
+        f'font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#4A5568;">O que está acelerando</div>'
+        if (_alertas_block or _vetor1_curva_block) else ""
     )
 
     # Impacto por frente xTech — vai para a esquerda, logo após o briefing
@@ -2251,8 +2288,16 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     # continuação do mesmo bloco, quando na verdade é outro dado (prévia dos
     # mesmos vetores que ganham análise completa no Mapa de Pressão, H2).
     # Rótulo próprio + link cruzado deixam essa relação explícita.
+    # Nível 3 (Endsley: projeção — "para onde vai") — separador neutro, sem
+    # nomear a teoria (spec de layout v34, Seção 3, decisão 3 fechada).
+    _grupo_projecao_label = (
+        f'<div style="margin-top:22px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.08);'
+        f'font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#4A5568;">Para onde isso aponta</div>'
+    )
     vetores_dom_block = (
-        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">'
+        f'{_grupo_projecao_label}'
+        f'<div style="margin-top:10px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">'
         f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
         f'letter-spacing:.10em;color:#79A3FF;margin-bottom:6px">Vetores Dominantes deste Ciclo</div>'
         f'<div>{badges_html}</div>'
@@ -2267,7 +2312,8 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     <div class="rte5-eyebrow" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">{_kicker_eyebrow}{_ciclo_label}{type_badge("leitura")}</div>
     <h1 class="rte5-headline">{h(headline)}</h1>
     <p class="rte5-subtitle" style="font-style:italic">{h(subtitle)}</p>
-    <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px">{h(lede)}</p>
+    {'<div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.08);font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:#4A5568;">O que isso significa</div>' if lede else ''}
+    <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px;margin-top:8px">{h(lede)}</p>
     {_cut_alert}
     {impacto_block}
     {vetores_dom_block}
@@ -2282,8 +2328,10 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     <div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">
       {_render_radar_setorial_svg(data, cycle)}
     </div>
+    {_grupo_projecao_right}
+    {_alertas_block}
     {_vetor1_curva_block}
-    <div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">
+    <div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;overflow-x:auto;">
       {_tech_matrix_block}
     </div>
   </div>
@@ -2452,7 +2500,12 @@ def render_map(data: Dict[str, Any]) -> str:
 
     return f"""
 <section class="rte5-section" id="mapa-pressao">
-  {section_head_open("dado")}<h2 class="rte5-title">Mapa de Pressão Estratégica × Janela de Decisão</h2>{type_badge("dado")}</div>
+  {section_head_open("dado")}<h2 class="rte5-title">Mapa de Pressão Estratégica × Janela de Decisão</h2>{bridge_badge()}</div>
+  <div style="font-size:.78rem;color:{C_MUTED};line-height:1.6;margin:2px 0 14px;max-width:70ch">
+    A ponte entre o presente e o planejamento: pega a urgência já detectada no Horizonte 1
+    (eixo pressão) e a traduz em janela de decisão (eixo horizontal) — onde alocar atenção
+    nos próximos 90–180 dias.
+  </div>
   <div class="rte5-map-wrap">
     <div class="rte5-chart-card"><canvas id="rte5-vetores-canvas"></canvas></div>
     <div class="rte5-map-side">{side}</div>
@@ -2895,6 +2948,112 @@ def render_curva_convergencia(hist_data: Dict[str, Any]) -> str:
         f'  </div>\n'
         + js
         + '\n</section>'
+    )
+
+
+_CORES_DISRUPCAO = [C_TERRA, C_GREEN, C_AMBER, C_PURPLE]
+
+_HONESTIDADE_DISRUPCAO = (
+    "Tecnologias jovens acelerando podem interceptar as dominantes por baixo — sinaliza condição "
+    "estrutural (estágio inicial + aceleração), não prevê qual tecnologia vai disromper."
+)
+
+
+def _render_curva_disrupcao_svg(candidatos: List[Dict[str, Any]], w: int = 520, hgt: int = 170) -> str:
+    """SVG estático (sem Chart.js) — uma curva S 'dominante' madura (tom
+    neutro) com uma ou mais curvas 'emergentes' nascentes cruzando por baixo,
+    ponto sólido = posição atual, traço tracejado = projeção até a
+    interseção potencial. Eixo x=tempo/esforço, eixo y=desempenho/adoção.
+    Parâmetro `hgt` (não `h`) — evita sombrear o escapador global h()."""
+    if not candidatos:
+        return ""
+    ml, mr, mt, mb = 8, 8, 16, 8
+    pw, ph = w - ml - mr, hgt - mt - mb
+    base_y = mt + ph
+
+    dominante = (
+        f'M {ml},{base_y} '
+        f'C {ml + pw * 0.18},{base_y} {ml + pw * 0.30},{mt + ph * 0.12} {ml + pw * 0.58},{mt + ph * 0.06} '
+        f'C {ml + pw * 0.78},{mt + ph * 0.02} {ml + pw * 0.92},{mt} {ml + pw},{mt}'
+    )
+
+    curvas = []
+    for i, c in enumerate(candidatos[:4]):
+        cor = _CORES_DISRUPCAO[i % len(_CORES_DISRUPCAO)]
+        x0 = ml + pw * (0.10 + i * 0.06)
+        x_now = x0 + pw * 0.14
+        y_now = mt + ph * (0.86 - i * 0.03)
+        x_cross = x_now + pw * 0.22
+        y_cross = mt + ph * 0.22
+        solid = (
+            f'<path d="M {x0:.1f},{base_y} Q {x0 + pw * 0.06:.1f},{y_now + 8:.1f} {x_now:.1f},{y_now:.1f}" '
+            f'fill="none" stroke="{cor}" stroke-width="2"/>'
+        )
+        dashed = (
+            f'<path d="M {x_now:.1f},{y_now:.1f} Q {x_now + pw * 0.12:.1f},{y_cross - 6:.1f} {x_cross:.1f},{y_cross:.1f}" '
+            f'fill="none" stroke="{cor}" stroke-width="1.5" stroke-dasharray="3,3"/>'
+        )
+        dot_now = f'<circle cx="{x_now:.1f}" cy="{y_now:.1f}" r="3" fill="{cor}"/>'
+        dot_cross = f'<circle cx="{x_cross:.1f}" cy="{y_cross:.1f}" r="3.5" fill="none" stroke="{cor}" stroke-width="1.5"/>'
+        label = (
+            f'<text x="{x_now - 4:.1f}" y="{y_now - 8:.1f}" font-size="9" fill="{cor}" '
+            f'font-family="\'IBM Plex Mono\',monospace" text-anchor="end">{h(c.get("tecnologia", ""))}</text>'
+        )
+        curvas.append(solid + dashed + dot_now + dot_cross + label)
+
+    return (
+        f'<svg width="100%" height="{hgt}" viewBox="0 0 {w} {hgt}" preserveAspectRatio="xMidYMid meet" '
+        f'style="display:block;max-width:100%;overflow:visible">'
+        f'<path d="{dominante}" fill="none" stroke="#4A5568" stroke-width="2"/>'
+        f'<text x="{ml + pw * 0.55:.1f}" y="{mt - 4}" font-size="9" fill="#718096" '
+        f'font-family="\'IBM Plex Mono\',monospace" text-anchor="middle">tecnologia(s) dominante(s)</text>'
+        f'{"".join(curvas)}'
+        f'</svg>'
+    )
+
+
+def render_disrupcao_emergente(data: Dict[str, Any]) -> str:
+    """Novas Curvas S / Sinais de Disrupção — spec de layout v34, Seção 5,
+    decisão do cliente fechada. Fonte: disrupcao_emergente (disruption_emergente_v1),
+    já com o teto de candidatas aplicado no pipeline. Degradação graciosa:
+    sem candidatas no ciclo, não renderiza — nunca quebra o Horizonte 3."""
+    candidatos = data.get("disrupcao_emergente") or []
+    if not candidatos:
+        return ""
+
+    svg = _render_curva_disrupcao_svg(candidatos)
+    cards = []
+    for i, c in enumerate(candidatos[:4]):
+        cor = _CORES_DISRUPCAO[i % len(_CORES_DISRUPCAO)]
+        interceptada = c.get("tecnologia_dominante_interceptada")
+        intercepta_html = (
+            f'<div style="font-size:.68rem;color:#718096;margin-top:6px">Poderia interceptar: '
+            f'<span style="color:#A8B3C2">{h(interceptada)}</span></div>' if interceptada else ""
+        )
+        cards.append(
+            f'<div style="background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+            f'border-radius:10px;padding:12px;border-left:3px solid {cor}">'
+            f'<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 8px;margin-bottom:5px">'
+            f'<span style="font-size:.74rem;font-weight:700;color:{C_TEXT};min-width:0">{h(c.get("tecnologia"))}</span>'
+            f'<span style="font-size:.58rem;color:#718096">{h(c.get("fase_curva_s"))} · {h(c.get("frente"))}</span>'
+            f'</div>'
+            f'<div style="font-size:.74rem;color:#A8B3C2;line-height:1.5">{h(c.get("tese_disrupcao_curta") or "")}</div>'
+            f'{intercepta_html}'
+            f'<div style="font-size:.66rem;color:#5B8CFF;margin-top:8px"><strong>O que observar:</strong> {h(c.get("o_que_observar") or "")}</div>'
+            f'</div>'
+        )
+
+    return (
+        f'<section class="rte5-section" id="disrupcao-emergente">'
+        f'{section_head_open("leitura")}<h2 class="rte5-title">Novas Curvas S / Sinais de Disrupção</h2>{type_badge("leitura")}</div>'
+        f'<div style="font-size:.78rem;color:{C_MUTED};line-height:1.6;margin:2px 0 12px;max-width:75ch">'
+        f'Tecnologias em estágio inicial da curva de maturidade, mas já acelerando, nascem em mercados '
+        f'adjacentes com desempenho inicialmente inferior — por isso incumbentes costumam ignorá-las até '
+        f'ser tarde. Este card sinaliza essas curvas nascentes antes de serem óbvias.</div>'
+        f'<div style="margin-bottom:14px">{svg}</div>'
+        f'<div style="font-size:.60rem;color:#718096;margin-bottom:14px">{h(_HONESTIDADE_DISRUPCAO)}</div>'
+        f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">{"".join(cards)}</div>'
+        f'</section>'
     )
 
 
@@ -4319,15 +4478,37 @@ def _render_curva_formacao_svg(
     return "".join(parts)
 
 
+_STATUS_CENARIO = {
+    "confirmado":         ("Confirmado", C_GREEN),
+    "nao_materializado":  ("Não-materializado", C_MUTED),
+    "em_formacao":        ("Em formação", C_AMBER),
+    "em_aberto":          ("Em observação", C_MUTED),
+}
+
+
 def _render_track_record_card(item: Dict[str, Any]) -> str:
     tipo = item.get("tipo") or "Misto"
     tipo_color = _TIPO_CENARIO_COLOR.get(tipo, C_MUTED)
     status = item.get("status")
-    is_confirmado = status == "confirmado"
-    status_label = "Confirmado" if is_confirmado else "Não-materializado"
-    status_color = C_GREEN if is_confirmado else C_MUTED
-    dias = item.get("dias_antecedencia")
-    meta = f" · {dias}d de antecedência" if is_confirmado and dias is not None else ""
+    status_label, status_color = _STATUS_CENARIO.get(status, ("—", C_MUTED))
+
+    if status == "confirmado":
+        dias = item.get("dias_antecedencia")
+        meta = f" · {dias}d de antecedência" if dias is not None else ""
+    elif status in ("em_formacao", "em_aberto"):
+        dias = item.get("dias_em_formacao")
+        meta = f" · {dias}d em acompanhamento" if dias is not None else ""
+    else:
+        meta = ""
+
+    evidencia = item.get("evidencia_resumo")
+    if not evidencia and status in ("em_formacao", "em_aberto"):
+        fracao = item.get("fracao_confirmada") or 0.0
+        evidencia = (
+            f"{fracao:.0%} dos gatilhos já acionados — ainda em observação."
+            if fracao > 0 else "Nenhum gatilho acionado ainda — projeção segue em aberto."
+        )
+
     svg = _render_curva_formacao_svg(item.get("curva_formacao"), item.get("idx_emissao"), item.get("idx_confirmacao"))
     return (
         f'<div style="background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
@@ -4339,7 +4520,7 @@ def _render_track_record_card(item: Dict[str, Any]) -> str:
         f'</div>'
         f'<div style="font-size:.62rem;color:{status_color};margin-bottom:6px">{status_label}{meta}</div>'
         f'{svg}'
-        f'<div style="font-size:.60rem;color:#8B99A8;margin-top:6px">{h(item.get("evidencia_resumo") or "")}</div>'
+        f'<div style="font-size:.60rem;color:#8B99A8;margin-top:6px">{h(evidencia or "")}</div>'
         f'</div>'
     )
 
@@ -4409,25 +4590,26 @@ def _render_vetor1_curva_block(vetor1: Dict[str, Any] | None) -> str:
     )
 
 
-def _render_h1_track_record_destaques(data: Dict[str, Any]) -> str:
-    """H1, abaixo do radar setorial — os N_TRACK_RECORD_DESTAQUE cards de
-    destaque do Track Record (decisão do cliente: repetir aqui e no H2 é
-    aceitável). Substitui o card único de curva do vetor #1: os 4
-    destaques já são a prova de formação mais forte do ciclo, e repetição
-    entre H1/H2 não é problema."""
+def _render_h1_em_formacao(data: Dict[str, Any]) -> str:
+    """H1, abaixo do radar setorial — cenários AINDA em formação (status
+    em_aberto/em_formacao, nunca resolvidos). Só o marcador de emissão
+    (âmbar) aparece nos gráficos — nunca o de confirmação, porque estes
+    cenários ainda não confirmaram. O arco completo (emissão→confirmação,
+    os dois marcadores) é retrospectiva e mora no Track Record do H2."""
     tracking = data.get("scenario_tracking") or {}
-    destaques = [it for it in (tracking.get("track_record") or []) if it.get("destaque")]
-    if not destaques:
+    itens = tracking.get("em_formacao") or []
+    if not itens:
         return ""
-    cards = "".join(_render_track_record_card(it) for it in destaques)
+    cards = "".join(_render_track_record_card(it) for it in itens)
     return (
         f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
         f'border-radius:12px;padding:14px;">'
         f'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">'
         f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
-        f'letter-spacing:.10em;color:#79A3FF;">Track Record — Cenários em Formação</span>{type_badge("leitura")}'
+        f'letter-spacing:.10em;color:#79A3FF;">Cenários em Formação</span>{type_badge("leitura")}'
         f'</div>'
-        f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:8px">{h(_HONESTIDADE_TRACK_RECORD)}</div>'
+        f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:8px">{h(_HONESTIDADE_TRACK_RECORD)} Só o marcador de '
+        f'emissão aparece aqui — estes cenários ainda não confirmaram; o histórico completo está no Track Record.</div>'
         f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">{cards}</div>'
         f'</div>'
     )
@@ -4653,17 +4835,15 @@ def render_cta(data: Dict[str, Any]) -> str:
 
 
 def render_metodologia() -> str:
-    """Faixa de metodologia antes do rodapé (v11.2, Onda 2) — fecha a narrativa
-    do e-book em três afirmações verdadeiras e sem dado fabricado: sinais fracos
-    (Ansoff, 1975), a arquitetura de três camadas, e a divisão de trabalho
-    IA↔curadoria humana (Cap. 5 e 7 do e-book)."""
-    return (
-        f'<div style="margin:34px 0 0;padding:18px 22px;border:1px solid {C_LINE};'
-        f'border-left:3px solid {C_TERRA};background:{C_BG2};border-radius:0 12px 12px 0;">'
-        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;'
-        f'text-transform:uppercase;letter-spacing:.10em;color:{C_TERRA_LIGHT};margin-bottom:8px">'
-        f'Como este radar funciona</div>'
-        f'<div style="font-size:.82rem;color:{C_MUTED};line-height:1.7">'
+    """Faixa de metodologia antes do rodapé (v11.2, Onda 2; recolhida na spec
+    de layout v34, Seção 8). Fecha a narrativa do e-book em afirmações
+    verdadeiras e sem dado fabricado: sinais fracos (Ansoff, 1975), a
+    arquitetura de três camadas, a divisão de trabalho IA↔curadoria humana
+    (Cap. 5 e 7 do e-book) — e, por decisão do cliente (spec v34, decisão 3),
+    o ÚNICO lugar da página onde os fundamentos acadêmicos da estrutura de
+    horizontes são nomeados (não aparecem nos cards do H1 nem na vitrine)."""
+    corpo = (
+        f'<div style="font-size:.82rem;color:{C_MUTED};line-height:1.7;margin-bottom:16px">'
         f'Captação contínua de <strong style="color:{C_TEXT}">sinais fracos</strong> — indícios ainda '
         f'ambíguos que precedem mudanças relevantes (Ansoff, 1975) — indexados numa '
         f'<strong style="color:{C_TEXT}">memória vetorial que se acumula a cada ciclo</strong>, e '
@@ -4672,8 +4852,22 @@ def render_metodologia() -> str:
         f'escala; a <strong style="color:{C_TEXT}">curadoria humana do Think Tank</strong> julga o que, '
         f'entre tudo que foi capturado, realmente importa para a decisão.'
         f'</div>'
+        f'<div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;'
+        f'color:{C_TERRA_LIGHT};margin-bottom:8px">Por que três horizontes, nesta ordem</div>'
+        f'<div style="font-size:.80rem;color:{C_MUTED};line-height:1.75">'
+        f'<p style="margin:0 0 10px"><strong style="color:{C_TEXT}">Presente</strong> segue a lógica de '
+        f'consciência situacional — perceber, compreender, projetar (Endsley, 1995) — e o ciclo rápido de '
+        f'decisão sob incerteza (Boyd, OODA loop): por isso o Horizonte 1 é organizado nesses três níveis.</p>'
+        f'<p style="margin:0 0 10px">A estrutura de <strong style="color:{C_TEXT}">três horizontes</strong> '
+        f'(presente, planejamento, futuro) vem do planejamento de crescimento de longo prazo — cada horizonte '
+        f'responde a um critério de alocação diferente (Baghai, Coley &amp; White, 1999).</p>'
+        f'<p style="margin:0"><strong style="color:{C_TEXT}">Futuro</strong> observa onde cada tecnologia está '
+        f'na curva de maturidade (Foster, 1986) e sinaliza o padrão de disrupção — tecnologias emergentes que '
+        f'interceptam as dominantes por baixo, com desempenho inicialmente inferior, em mercado adjacente '
+        f'(Christensen, 1997).</p>'
         f'</div>'
     )
+    return details_block("Como o Radar organiza a informação", corpo, cls="rte5-metodologia")
 
 
 # ─── Cabeçalho de Horizonte (v9; promovido a contêiner <details> na v11) ─────
@@ -4915,21 +5109,21 @@ def render_html(data: Dict[str, Any], hist_data: Dict[str, Any] | None = None) -
     # evitando manter rótulo/audiência/pergunta duplicados em dois lugares.
     horizons = [
         {
-            "n": "1", "nome": "Operação e monitoramento",
+            "n": "1", "nome": "Presente",
             "audiencia": "analistas, gestores, consultores",
-            "pergunta": "O que mudou hoje? O que devo monitorar?",
+            "pergunta": "O que mudou hoje — e o que isso exige de você agora.",
             "resumo": h1_resumo,
         },
         {
-            "n": "2", "nome": "Planejamento estratégico",
+            "n": "2", "nome": "Planejamento",
             "audiencia": "diretores, C-level, comitês de estratégia",
-            "pergunta": "Qual é a tendência de 6–18 meses? Onde estão os riscos?",
+            "pergunta": "Onde posicionar recursos nos próximos 90 a 180 dias.",
             "resumo": h2_resumo,
         },
         {
-            "n": "3", "nome": "Desenvolvimento de projetos",
+            "n": "3", "nome": "Futuro",
             "audiencia": "empreendedores, consultores, equipes de consultoria",
-            "pergunta": "Qual oportunidade posso capturar? Quais competências preciso?",
+            "pergunta": "Que tecnologias emergentes podem virar o jogo.",
             "resumo": h3_resumo,
         },
     ]
@@ -5015,6 +5209,8 @@ def render_html(data: Dict[str, Any], hist_data: Dict[str, Any] | None = None) -
         f'{h3_resposta}'
         # H3·B7 — Curva de Maturidade xTech
         f'{curva_html}'
+        # H3·B7b — Novas Curvas S / Sinais de Disrupção (spec de layout v34, Seção 5)
+        f'{render_disrupcao_emergente(data)}'
         # H3·B8 — Análise Reversa de Competências — versão pública
         f'{render_aplicacoes_corporativas(data)}'
         # H3·B9 — CTA · e-book O Fim do Dashboard + Programa Piloto

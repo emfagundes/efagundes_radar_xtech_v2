@@ -7,7 +7,7 @@ Fluxo simplificado (engine core preservado):
   1.   Coleta       collector_v6.py
   1.5  Docs PDF     doc_collector_v1.py
   2.   Limpeza      cleaner_v2.py
-  3.   Análise      analyzer_v34_agent.py  [+ critic_agent_v1 multi-LLM se disponível]
+  3.   Análise      analyzer_v33_agent.py  [+ critic_agent_v1 multi-LLM se disponível]
   4.   Arquivamento arquivar_intel.py
   5a.  SQLite       ingest_to_sqlite.py
   5b.  Zettelkasten update_zettels.py
@@ -80,7 +80,7 @@ INTEL_OUTPUT = "intel_output.json"
 COLETOR               = "collector_v7.py"
 DOC_COLETOR           = "doc_collector_v1.py"
 LIMPADOR              = "cleaner_v2.py"
-ANALISADOR            = "analyzer_v34_agent.py"
+ANALISADOR            = "analyzer_v33_agent.py"
 CRITIC_AGENT          = "critic_agent_v1.py"
 MARKET_COLLECTOR      = "market_collector_v1.py"
 MARKET_SIGNALS        = "market_signals.json"
@@ -95,6 +95,7 @@ HYPE_CYCLE_UPDATER    = "hype_cycle_updater.py"
 STRATEGIC_BRIEFING    = "strategic_briefing_v1.py"
 SCENARIO_TRACKER      = "scenario_tracker_v1.py"
 ACCELERATION_ALERTS   = "acceleration_alerts_v1.py"
+DISRUPTION_EMERGENTE  = "disruption_emergente_v1.py"
 BACKUP_DB             = "backup_db.py"
 
 
@@ -259,6 +260,19 @@ def etapa_analise(skip_critic: bool = False) -> None:
         warn(f"Critic agent falhou (análise original mantida): {e}")
 
 
+def etapa_confirmar_coleta() -> None:
+    header("4.5/7", f"Confirmação de Deduplicação — {COLETOR}")
+    mod = carregar_modulo(COLETOR, "collector_confirm_pipeline")
+    if not hasattr(mod, "confirmar_lote"):
+        warn(f"{COLETOR} não possui confirmar_lote() — pulando confirmação")
+        return
+    n = mod.confirmar_lote()
+    if n:
+        ok(f"{n} hashes promovidos a seen_hashes.json definitivo")
+    else:
+        info("Nenhum hash pendente para confirmar")
+
+
 def etapa_arquivamento() -> None:
     header("4/7", f"Arquivamento — {ARQUIVADOR}")
     exigir(INTEL_OUTPUT)
@@ -333,6 +347,18 @@ def etapa_hype_cycle() -> None:
     t0 = time.time()
     run_main(mod, [HYPE_CYCLE_UPDATER])
     ok(f"Hype Cycle atualizado em {duracao(time.time() - t0)}")
+
+
+def etapa_disrupcao_emergente() -> None:
+    header("5.55/7", f"Novas Curvas S / Disrupção — {DISRUPTION_EMERGENTE}")
+    exigir(INTEL_OUTPUT)
+    if not as_path(DISRUPTION_EMERGENTE).exists():
+        warn(f"{DISRUPTION_EMERGENTE} não encontrado — etapa ignorada (sem disrupcao_emergente no JSON)")
+        return
+    mod = carregar_modulo(DISRUPTION_EMERGENTE, "disruption_emergente_pipeline")
+    t0 = time.time()
+    run_main(mod, [DISRUPTION_EMERGENTE, "--input", INTEL_OUTPUT])
+    ok(f"Disrupção emergente concluída em {duracao(time.time() - t0)}")
 
 
 def etapa_strategic_briefing() -> None:
@@ -414,26 +440,21 @@ def imprimir_resumo(t_total: float) -> None:
     print(f"  {'─' * 62}")
     print("  Outputs:")
 
-    radares = sorted(OUTPUTS_RADAR.glob("radar-xtechs-*.html")) if OUTPUTS_RADAR.exists() else []
-    if radares:
-        p = radares[-1]
-        print(f"  ✓ {'Radar xTechs':<24} {p.name} ({file_kb(p)})")
-    else:
-        print(f"  ✗ {'Radar xTechs':<24} [não gerado]")
+    def _report_output(label: str, pattern: str) -> None:
+        candidatos = sorted(OUTPUTS_RADAR.glob(pattern)) if OUTPUTS_RADAR.exists() else []
+        if not candidatos:
+            print(f"  ✗ {label:<24} [não gerado]")
+            return
+        p = candidatos[-1]
+        if ciclo in p.name:
+            print(f"  ✓ {label:<24} {p.name} ({file_kb(p)})")
+        else:
+            print(f"  ⚠ {label:<24} {p.name} ({file_kb(p)}) — DESATUALIZADO, "
+                  f"esperado ciclo {ciclo}: etapa provavelmente falhou neste run")
 
-    heroes_ef = sorted(OUTPUTS_RADAR.glob("hero-[0-9]*.html")) if OUTPUTS_RADAR.exists() else []
-    if heroes_ef:
-        p = heroes_ef[-1]
-        print(f"  ✓ {'Hero efagundes.com':<24} {p.name} ({file_kb(p)})")
-    else:
-        print(f"  ✗ {'Hero efagundes.com':<24} [não gerado]")
-
-    heroes_nm = sorted(OUTPUTS_RADAR.glob("hero-nmentors-*.html")) if OUTPUTS_RADAR.exists() else []
-    if heroes_nm:
-        p = heroes_nm[-1]
-        print(f"  ✓ {'Hero nMentors':<24} {p.name} ({file_kb(p)})")
-    else:
-        print(f"  ✗ {'Hero nMentors':<24} [não gerado]")
+    _report_output("Radar xTechs", "radar-xtechs-*.html")
+    _report_output("Hero efagundes.com", "hero-[0-9]*.html")
+    _report_output("Hero nMentors", "hero-nmentors-*.html")
 
     print(SEP + "\n")
 
@@ -536,6 +557,7 @@ def main() -> None:
             etapas.append((etapa_alertas_aceleracao, "Alertas de Aceleração"))
 
     etapas.append((etapa_hype_cycle, "Hype Cycle Dinâmico"))
+    etapas.append((etapa_disrupcao_emergente, "Novas Curvas S / Disrupção"))
 
     if skip_briefing:
         info("--skip-briefing: Strategic Briefing ignorado (heroes sem pergunta estratégica)")
@@ -552,11 +574,23 @@ def main() -> None:
     if not skip_memory:
         etapas.append((etapa_backup, "Backup"))
 
+    sucesso: dict[str, bool] = {}
     for fn, label in etapas:
         try:
             fn()
+            sucesso[label] = True
         except Exception as exc:
             warn(f"{label} falhou: {exc}")
+            sucesso[label] = False
+
+    # Só promove os hashes deste ciclo a "definitivos" (não recoletáveis) se a
+    # análise E o arquivamento tiverem sido concluídos com sucesso — evita
+    # perder itens coletados quando o ciclo é interrompido antes de analisá-los.
+    if not skip_coleta and sucesso.get("Análise + Critic") and sucesso.get("Arquivamento"):
+        try:
+            etapa_confirmar_coleta()
+        except Exception as exc:
+            warn(f"Confirmação de coleta falhou: {exc}")
 
     imprimir_resumo(time.time() - t0)
 
