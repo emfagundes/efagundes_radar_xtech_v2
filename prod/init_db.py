@@ -244,6 +244,7 @@ DDL = [
         titulo_cenario           TEXT NOT NULL,
         tipo                     TEXT,
         probabilidade_inicial    INTEGER,
+        probabilidade_bruta      INTEGER,
         impacto                  TEXT,
         pos_x                    REAL,
         pos_y                    REAL,
@@ -253,6 +254,39 @@ DDL = [
         mecanismo_kws            TEXT,
         horizonte_dias           INTEGER DEFAULT 30,
         criado_em                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    # scenario_calibration_v1 — auto-calibração de probabilidades (Seção 6 do spec de calibração)
+    """
+    CREATE TABLE IF NOT EXISTS calibration_history (
+        ciclo_id                TEXT PRIMARY KEY,
+        n_cenarios_avaliados     INTEGER,
+        ece                      REAL,
+        separacao                REAL,
+        curva_bins               TEXT,
+        funcao_recalibracao      TEXT,
+        justificativa            TEXT,
+        criado_em                TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    # acceleration_alerts_v1 — alerta de aceleração anômala com julgamento por LLM
+    """
+    CREATE TABLE IF NOT EXISTS acceleration_alerts (
+        alert_uid             TEXT PRIMARY KEY,
+        ciclo_id               TEXT NOT NULL,
+        theme                  TEXT NOT NULL,
+        escore_saliencia        REAL,
+        comp_aceleracao         REAL,
+        comp_patamar            REAL,
+        enredo                  TEXT,
+        natureza                TEXT,
+        natureza_secundaria     TEXT,
+        acao_mitigacao          TEXT,
+        consequencia_inacao     TEXT,
+        momento                 TEXT,
+        confianca_llm           REAL,
+        evidencia               TEXT,
+        criado_em               TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """,
     """

@@ -13,6 +13,7 @@ Fluxo simplificado (engine core preservado):
   5b.  Zettelkasten update_zettels.py
   5c.  Memória      update_memory_v2.py
   5d.  Contradições detect_contradictions.py
+  5.45 Alertas Aceleração acceleration_alerts_v1.py → alertas_aceleracao injeta em intel_output.json
   5.5  Hype Cycle        hype_cycle_updater.py
   5.6  Strategic Briefing strategic_briefing_v1.py  → strategic_briefing injeta em intel_output.json
   5.7  Scenario Tracker  scenario_tracker_v1.py     → scenario_tracking injeta em intel_output.json
@@ -39,6 +40,7 @@ Uso:
   python run_pipeline_v3.py --only-market    # executa apenas market_collector
   python run_pipeline_v3.py --skip-briefing  # pula Strategic Briefing (sem pergunta estratégica)
   python run_pipeline_v3.py --skip-scenario-tracker  # pula o Rastreador de Cenários Prospectivos
+  python run_pipeline_v3.py --skip-alertas-aceleracao  # pula o Alerta de Aceleração Anômala
 """
 
 from __future__ import annotations
@@ -92,6 +94,7 @@ RADAR                 = "gerar_radar_xtechs_v11.py"
 HYPE_CYCLE_UPDATER    = "hype_cycle_updater.py"
 STRATEGIC_BRIEFING    = "strategic_briefing_v1.py"
 SCENARIO_TRACKER      = "scenario_tracker_v1.py"
+ACCELERATION_ALERTS   = "acceleration_alerts_v1.py"
 BACKUP_DB             = "backup_db.py"
 
 
@@ -307,6 +310,19 @@ def etapa_memoria(dry_run: bool = False, backfill: bool = False) -> None:
     ok(f"Contradições detectadas em {duracao(time.time() - t0)}")
 
 
+def etapa_alertas_aceleracao() -> None:
+    header("5.45/7", f"Alertas de Aceleração — {ACCELERATION_ALERTS}")
+    exigir(INTEL_OUTPUT)
+    if not as_path(ACCELERATION_ALERTS).exists():
+        warn(f"{ACCELERATION_ALERTS} não encontrado — etapa ignorada (sem alertas_aceleracao no JSON)")
+        return
+    garantir_banco()
+    mod = carregar_modulo(ACCELERATION_ALERTS, "acceleration_alerts_pipeline")
+    t0 = time.time()
+    run_main(mod, [ACCELERATION_ALERTS, "--input", INTEL_OUTPUT, "--db", str(DEFAULT_DB)])
+    ok(f"Alertas de Aceleração concluídos em {duracao(time.time() - t0)}")
+
+
 def etapa_hype_cycle() -> None:
     header("5.5/7", f"Hype Cycle Dinâmico — {HYPE_CYCLE_UPDATER}")
     exigir(INTEL_OUTPUT)
@@ -436,6 +452,7 @@ def main() -> None:
     skip_market    = has_flag(argv, "--skip-market")
     skip_briefing  = has_flag(argv, "--skip-briefing")
     skip_scenario_tracker = has_flag(argv, "--skip-scenario-tracker")
+    skip_alertas_aceleracao = has_flag(argv, "--skip-alertas-aceleracao")
     only_docs    = has_flag(argv, "--only-docs")
     only_radar   = has_flag(argv, "--only-radar")
     only_memory  = has_flag(argv, "--only-memory")
@@ -510,8 +527,13 @@ def main() -> None:
 
     if skip_memory:
         info("--skip-memory: etapas de memória desativadas")
+        info("  (Alertas de Aceleração também ignorados — dependem do raw_items do ciclo já ingerido)")
     else:
         etapas.append((lambda: etapa_memoria(dry_run=dry_run, backfill=backfill), "Memória"))
+        if skip_alertas_aceleracao:
+            info("--skip-alertas-aceleracao: Alerta de Aceleração Anômala ignorado")
+        else:
+            etapas.append((etapa_alertas_aceleracao, "Alertas de Aceleração"))
 
     etapas.append((etapa_hype_cycle, "Hype Cycle Dinâmico"))
 
