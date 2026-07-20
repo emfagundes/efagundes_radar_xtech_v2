@@ -2194,11 +2194,14 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     # substitui o antigo sparkline "IPS por frente"
     _tech_matrix_block = _render_tech_matrix(data)
 
-    # Curva de formação do vetor #1 do ciclo — logo abaixo do radar setorial
-    # (Mudança 2). vetores[0] é o mesmo vetor #1 já exibido nos badges acima
-    # (pós sort_vetores_for_priority), com curva_formacao já embutida pelo
-    # pipeline (scenario_tracker_v1.aplicar_curva_formacao_vetor1).
-    _vetor1_curva_block = _render_vetor1_curva_block(vetores[0] if vetores else None)
+    # Track Record (4 destaques) abaixo do radar setorial — decisão do
+    # cliente: substitui o card único de curva do vetor #1 (repetir o
+    # mesmo conteúdo aqui e no H2 é aceitável). Fallback pro card de
+    # vetor #1 se ainda não houver destaques (ex.: base de cenários vazia).
+    _vetor1_curva_block = (
+        _render_h1_track_record_destaques(data)
+        or _render_vetor1_curva_block(vetores[0] if vetores else None)
+    )
 
     # Impacto por frente xTech — vai para a esquerda, logo após o briefing
     # (leitura editorial, não gráfico) — equilibra a altura das duas colunas.
@@ -4292,7 +4295,13 @@ def _render_curva_formacao_svg(
 
     pts = " ".join(f"{x_pos(i)},{y_pos(v)}" for i, v in enumerate(vals))
     parts = [
-        f'<svg width="{w}" height="{hgt}" viewBox="0 0 {w} {hgt}" style="display:block;overflow:visible">',
+        # width="100%" (não {w} fixo em px) — a largura real do card no grid
+        # (minmax(220px,1fr) menos padding) nem sempre bate com w; com
+        # overflow:visible, um SVG de largura fixa maior que o container
+        # vazava linha/marcador pra fora da borda do card. viewBox continua
+        # em {w}x{hgt} só pra manter a matemática de x_pos/y_pos.
+        f'<svg width="100%" height="{hgt}" viewBox="0 0 {w} {hgt}" preserveAspectRatio="none" '
+        f'style="display:block;max-width:100%;overflow:hidden">',
         f'<polyline points="{pts}" fill="none" stroke="{C_TERRA}" stroke-width="1.6" '
         f'stroke-linejoin="round" stroke-linecap="round"/>',
     ]
@@ -4396,6 +4405,30 @@ def _render_vetor1_curva_block(vetor1: Dict[str, Any] | None) -> str:
         f'</div>'
         f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:6px">{h(_HONESTIDADE_TRACK_RECORD)}{h(nota_origem)}</div>'
         f'{svg}'
+        f'</div>'
+    )
+
+
+def _render_h1_track_record_destaques(data: Dict[str, Any]) -> str:
+    """H1, abaixo do radar setorial — os N_TRACK_RECORD_DESTAQUE cards de
+    destaque do Track Record (decisão do cliente: repetir aqui e no H2 é
+    aceitável). Substitui o card único de curva do vetor #1: os 4
+    destaques já são a prova de formação mais forte do ciclo, e repetição
+    entre H1/H2 não é problema."""
+    tracking = data.get("scenario_tracking") or {}
+    destaques = [it for it in (tracking.get("track_record") or []) if it.get("destaque")]
+    if not destaques:
+        return ""
+    cards = "".join(_render_track_record_card(it) for it in destaques)
+    return (
+        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+        f'border-radius:12px;padding:14px;">'
+        f'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">'
+        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#79A3FF;">Track Record — Cenários em Formação</span>{type_badge("leitura")}'
+        f'</div>'
+        f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:8px">{h(_HONESTIDADE_TRACK_RECORD)}</div>'
+        f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">{cards}</div>'
         f'</div>'
     )
 
