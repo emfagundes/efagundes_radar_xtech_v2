@@ -51,6 +51,7 @@ except ImportError:
     pass
 
 import scenario_calibration_v1 as calibration
+import formation_curves_v1 as fc
 
 BRASILIA = timezone(timedelta(hours=-3))
 
@@ -493,6 +494,173 @@ def build_scenario_tracking_summary(conn: sqlite3.Connection) -> dict:
     }
 
 
+# ─── Track Record — curvas de formação dos cenários resolvidos ────────────
+
+N_TRACK_RECORD_DESTAQUE = 4  # decisão do cliente — dose acionável, não os 35
+
+
+def _resumir_evidencia(evidencia_json: str | None) -> str:
+    """Resumo textual curto de qual(is) gatilho(s) confirmaram o cenário —
+    mesma evidência já auditável em scenario_evaluations.evidencia, só
+    tornada legível para o card do Track Record."""
+    if not evidencia_json:
+        return ""
+    try:
+        ev = json.loads(evidencia_json)
+    except Exception:
+        return ""
+    fontes = []
+    if ev.get("vetor_top3"):
+        fontes.append("vetor estratégico no top-3")
+    if ev.get("hero"):
+        fontes.append("manchete do ciclo")
+    if ev.get("fato_canonico"):
+        fontes.append("fato canônico registrado")
+    if not fontes:
+        return ""
+    return "Confirmado via " + ", ".join(fontes) + "."
+
+
+_TR_BUFFER_SEMANAS_ANTES = 3
+_TR_MIN_SEMANAS_JANELA   = 8
+_TR_MAX_SEMANAS_JANELA   = 16
+
+
+def _janela_relativa_ao_cenario(data_emissao: str, data_referencia: str) -> tuple[str, int]:
+    """Fim + nº de semanas de uma curva ANCORADA no ciclo de vida do cenário
+    (emissão -> desfecho), não no fim do banco. Sem isso, um cenário emitido
+    há poucas semanas tem a maior parte de uma janela fixa de 16 semanas
+    ocupada por volume de meses antes de ele sequer existir — dominando
+    visualmente a curva sem relação com o cenário (achado ao validar contra
+    dado real: curvas caindo desde o início em vez de subir até a
+    confirmação, porque a maior parte da janela era história irrelevante)."""
+    emi = _parse_date(data_emissao)
+    ref = _parse_date(data_referencia)
+    dias = (ref - emi).days + _TR_BUFFER_SEMANAS_ANTES * 7
+    semanas = max(_TR_MIN_SEMANAS_JANELA, min(_TR_MAX_SEMANAS_JANELA, (dias // 7) + 1))
+    return data_referencia, semanas
+
+
+def build_track_record(conn: sqlite3.Connection, ciclo_id: str) -> list[dict]:
+    """Um item por cenário com desfecho terminal (confirmado ou
+    nao_materializado) — não só os 4 de destaque: a lista completa é o que
+    sustenta o "ver todos" no template. Cada item traz a curva de formação
+    semanal (None se o volume de sinais correspondentes não passar o piso —
+    nunca uma curva fabricada). `destaque=True` marca os N_TRACK_RECORD_DESTAQUE
+    escolhidos por maior dias_antecedencia entre os CONFIRMADOS com curva
+    válida (curadoria da Seção — curva nítida > curva ruidosa)."""
+    rows = conn.execute(
+        """
+        SELECT ss.scenario_uid, ss.titulo_cenario, ss.tipo, ss.data_emissao,
+               ss.mecanismo_kws, se.data_avaliacao, se.status, se.evidencia
+        FROM scenario_snapshots ss
+        JOIN scenario_evaluations se ON se.scenario_uid = ss.scenario_uid
+        WHERE se.status IN ('confirmado', 'nao_materializado')
+        ORDER BY ss.data_emissao ASC
+        """
+    ).fetchall()
+
+    itens = []
+    for uid, titulo, tipo, data_emissao, kws_json, data_avaliacao, status, evidencia in rows:
+        kws = json.loads(kws_json or "[]")
+        dias_antecedencia = (_parse_date(data_avaliacao) - _parse_date(data_emissao)).days
+
+        # Curva ancorada no ciclo de vida do PRÓPRIO cenário (emissão -> desfecho
+        # + margem), não numa janela fixa de 16 semanas terminando hoje.
+        data_fim_curva = data_avaliacao if status == "confirmado" else ciclo_id
+        fim_curva, semanas_curva = _janela_relativa_ao_cenario(data_emissao, data_fim_curva)
+        curva = fc.curva_formacao_semanal(conn, kws, fim_curva, semanas=semanas_curva)
+
+        item = {
+            "scenario_uid": uid,
+            "titulo": titulo,
+            "tipo": tipo or "Misto",
+            "status": status,
+            "data_emissao": data_emissao,
+            "data_confirmacao": data_avaliacao if status == "confirmado" else None,
+            "dias_antecedencia": dias_antecedencia,
+            "curva_formacao": curva,
+            "idx_emissao": fc.indice_semana_para_data(fim_curva, semanas_curva, data_emissao) if curva else None,
+            "idx_confirmacao": (
+                fc.indice_semana_para_data(fim_curva, semanas_curva, data_avaliacao)
+                if curva and status == "confirmado" else None
+            ),
+            "evidencia_resumo": _resumir_evidencia(evidencia),
+            "destaque": False,
+        }
+        itens.append(item)
+
+    # Curadoria dos destaques: só confirmados com curva válida (nítida),
+    # maior dias_antecedencia primeiro — "preferir os confirmados de maior
+    # antecedência, que tendem a ter formação mais nítida".
+    candidatos_destaque = [
+        it for it in itens if it["status"] == "confirmado" and it["curva_formacao"] is not None
+    ]
+    candidatos_destaque.sort(key=lambda it: it["dias_antecedencia"], reverse=True)
+    for it in candidatos_destaque[:N_TRACK_RECORD_DESTAQUE]:
+        it["destaque"] = True
+
+    return itens
+
+
+# ─── Curva de formação do vetor #1 (Horizonte 1) ───────────────────────────
+
+def _sort_vetores_prioridade(vetores: list[dict]) -> list[dict]:
+    """Deve espelhar sort_vetores_for_priority em gerar_radar_xtechs_v11.py —
+    mesma ordem que decide qual vetor aparece como #1 na Sala de Situação.
+    Duplicado (não importado do template) por direção de dependência: o
+    pipeline não deve depender do renderer."""
+    quad_rank = {"Mobilizar Agora": 4, "Capturar Vantagem": 3, "Monitorar Vetores": 2, "Ruído Operacional": 1}
+    return sorted(
+        vetores,
+        key=lambda v: (
+            quad_rank.get(v.get("quadrante_executivo", ""), 0),
+            float(v.get("pressao_estrategica") or 0),
+            -int(v.get("janela_decisoria_dias") or 999),
+            float(v.get("intensidade_momento") or 0),
+        ),
+        reverse=True,
+    )
+
+
+def aplicar_curva_formacao_vetor1(conn: sqlite3.Connection, intel: dict, ciclo_id: str) -> None:
+    """Mudança 2 — embute curva_formacao no vetor #1 (o mesmo já exibido em
+    destaque na Sala de Situação, não vetores_estrategicos[0] bruto: o
+    template reordena por prioridade executiva antes de exibir). Fallback
+    para o tema de maior saliência do ciclo (mesmo funil do
+    acceleration_alerts_v1) se a série do vetor #1 não passar o piso de
+    volume ou for muito plana; sem isso também, omite graciosamente (sem
+    gravar o campo) — nunca uma curva vazia/enganosa."""
+    vetores = intel.get("vetores_estrategicos") or []
+    if not vetores:
+        return
+    vetor1 = _sort_vetores_prioridade(vetores)[0]
+
+    kws = extrair_mecanismo_kws(f"{vetor1.get('nome', '')} {vetor1.get('mecanismo_causal', '')}")
+    curva = fc.curva_formacao_semanal(conn, kws, ciclo_id)
+    titulo = vetor1.get("nome", "")
+    origem = "vetor"
+
+    if fc.curva_e_plana(curva):
+        try:
+            import acceleration_alerts_v1 as aa
+            candidatos = aa.calcular_saliencia_temas(conn, ciclo_id)
+        except Exception:
+            candidatos = []
+        if candidatos:
+            top_tema = candidatos[0]["theme"]
+            curva_fallback = fc.curva_formacao_semanal_por_tema(conn, top_tema, ciclo_id)
+            if not fc.curva_e_plana(curva_fallback):
+                curva, titulo, origem = curva_fallback, top_tema, "tema_saliente"
+
+    if curva is None:
+        return  # nada usável nem no vetor #1 nem no fallback — omite, nunca curva vazia
+
+    vetor1["curva_formacao"] = curva
+    vetor1["curva_formacao_titulo"] = titulo
+    vetor1["curva_formacao_origem"] = origem
+
+
 # ─── Entrypoint (usado pelo pipeline e pelo CLI) ───────────────────────────
 
 def run_scenario_tracker(
@@ -534,6 +702,9 @@ def run_scenario_tracker(
 
         tracking = build_scenario_tracking_summary(conn)
         tracking["auto_calibracao"] = calibration.build_auto_calibracao_summary(conn)
+        tracking["track_record"] = build_track_record(conn, ciclo_id)
+        if not dry_run:
+            aplicar_curva_formacao_vetor1(conn, intel, ciclo_id)
     finally:
         conn.close()
 

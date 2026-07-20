@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 gerar_radar_xtechs_v11.py
-Radar xTechs — Painel de Inteligência das 5 Frentes Tecnológicas · efagundes.com
+Radar xTechs — Radar Temático de Inteligência Estratégica · 5 Frentes de Inovação · efagundes.com
 
 Evolução v11 (sobre v10)
 ------------------------
@@ -25,6 +25,18 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+# Carrega ANTHROPIC_API_KEY do .env. Necessário quando este script roda
+# standalone (fora do run_pipeline_v3.py) — chamadas LLM (Lente de Decisão,
+# hero nMentors) dependem de ANTHROPIC_API_KEY já estar em os.environ.
+# Caminho explícito porque load_dotenv() sem path usa find_dotenv(), que
+# inspeciona a stack e falha quando este módulo é carregado dinamicamente
+# via importlib (como faz gerar_hero_nmentors.py).
+try:
+    from dotenv import load_dotenv
+    load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+except ImportError:
+    pass
 
 BRASILIA = timezone(timedelta(hours=-3))
 DEFAULT_INPUT = str(Path(__file__).parent / "intel_output.json")
@@ -383,6 +395,210 @@ def get_vetores(data: Dict[str, Any]) -> List[Dict[str, Any]]:
     return v if isinstance(v, list) else []
 
 
+def _contar_fontes(data: Dict[str, Any]) -> int:
+    """Conta fontes únicas reais do ciclo a partir dos itens coletados."""
+    itens = data.get("itens") or []
+    fontes = {str(it.get("fonte", "")).strip() for it in itens if it.get("fonte")}
+    return len(fontes) if fontes else (data.get("dashboard") or {}).get("fontes_monitoradas", 0)
+
+
+def _contar_paises(data: Dict[str, Any]) -> int:
+    """Conta países únicos cobertos no ciclo via mapeamento de fonte/link."""
+    import re as _re
+    FONTE_PAIS = {
+        "Renew Economy": "AU", "PV Magazine": "DE", "Financial Times": "GB",
+        "CleanTechnica": "US", "Datacenter Knowledge": "US", "Data Center Dynamics": "GB",
+        "Wood Mackenzie": "US", "Crunchbase News": "US", "Climate Home News": "GB",
+        "Energía Estratégica": "AR", "S&P Global": "US", "Bloomberg NEF": "US",
+        "Reuters": "GB", "Forbes": "US", "TechCrunch": "US", "Wired": "US",
+        "MIT Technology Review": "US",
+    }
+    GL_MAP = {
+        "BR": "BR", "US": "US", "AR": "AR", "AU": "AU", "DE": "DE",
+        "GB": "GB", "FR": "FR", "ES": "ES", "MX": "MX", "CL": "CL",
+        "PE": "PE", "CO": "CO", "PT": "PT", "IN": "IN", "CN": "CN",
+        "JP": "JP", "ZA": "ZA", "IT": "IT", "NL": "NL", "CA": "CA",
+        "KR": "KR", "SE": "SE", "NO": "NO", "NG": "NG",
+    }
+    paises: set[str] = set()
+    for it in (data.get("itens") or []):
+        fonte = str(it.get("fonte", "")).strip()
+        if fonte in FONTE_PAIS:
+            paises.add(FONTE_PAIS[fonte])
+            continue
+        link = it.get("link", "") or ""
+        m = _re.search(r"gl=([A-Z]{2})", link)
+        if m and m.group(1) in GL_MAP:
+            paises.add(GL_MAP[m.group(1)])
+            continue
+        if ".com.br" in link or ".gov.br" in link or ".org.br" in link:
+            paises.add("BR")
+        elif ".com.au" in link:
+            paises.add("AU")
+        elif ".co.uk" in link:
+            paises.add("GB")
+        elif ".com.ar" in link:
+            paises.add("AR")
+        elif ".de/" in link or link.endswith(".de"):
+            paises.add("DE")
+    return len(paises) or (data.get("dashboard") or {}).get("paises_cobertos", 0)
+
+
+def _fmt_ciclo(ciclo: str) -> str:
+    """Converte ciclo ISO (2026-07-01) para formato dd-mm-aaaa."""
+    try:
+        from datetime import date as _date
+        d = _date.fromisoformat(str(ciclo)[:10])
+        return d.strftime("%d-%m-%Y")
+    except Exception:
+        return ciclo
+
+
+def _render_radar_setorial_svg(data: Dict[str, Any], ciclo: str = "") -> str:
+    """SVG inline 5-eixos baseado em score médio dos itens por frente xTech."""
+    import math
+    FRENTES = ["EnergyTech", "CleanTech", "DeepTech", "AgriTech", "FinTech"]
+    # Alias: itens usam 'AgroTech' mas a frente oficial é 'AgriTech'
+    ALIAS = {"AgroTech": "AgriTech", "Agritech": "AgriTech", "agritech": "AgriTech"}
+    CORES = {
+        "EnergyTech": "#2FA87C",
+        "CleanTech":  "#5DCAA5",
+        "DeepTech":   "#5B8CFF",
+        "AgriTech":   "#7AB648",
+        "FinTech":    "#D9A441",
+    }
+    # Agrupa score_final dos itens por frente xTech
+    frente_scores: Dict[str, list] = {f: [] for f in FRENTES}
+    for it in (data.get("itens") or []):
+        xtech = ALIAS.get(it.get("xtech", ""), it.get("xtech", ""))
+        score = float(it.get("score_final") or 0)
+        if xtech in frente_scores and score > 0:
+            frente_scores[xtech].append(score)
+    valores_raw = [
+        (sum(frente_scores[f]) / len(frente_scores[f])) if frente_scores[f] else 0.0
+        for f in FRENTES
+    ]
+    max_val = max(valores_raw) if any(v > 0 for v in valores_raw) else 10.0
+    valores = [round(v / max_val * 10, 2) for v in valores_raw]
+
+    CX, CY, R = 190, 145, 80
+    N = len(FRENTES)
+    label_dist = R + 22
+
+    def pt(i: int, val: float):
+        ang = -math.pi / 2 + 2 * math.pi * i / N
+        r = R * val / 10
+        return CX + r * math.cos(ang), CY + r * math.sin(ang)
+
+    def lpt(i: int):
+        ang = -math.pi / 2 + 2 * math.pi * i / N
+        return CX + label_dist * math.cos(ang), CY + label_dist * math.sin(ang)
+
+    # Rings (20/40/60/80/100%)
+    rings = []
+    for pct in [0.2, 0.4, 0.6, 0.8, 1.0]:
+        pts_ring = " ".join(
+            f"{CX + R*pct*math.cos(-math.pi/2+2*math.pi*k/N):.1f},{CY + R*pct*math.sin(-math.pi/2+2*math.pi*k/N):.1f}"
+            for k in range(N)
+        )
+        op = "rgba(255,255,255,.06)" if pct < 1.0 else "rgba(255,255,255,.10)"
+        rings.append(f'<polygon points="{pts_ring}" fill="none" stroke="{op}" stroke-width="1"/>')
+
+    # Spokes
+    spokes = []
+    for i in range(N):
+        ex = CX + R * math.cos(-math.pi / 2 + 2 * math.pi * i / N)
+        ey = CY + R * math.sin(-math.pi / 2 + 2 * math.pi * i / N)
+        spokes.append(f'<line x1="{CX}" y1="{CY}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="rgba(255,255,255,.07)" stroke-width="1"/>')
+
+    # Data polygon
+    poly_pts = " ".join(f"{pt(i, valores[i])[0]:.1f},{pt(i, valores[i])[1]:.1f}" for i in range(N))
+
+    # Dots + labels
+    dots = []
+    labels = []
+    for i, frente in enumerate(FRENTES):
+        px, py = pt(i, valores[i])
+        c = CORES[frente]
+        dots.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="3.5" fill="{c}"/>')
+        lx, ly = lpt(i)
+        anchor = "middle" if abs(math.cos(-math.pi/2 + 2*math.pi*i/N)) < 0.3 else ("start" if lx > CX else "end")
+        is_top = valores[i] == max(valores)
+        fw = "700" if is_top else "500"
+        fc = "#A8B3C2" if is_top else "#718096"
+        labels.append(
+            f'<text x="{lx:.1f}" y="{ly+3:.1f}" text-anchor="{anchor}" '
+            f'font-size="8" font-weight="{fw}" fill="{fc}" '
+            f'font-family="\'IBM Plex Mono\',monospace">{frente}</text>'
+        )
+
+    # Hotspots interativos: caixa explicando a posição de cada vértice ao passar o mouse
+    lead_frente = FRENTES[valores.index(max(valores))] if any(valores) else FRENTES[0]
+    hotspots = []
+    for i, frente in enumerate(FRENTES):
+        px, py = pt(i, valores[i])
+        n_sinais = len(frente_scores[frente])
+        raw = valores_raw[i]
+        tip_below = "rte5-tip-below" if py < CY else ""
+        if n_sinais:
+            sinal_word = "sinal" if n_sinais == 1 else "sinais"
+            avaliado_word = "avaliado" if n_sinais == 1 else "avaliados"
+            if frente == lead_frente:
+                segunda_frase = "A posição no radar reflete esse score — é a frente com maior pressão relativa neste ciclo."
+            else:
+                segunda_frase = (
+                    f"A posição no radar é esse score normalizado em relação "
+                    f"à frente com maior pressão do ciclo ({lead_frente})."
+                )
+            tip_text = (
+                f"{frente}: {n_sinais} {sinal_word} {avaliado_word} neste ciclo, score médio {raw:.1f}/10. "
+                f"{segunda_frase}"
+            )
+        else:
+            tip_text = f"{frente}: nenhum sinal com score válido neste ciclo — ponto permanece no centro do radar."
+        left_pct = px / 380 * 100
+        top_pct = py / 290 * 100
+        hotspots.append(
+            f'<span class="rte5-radar-dot rte5-ips-wrap {tip_below}" '
+            f'style="left:{left_pct:.2f}%;top:{top_pct:.2f}%;" tabindex="0" '
+            f'onclick="this.classList.toggle(\'active\')">'
+            f'<span class="rte5-ips-tip">{h(tip_text)}</span>'
+            f'</span>'
+        )
+
+    ciclo_label = ciclo or ""
+    ciclo_label_fmt = _fmt_ciclo(ciclo_label) if ciclo_label else ""
+    _radar_tooltip = (
+        "Cada ponto mostra a força de uma frente xTech neste ciclo: quanto mais "
+        "sinais relevantes (notícias e eventos analisados pelo Radar) e maior o "
+        "score médio desses sinais (0–10, relevância estratégica para o Brasil), "
+        "mais o ponto se afasta do centro."
+    )
+    return f"""<div style="margin-top:14px;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#79A3FF;margin-bottom:4px;">
+    <span class="rte5-ips-wrap rte5-tip-below">Radar Setorial · {ciclo_label_fmt}<span class="rte5-ips-icon" onclick="this.closest('.rte5-ips-wrap').classList.toggle('active')">ⓘ</span><span class="rte5-ips-tip">{_radar_tooltip}</span></span>
+  </div>
+  <div style="position:relative;">
+    <svg viewBox="0 0 380 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible;">
+      <defs>
+        <radialGradient id="rsg{ciclo_label.replace('-','')}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#5B8CFF" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="#5B8CFF" stop-opacity="0.04"/>
+        </radialGradient>
+      </defs>
+      {''.join(rings)}
+      {''.join(spokes)}
+      <polygon points="{poly_pts}"
+               fill="url(#rsg{ciclo_label.replace('-','')})" stroke="#5B8CFF" stroke-width="1.6"
+               stroke-linejoin="round" stroke-opacity="0.88"/>
+      {''.join(dots)}
+      {''.join(labels)}
+    </svg>
+    {''.join(hotspots)}
+  </div>
+</div>"""
+
+
 def get_briefing(data: Dict[str, Any]) -> Dict[str, Any]:
     return data.get("briefing_diario") or {}
 
@@ -465,6 +681,22 @@ def janela_to_x(v: Dict[str, Any]) -> float:
 
 def chip(label: str, color: str = C_TERRA_LIGHT) -> str:
     return f'<span class="rte5-chip" style="--chip:{h(color)}">{h(label)}</span>'
+
+
+def type_badge(kind: str) -> str:
+    """Badge DADO/LEITURA para o cabeçalho de uma seção (v11 — layout por horizontes)."""
+    is_dado = kind == "dado"
+    color = C_TERRA if is_dado else C_GREEN
+    label = "DADO" if is_dado else "LEITURA"
+    return f'<span class="rte5-type-badge" style="color:{color};border-color:{color}">{label}</span>'
+
+
+def section_head_open(kind: str) -> str:
+    """Abre o <div class="rte5-section-head"> com acento de borda dado/leitura.
+    Mantém o prefixo `<div class="rte5-section-head"` — _with_anchor() casa por
+    prefixo (v11), então atributos extras aqui não quebram a inserção de âncora."""
+    color = C_TERRA if kind == "dado" else C_GREEN
+    return f'<div class="rte5-section-head" style="border-left:3px solid {color};padding-left:12px">'
 
 
 def details_block(summary: str, body: str, cls: str = "") -> str:
@@ -753,12 +985,41 @@ def _build_items_index(data: Dict[str, Any]):
     return by_idx, by_title
 
 
+def _referencia_abnt_pdf(it: Dict[str, Any]) -> str:
+    """Monta referência bibliográfica estilo ABNT para documento PDF local.
+
+    PDFs do inbox não têm URL pública (apontam para caminho local do Drive,
+    inacessível a visitantes externos — gera 404). Em vez de link quebrado,
+    exibe apenas a referência bibliográfica, sem crédito de autoria (o
+    metadata "Author" do PDF não é confiável — ver doc_collector_v1.py).
+    """
+    titulo = (it.get("doc_titulo") or it.get("titulo_pt") or it.get("titulo") or "").strip()
+    titulo = re.sub(r"\s*\[\d+/\d+\]\s*$", "", titulo)  # remove sufixo [n/m] do chunk
+    n_pag  = it.get("doc_n_paginas") or "?"
+    ano    = (it.get("data") or "")[:4] or "s.d."
+    return f"{titulo}. [S.l.: s.n.], {ano}. Documento em PDF, {n_pag} p."
+
+
 def _render_fontes_block(items_list: List[Dict[str, Any]]) -> str:
-    """Renderiza bloco colapsável com títulos linkados das fontes."""
+    """Renderiza bloco colapsável com títulos linkados das fontes.
+
+    Itens tipo_fonte="documento" (PDFs do inbox) não têm URL pública —
+    exibidos como referência bibliográfica ABNT em texto puro, deduplicados
+    por documento (vários chunks do mesmo PDF citam o mesmo documento uma
+    única vez). Demais itens seguem como link clicável normal.
+    """
     if not items_list:
         return ""
     links = []
+    pdf_titulos_vistos: set[str] = set()
     for it in items_list:
+        if (it.get("tipo_fonte") or "") == "documento":
+            ref = _referencia_abnt_pdf(it)
+            if not ref or ref in pdf_titulos_vistos:
+                continue
+            pdf_titulos_vistos.add(ref)
+            links.append(f'<div class="rte5-signal">{h(ref)}</div>')
+            continue
         titulo = (it.get("titulo_pt") or it.get("titulo") or "").strip()
         url    = (it.get("link") or "").strip()
         fonte  = (it.get("fonte") or "").strip()
@@ -766,7 +1027,7 @@ def _render_fontes_block(items_list: List[Dict[str, Any]]) -> str:
             continue
         label = f"{titulo}" + (f" — {fonte}" if fonte else "")
         if url:
-            links.append(f'<div class="rte5-signal"><a href="{h(url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">{h(label)}</a></div>')
+            links.append(f'<div class="rte5-signal"><a href="{h(url)}" target="_blank" rel="noopener" style="font-size:.82rem;line-height:1.55;color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2)">{h(label)}</a></div>')
         else:
             links.append(f'<div class="rte5-signal">{h(label)}</div>')
     if not links:
@@ -932,6 +1193,10 @@ def _css() -> str:
   border:6px solid transparent; border-top-color:#0f1722; }}
 .rte5-ips-wrap:hover .rte5-ips-tip,
 .rte5-ips-wrap.active .rte5-ips-tip {{ display:block; }}
+.rte5-radar-dot.rte5-ips-wrap {{ position:absolute; display:block; width:16px; height:16px; margin:-8px 0 0 -8px; cursor:pointer; }}
+.rte5-radar-dot .rte5-ips-tip {{ width:210px; text-align:left; }}
+.rte5-tip-below .rte5-ips-tip {{ bottom:auto; top:calc(100% + 8px); }}
+.rte5-tip-below .rte5-ips-tip::after {{ top:auto; bottom:100%; border-top-color:transparent; border-bottom-color:#0f1722; }}
 .rte5-priority-card {{ border:1px solid rgba(217,108,108,.34); background:rgba(217,108,108,.07); border-radius:16px; padding:16px; }}
 .rte5-priority-label {{ font-family:'IBM Plex Mono',monospace; color:var(--danger); font-size:.66rem; text-transform:uppercase; letter-spacing:.12em; margin-bottom:8px; }}
 .rte5-priority-name {{ font-size:.95rem; font-weight:800; letter-spacing:-.02em; line-height:1.32; margin-bottom:10px; }}
@@ -1187,6 +1452,92 @@ def _css() -> str:
 @media(max-width:700px) {{
   .radar-horizonte-header {{ flex-direction:column; gap:5px; }}
 }}
+
+/* ── Contêineres de horizonte — <details> (v11) ── */
+.radar-horizonte-details {{ margin:40px 0 18px; }}
+.radar-horizonte-details > summary.radar-horizonte-header {{
+  cursor:pointer; list-style:none; margin:0 0 18px; outline:none;
+}}
+.radar-horizonte-details > summary.radar-horizonte-header::marker,
+.radar-horizonte-details > summary.radar-horizonte-header::-webkit-details-marker {{ display:none; content:''; }}
+.horizonte-toggle {{
+  font-family:'IBM Plex Mono',monospace; font-size:.9rem; color:{C_TERRA_LIGHT};
+  flex-shrink:0; margin-left:auto; transition:transform .18s; user-select:none;
+}}
+.radar-horizonte-details[open] > summary .horizonte-toggle {{ transform:rotate(45deg); }}
+.horizonte-resumo {{
+  flex-basis:100%; font-size:.78rem; color:{C_MUTED};
+  font-family:'IBM Plex Mono',monospace; margin-top:2px;
+}}
+.radar-horizonte-body {{ padding-top:2px; }}
+@media(max-width:700px) {{ .horizonte-toggle {{ margin-left:0; }} }}
+
+/* ── Badges dado/leitura (v11) ── */
+.rte5-type-badge {{
+  display:inline-flex; align-items:center; font-family:'IBM Plex Mono',monospace;
+  font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.10em;
+  padding:2px 8px; border-radius:999px; border:1px solid; background:rgba(255,255,255,.04);
+  line-height:1.5; white-space:nowrap;
+}}
+.rte5-legend {{
+  font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:{C_WEAK};
+  display:flex; align-items:center; gap:6px; margin-top:6px; flex-wrap:wrap; justify-content:flex-end;
+}}
+
+/* ── Navegação por horizonte (v11) ── */
+.rte5-hnav {{
+  position:sticky; top:0; z-index:40; display:flex; gap:8px; flex-wrap:wrap;
+  padding:10px 0; margin-bottom:8px; background:{C_BG}; border-bottom:1px solid {C_LINE};
+}}
+.rte5-hnav-link {{
+  font-family:'IBM Plex Mono',monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em;
+  color:{C_MUTED}; text-decoration:none; border:1px solid {C_LINE2}; border-radius:999px;
+  padding:5px 12px; transition:all .15s;
+}}
+.rte5-hnav-link:hover {{ color:{C_TERRA_LIGHT}; border-color:{C_TERRA}; }}
+
+/* ── Mapa do conteúdo — cards de horizonte (v11.1) ── */
+.rte5-hmap {{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:4px 0 30px; }}
+.rte5-hmap-card {{
+  display:flex; flex-direction:column; text-decoration:none; border:1px solid {C_LINE};
+  background:{C_PANEL}; border-radius:16px; padding:18px; transition:border-color .15s, transform .15s;
+}}
+.rte5-hmap-card:hover {{ border-color:{C_TERRA_LIGHT}; transform:translateY(-2px); }}
+.rte5-hmap-num {{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:{C_TERRA_LIGHT}; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }}
+.rte5-hmap-label {{ font-size:.96rem; font-weight:800; color:{C_TEXT}; margin-bottom:6px; letter-spacing:-.01em; line-height:1.3; }}
+.rte5-hmap-audiencia {{ font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:{C_MUTED}; margin-bottom:10px; }}
+.rte5-hmap-pergunta {{ font-size:.80rem; font-style:italic; color:{C_TEXT}; opacity:.82; margin-bottom:10px; line-height:1.5; }}
+.rte5-hmap-resumo {{ font-size:.76rem; color:{C_MUTED}; line-height:1.55; border-top:1px solid {C_LINE}; padding-top:10px; margin-top:auto; }}
+.rte5-hmap-cta {{ margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:{C_TERRA_LIGHT}; }}
+@media(max-width:900px) {{ .rte5-hmap {{ grid-template-columns:1fr; }} }}
+
+/* ── Faixa manifesto anti-dashboard + memória acumulada (v11.2) ── */
+.rte5-manifesto {{
+  display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  margin:4px 0 26px; padding:16px 22px;
+  border:1px solid rgba(91,140,255,.20); border-left:3px solid {C_TERRA};
+  background:linear-gradient(90deg, rgba(91,140,255,.09) 0%, rgba(91,140,255,.02) 65%, transparent 100%);
+  border-radius:0 14px 14px 0;
+}}
+.rte5-manifesto-lead {{ font-size:.94rem; color:{C_TEXT}; line-height:1.5; font-weight:700; letter-spacing:-.01em; }}
+.rte5-manifesto-lead strong {{ color:{C_TERRA_LIGHT}; font-weight:800; }}
+.rte5-manifesto-sub {{ font-size:.80rem; color:{C_MUTED}; line-height:1.55; margin-top:5px; max-width:62ch; font-weight:400; }}
+.rte5-manifesto-memory {{ flex-shrink:0; text-align:right; border-left:1px solid {C_LINE2}; padding-left:20px; }}
+.rte5-manifesto-memory-num {{ font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:800; color:{C_TERRA_LIGHT}; line-height:1; }}
+.rte5-manifesto-memory-label {{ font-family:'IBM Plex Mono',monospace; font-size:.63rem; color:{C_MUTED}; text-transform:uppercase; letter-spacing:.08em; margin-top:6px; line-height:1.5; }}
+@media(max-width:820px) {{
+  .rte5-manifesto-memory {{ border-left:none; padding-left:0; border-top:1px solid {C_LINE}; padding-top:12px; text-align:left; width:100%; }}
+}}
+
+/* ── CTA leve por horizonte (v11.1) ── */
+.rte5-horizon-cta {{
+  margin-top:18px; padding:14px 18px; border:1px solid rgba(47,168,124,.22);
+  background:rgba(47,168,124,.05); border-left:3px solid {C_GREEN}; border-radius:0 12px 12px 0;
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+}}
+.rte5-horizon-cta-text {{ font-size:.84rem; color:{C_TEXT}; line-height:1.55; }}
+.rte5-horizon-cta-link {{ font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; color:{C_GREEN}; text-decoration:none; white-space:nowrap; }}
+.rte5-horizon-cta-link:hover {{ text-decoration:underline; }}
 </style>
 """
 
@@ -1197,20 +1548,84 @@ def render_header(data: Dict[str, Any]) -> str:
     dash = get_dashboard(data)
     ciclo = dash.get("ciclo") or data.get("ciclo_id") or datetime.now(BRASILIA).strftime("%Y-%m-%d")
     versao = dash.get("versao") or data.get("versao") or "v6"
-    fontes = dash.get("fontes_monitoradas", "—")
-    paises = dash.get("paises_cobertos", "—")
+    fontes = _contar_fontes(data) or dash.get("fontes_monitoradas", "—")
+    paises = _contar_paises(data) or dash.get("paises_cobertos", "—")
     total = dash.get("total_sinais") or data.get("total_itens") or "—"
+    ciclo_fmt = _fmt_ciclo(ciclo)
     return f"""
+<script>
+window.__rte5Lazy = window.__rte5Lazy || {{}};
+window.__rte5RegisterLazy = window.__rte5RegisterLazy || function(id, fn) {{
+  (window.__rte5Lazy[id] = window.__rte5Lazy[id] || []).push(fn);
+}};
+</script>
 <div class="rte5-header">
   <div class="rte5-brand">
     <div class="rte5-logo">⌁</div>
     <div>
       <div class="rte5-brand-title">Radar xTechs</div>
-      <div class="rte5-brand-sub">Painel de Inteligência das 5 Frentes Tecnológicas · efagundes.com</div>
+      <div class="rte5-brand-sub">Radar Temático de Inteligência Estratégica · 5 Frentes de Inovação · efagundes.com</div>
     </div>
   </div>
-  <div class="rte5-cycle"><strong>Ciclo {h(ciclo)}</strong> · {h(versao)}<br>{h(total)} sinais · {h(fontes)} fontes monitoradas · {h(paises)} países</div>
+  <div>
+    <div class="rte5-cycle"><strong>Ciclo {h(ciclo_fmt)}</strong> · {h(versao)}<br>{h(total)} sinais · {h(fontes)} fontes monitoradas · {h(paises)} países</div>
+    <div class="rte5-legend">{type_badge("dado")} visualização/série de dados &nbsp;·&nbsp; {type_badge("leitura")} leitura decisória do Think Tank</div>
+  </div>
 </div>"""
+
+
+_MESES_ABBR = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+
+
+def _fmt_mes_ano(iso_date: str) -> str:
+    """'2026-04-04' -> 'abr/2026'. Retorna '' se não parsear."""
+    try:
+        y, m = iso_date.split("-")[:2]
+        return f"{_MESES_ABBR[int(m) - 1]}/{y}"
+    except (ValueError, IndexError, AttributeError):
+        return ""
+
+
+def render_manifesto(data: Dict[str, Any], hist_data: Dict[str, Any] | None = None) -> str:
+    """Faixa de posicionamento entre o cabeçalho e o mapa de horizontes (v11.2).
+
+    Carrega a narrativa do e-book 'O Fim do Dashboard' (efagundes.com Think
+    Tank), que nomeia o Radar xTech como prova viva da arquitetura:
+      - manifesto anti-dashboard (Cap. 1): radar ≠ dashboard — capta sinal
+        externo que ainda não virou dado nos sistemas da organização;
+      - indicador de memória acumulada (Cap. 4): o volume histórico indexado
+        é o diferencial competitivo que um concorrente não replica da noite
+        para o dia. Números reais do pipeline (hist_data), com fallback mudo
+        quando ausentes — nunca inventa dado."""
+    hist_data = hist_data or data.get("hist_data") or {}
+    total_acum = hist_data.get("total_acumulado")
+    desde = _fmt_mes_ano(hist_data.get("data_inicio") or "")
+
+    memory_block = ""
+    if total_acum:
+        try:
+            num_fmt = f"{int(total_acum):,}".replace(",", ".")
+        except (ValueError, TypeError):
+            num_fmt = str(total_acum)
+        desde_txt = f"indexados desde {desde}" if desde else "indexados"
+        memory_block = (
+            f'<div class="rte5-manifesto-memory">'
+            f'<div class="rte5-manifesto-memory-num">{h(num_fmt)}</div>'
+            f'<div class="rte5-manifesto-memory-label">sinais {h(desde_txt)}<br>memória que cresce a cada ciclo</div>'
+            f'</div>'
+        )
+
+    return (
+        f'<div class="rte5-manifesto">'
+        f'<div>'
+        f'<div class="rte5-manifesto-lead">Isto não é um dashboard. É um <strong>radar</strong>.</div>'
+        f'<div class="rte5-manifesto-sub">Dashboards explicam o dado que sua organização já capturou. '
+        f'Este radar captura o que está mudando no ambiente externo — regulação, tecnologia, capital, '
+        f'geopolítica — antes de virar dado em qualquer sistema interno.</div>'
+        f'</div>'
+        f'{memory_block}'
+        f'</div>'
+    )
 
 
 def render_situation_room(data: Dict[str, Any]) -> str:
@@ -1218,9 +1633,15 @@ def render_situation_room(data: Dict[str, Any]) -> str:
     briefing = get_briefing(data)
     vetores = sort_vetores_for_priority(get_vetores(data))
     thesis = dash.get("executive_thesis") or {}
+    _hero0 = data.get("hero") or {}
     headline = thesis.get("frase_central") or briefing.get("titulo") or "Energia, IA e capital entraram na mesma equação estratégica."
     subtitle = briefing.get("subtitulo") or first_sentence(briefing.get("frase_de_abertura", "")) or "Sinais globais traduzidos em decisões para conselhos, CEOs e investidores no Brasil."
-    lede = clean_text(briefing.get("frase_de_abertura") or dash.get("briefing_executivo") or "")
+    lede = clean_text(
+        _hero0.get("briefing")
+        or briefing.get("frase_de_abertura")
+        or dash.get("briefing_executivo")
+        or ""
+    )
     mudancas = thesis.get("mudancas_estruturais") or []
     decisions = thesis.get("decisoes_prioritarias") or []
 
@@ -1233,8 +1654,8 @@ def render_situation_room(data: Dict[str, Any]) -> str:
     decisions = decisions[:3]
 
     total = dash.get("total_sinais") or data.get("total_itens") or "—"
-    fontes = dash.get("fontes_monitoradas", "—")
-    paises = dash.get("paises_cobertos", "—")
+    fontes = _contar_fontes(data) or dash.get("fontes_monitoradas", "—")
+    paises = _contar_paises(data) or dash.get("paises_cobertos", "—")
     ips = dash.get("score_ips_medio", "—")
     cycle = dash.get("ciclo") or data.get("ciclo_id") or ""
 
@@ -1271,7 +1692,7 @@ def render_situation_room(data: Dict[str, Any]) -> str:
     return f"""
 <section class="rte5-situation" id="sala-situacao">
   <div class="rte5-sit-left">
-    <div class="rte5-eyebrow">Sala de Situação Executiva · ciclo {h(cycle)}</div>
+    <div class="rte5-eyebrow">Sala de Situação Executiva · ciclo {h(_fmt_ciclo(cycle))}</div>
     <h1 class="rte5-headline">{h(headline)}</h1>
     <p class="rte5-subtitle">{h(subtitle)}</p>
     <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px">{h(lede)}</p>
@@ -1285,6 +1706,7 @@ def render_situation_room(data: Dict[str, Any]) -> str:
       <div class="rte5-metric"><div class="rte5-metric-val">{h(paises)}</div><div class="rte5-metric-label">países cobertos</div></div>
       <div class="rte5-metric"><div class="rte5-metric-val">{h(ips)}</div><div class="rte5-metric-label"><span class="rte5-ips-wrap">IPS médio<span class="rte5-ips-icon" onclick="this.closest('.rte5-ips-wrap').classList.toggle('active')">ⓘ</span><span class="rte5-ips-tip">IPS médio considera o universo total de sinais monitorados. Os vetores exibidos são apenas os priorizados — por isso seus IPS individuais são mais altos que a média geral.</span></span></div></div>
     </div>
+    {_render_radar_setorial_svg(data, cycle)}
     <div class="rte5-priority-card" style="--p:{p_color}">
       <div class="rte5-priority-label">Vetor prioritário · {h(p_level)}</div>
       <div class="rte5-priority-name">{h(priority.get('nome') or 'Prioridade em consolidação')}</div>
@@ -1410,6 +1832,188 @@ def _render_sparkline_ips(pressure_weeks: list) -> str:
     )
 
 
+_TECH_KEYWORDS: Dict[str, List[str]] = {
+    "Solar GD": ["solar"], "Data Centers IA": ["data center"],
+    "IA Generativa": ["intelig", "generativ", " ia "],
+    "Eólica Onshore": ["eólica", "eolica"], "Transmissão Elétrica": ["transmiss"],
+    "BESS": ["bess"], "H₂ Verde": ["hidrogênio", "hidrogenio", "h2 verde"],
+    "Open Finance / Pix": ["pix", "open finance"], "Nuclear / SMR": ["nuclear", "smr"],
+    "Robótica Industrial": ["robótica", "robotica"], "5G Industrial": ["5g"],
+    "Satélites LEO": ["satélite", "satelite"], "Lítio & Mineração": ["lítio", "litio"],
+    "Semicondutores Brasil": ["semicondutor"],
+    "EV / Mobilidade Elétrica": ["veículo elétrico", "veiculo eletrico", "mobilidade elétrica"],
+}
+
+
+_TREND_COLOR = {"↗": C_GREEN, "↘": C_DANGER, "→": "#718096"}
+
+# Rampa ordinal de maturidade comercial (Hype Cycle, 7 fases) — mesma cor
+# estrutural do design system (C_TERRA), variando só a opacidade do claro ao
+# forte. Ordinal, não categórica: a cor não muda por fase, só a intensidade —
+# reforça que é uma progressão em UMA escala, não 7 rótulos independentes.
+_MATURITY_PHASES = [
+    "Sinal Emergente", "Narrativa Exponencial", "Pico de Especulação",
+    "Fricção Operacional", "Escala Econômica", "Infraestrutura Crítica", "Comoditização",
+]
+_MATURITY_OPACITY = [0.22, 0.35, 0.48, 0.60, 0.72, 0.85, 1.0]
+
+
+def _maturity_badge(phase: str, trend: str, signal: str) -> str:
+    """Selo de fase de maturidade comercial + seta de tendência, com tooltip
+    explicando a fase (campo `signal` de hype_cycle_live). Sem match/fase
+    desconhecida: traço neutro, nunca quebra a linha."""
+    if not phase or phase not in _MATURITY_PHASES:
+        return '<span style="color:#4A5568;font-size:.62rem;">—</span>'
+    opacity = _MATURITY_OPACITY[_MATURITY_PHASES.index(phase)]
+    trend = trend or "→"
+    trend_glyph = trend + "︎"
+    trend_color = _TREND_COLOR.get(trend, "#718096")
+    tip = h(re.sub(r"<[^>]+>", "", signal or ""))
+    return (
+        f'<span title="{tip}" style="display:inline-flex;align-items:center;gap:4px;'
+        f'background:rgba(91,140,255,{opacity});border-radius:10px;padding:2px 7px;'
+        f'font-size:.60rem;color:#fff;white-space:nowrap;cursor:help;">'
+        f'{h(phase)}<span style="color:{trend_color};font-weight:700">{trend_glyph}</span>'
+        f'</span>'
+    )
+
+
+def _maturity_legend() -> str:
+    steps = "".join(
+        f'<span style="display:inline-block;width:14px;height:8px;border-radius:2px;'
+        f'background:rgba(91,140,255,{op});margin-right:1px" title="{h(ph)}"></span>'
+        for ph, op in zip(_MATURITY_PHASES, _MATURITY_OPACITY)
+    )
+    return (
+        f'<div style="font-size:.56rem;color:#718096;margin-top:4px;display:flex;align-items:center;gap:5px">'
+        f'<span>Maturidade:</span><span style="display:inline-flex">{steps}</span>'
+        f'<span>Sinal Emergente → Comoditização</span></div>'
+    )
+
+
+def _render_tech_matrix(data: Dict[str, Any]) -> str:
+    """Matriz Tecnologia × xTech — quais tecnologias tocam quais frentes, e em
+    que velocidade cada uma está crescendo.
+
+    Frente única vem de HYPE_TECHS (curadoria estática). Frentes adicionais
+    são derivadas cruzando menções da tecnologia em zettels/memórias
+    estratégicas (hist_data) com o campo "fronts" já calculado para cada um
+    (ver _snap_themes_to_fronts em analyzer_v33_agent.py) — mesma lógica que
+    já tagueia entidades como BESS com múltiplas frentes.
+
+    Velocidade de crescimento (tech_growth, calculada em
+    gerar_snapshot_historico) compara sinais dos últimos 14 dias com os 14
+    dias anteriores — uma seta por tecnologia, não por célula: com volume
+    baixo em algumas frentes, uma tendência independente por célula seria
+    estatisticamente instável (poucos sinais bastam para inverter a seta).
+
+    As células por xTech mostram a bolinha original (relevância binária:
+    tecnologia toca ou não aquela frente), na cor da xTech.
+    """
+    hist = data.get("hist_data") or {}
+    volumes = hist.get("tech_signals") or {}
+    if not volumes:
+        return ""
+    scores = hist.get("tech_scores") or {}
+    growth = hist.get("tech_growth") or {}
+    static_frente = {t["id"]: t["frente"] for t in HYPE_TECHS}
+    # Maturidade comercial — join por id com hype_cycle_live (dinâmico, 21
+    # techs vs. as 15 de tech_signals). Nem toda linha tem match; tratado com
+    # "—" na própria _maturity_badge, nunca quebra a linha (Mudança 3).
+    maturidade_by_id = {t.get("id"): t for t in (hist.get("hype_cycle_live") or []) if t.get("id")}
+
+    registros = (hist.get("memories") or []) + (hist.get("zettels") or [])
+    corpora = [
+        (" ".join([r.get("title") or "", r.get("desc") or "", r.get("analise") or ""]).lower(), r.get("fronts") or [])
+        for r in registros
+    ]
+
+    linhas = []
+    for tech_id, vol in sorted(volumes.items(), key=lambda kv: -kv[1]):
+        if tech_id not in static_frente:
+            continue
+        derivados: set = set()
+        for corpus, fronts in corpora:
+            if any(kw in corpus for kw in _TECH_KEYWORDS.get(tech_id, [])):
+                derivados.update(fronts)
+        frentes_tech = derivados | {static_frente[tech_id]}
+        g = growth.get(tech_id) or {}
+        linhas.append({
+            "id": tech_id, "volume": vol, "score": scores.get(tech_id, 0),
+            "frentes": frentes_tech, "derivado": bool(derivados),
+            "trend": g.get("trend", "→"), "delta_pct": g.get("delta_pct", 0),
+        })
+
+    if not linhas:
+        return ""
+
+    FRONTES = [
+        ("EnergyTech", "#2FA87C"), ("CleanTech", "#5DCAA5"), ("DeepTech", "#5B8CFF"),
+        ("AgriTech", "#7AB648"), ("FinTech", "#D9A441"),
+    ]
+    header_cells = "".join(
+        f'<th style="padding:4px 5px;text-align:center;font-size:8px;color:{c};font-weight:700;white-space:nowrap;">{f}</th>'
+        for f, c in FRONTES
+    )
+    rows_html = []
+    for row in linhas:
+        derivado_tag = (
+            '<span style="font-size:7px;color:#5B8CFF;margin-left:4px;" '
+            'title="Correlação derivada de zettels/memórias">●</span>' if row["derivado"] else ""
+        )
+        trend = row["trend"]
+        # VARIATION SELECTOR-15 (︎) força apresentação em texto simples —
+        # sem ele, alguns navegadores/fontes renderizam ↗ ↘ → como ícone
+        # colorido de emoji (caixinha azul), ignorando a cor definida no CSS.
+        trend_glyph = trend + "︎"
+        trend_color = _TREND_COLOR.get(trend, "#718096")
+        delta_pct = row["delta_pct"]
+        sinal_pct = f'{"+" if delta_pct > 0 else ""}{delta_pct:.0f}%'
+        velocidade_cell = (
+            f'<td style="text-align:center;padding:3px 6px;" title="Sinais: 14d recentes vs. 14d anteriores ({sinal_pct})">'
+            f'<span style="font-weight:700;color:{trend_color}">{trend_glyph}</span> '
+            f'<span style="font-size:.62rem;color:#8B99A8">{sinal_pct}</span>'
+            f'</td>'
+        )
+        cells = "".join(
+            f'<td style="text-align:center;padding:3px;">'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+            f'background:{c if f in row["frentes"] else "rgba(255,255,255,.08)"};"></span></td>'
+            for f, c in FRONTES
+        )
+        mat = maturidade_by_id.get(row["id"])
+        maturidade_cell = (
+            f'<td style="text-align:left;padding:3px 6px;">'
+            f'{_maturity_badge(mat.get("phase"), mat.get("trend"), mat.get("signal")) if mat else _maturity_badge(None, None, None)}'
+            f'</td>'
+        )
+        rows_html.append(
+            f'<tr style="border-top:1px solid rgba(255,255,255,.05);">'
+            f'<td style="padding:4px 8px 4px 0;font-size:.68rem;color:#C3CCD6;white-space:nowrap;">{h(row["id"])}{derivado_tag}</td>'
+            f'<td style="padding:4px 6px;font-size:.64rem;color:#8B99A8;text-align:right;">{row["volume"]}</td>'
+            f'{velocidade_cell}'
+            f'{cells}'
+            f'{maturidade_cell}'
+            f'</tr>'
+        )
+
+    return f"""<div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:#79A3FF;margin-bottom:2px;">Tecnologias em foco por xTech</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#8B99A8;margin-bottom:8px;">● tecnologia com sinais relevantes em mais de uma frente xTech &nbsp;·&nbsp; velocidade = sinais dos últimos 14 dias vs. 14 dias anteriores</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead><tr>
+      <th style="text-align:left;padding:4px 8px 4px 0;font-size:.56rem;color:#8B99A8;">TECNOLOGIA</th>
+      <th style="text-align:right;padding:4px 6px;font-size:.56rem;color:#8B99A8;">SINAIS</th>
+      <th style="text-align:center;padding:4px 6px;font-size:.56rem;color:#8B99A8;white-space:nowrap;">VELOCIDADE</th>
+      {header_cells}
+      <th style="text-align:left;padding:4px 6px;font-size:.56rem;color:#8B99A8;white-space:nowrap;">MATURIDADE COMERCIAL</th>
+    </tr></thead>
+    <tbody>{''.join(rows_html)}</tbody>
+  </table>
+  {_maturity_legend()}
+</div>"""
+
+
 def render_situation_room_v8(data: Dict[str, Any]) -> str:
     """Sala de Situação Executiva — versão v8.
     Esquerda: headline + badges dos vetores dominantes + sinais_relacionados links.
@@ -1435,11 +2039,17 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
         or first_sentence(briefing.get("frase_de_abertura", ""))
         or "Sinais globais traduzidos em decisões para conselhos, CEOs e investidores no Brasil."
     )
-    lede  = clean_text(briefing.get("frase_de_abertura") or dash.get("briefing_executivo") or "")
+    hero_data = data.get("hero") or {}
+    lede = clean_text(
+        hero_data.get("briefing")
+        or briefing.get("frase_de_abertura")
+        or dash.get("briefing_executivo")
+        or ""
+    )
     cycle = dash.get("ciclo") or data.get("ciclo_id") or ""
     total  = dash.get("total_sinais") or data.get("total_itens") or "—"
-    fontes = dash.get("fontes_monitoradas", "—")
-    paises = dash.get("paises_cobertos", "—")
+    fontes = _contar_fontes(data) or dash.get("fontes_monitoradas", "—")
+    paises = _contar_paises(data) or dash.get("paises_cobertos", "—")
     ips    = dash.get("score_ips_medio", "—")
 
     # Índice de itens por título (para resolver URLs dos sinais_relacionados)
@@ -1482,8 +2092,20 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
                     if any(tok in (item.get("titulo_pt") or item.get("titulo") or "").lower() for tok in tokens)
                 ][:5]
             parts = []
+            pdf_vistos_badge: set[str] = set()
             for titulo in sinais_rel[:5]:
                 item = by_title.get(titulo.lower().strip()) or {}
+                if (item.get("tipo_fonte") or "") == "documento":
+                    ref = _referencia_abnt_pdf(item)
+                    if not ref or ref in pdf_vistos_badge:
+                        continue
+                    pdf_vistos_badge.add(ref)
+                    parts.append(
+                        f'<div style="font-size:.82rem;color:#718096;line-height:1.55;margin-top:2px;'
+                        f'padding-left:6px;border-left:2px solid rgba(255,255,255,.08)">'
+                        f'{h(ref)}</div>'
+                    )
+                    continue
                 url  = item.get("link") or item.get("url") or ""
                 titulo_safe = h(titulo)
                 if url:
@@ -1515,6 +2137,8 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
         badges_html += badge + links_html
 
     # Impacto por frente xTech — lista vertical
+    _URGENCIA_LABELS = {"imediata": "Urgência imediata", "médio_prazo": "Médio prazo", "monitorar": "Monitorar"}
+    _URGENCIA_COLORS = {"imediata": C_DANGER, "médio_prazo": C_AMBER, "monitorar": C_MUTED}
     impacto_rows = ""
     if imp:
         for xt in ["EnergyTech", "CleanTech", "FinTech", "DeepTech", "AgriTech"]:
@@ -1525,6 +2149,36 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
             direcao  = str(d.get("direcao") or "neutra").lower()
             icon     = _DIR_ICONS.get(direcao, "◆")
             dir_col  = C_GREEN if "alta" in direcao and "neg" not in direcao else (C_DANGER if "neg" in direcao else C_AMBER)
+
+            # v11.1 (feedback 2026-07-19): a frase-martelo ficava órfã, sem link
+            # nem racional acessível. sinal_referencia e urgencia já são gerados
+            # pelo pipeline (impacto_xtech) mas não eram exibidos — expõe os dois
+            # num <details> "+"  (mesmo padrão já usado em details_block()),
+            # resolvendo o sinal de referência contra o índice de itens quando
+            # possível para virar link.
+            racional_parts = []
+            sinal_ref = d.get("sinal_referencia") or ""
+            if sinal_ref:
+                ref_item = by_title.get(sinal_ref.lower().strip()) or {}
+                ref_url = ref_item.get("link") or ref_item.get("url") or ""
+                if ref_url:
+                    racional_parts.append(
+                        f'<div style="margin-bottom:6px"><span style="color:#718096">Sinal de referência:</span> '
+                        f'<a href="{h(ref_url)}" target="_blank" rel="noopener" style="color:#79A3FF;text-decoration:none">{h(sinal_ref)}</a></div>'
+                    )
+                else:
+                    racional_parts.append(
+                        f'<div style="margin-bottom:6px"><span style="color:#718096">Sinal de referência:</span> {h(sinal_ref)}</div>'
+                    )
+            urgencia_raw = (d.get("urgencia") or "").lower()
+            if urgencia_raw:
+                urg_label = _URGENCIA_LABELS.get(urgencia_raw, urgencia_raw.replace("_", " ").capitalize())
+                urg_color = _URGENCIA_COLORS.get(urgencia_raw, C_MUTED)
+                racional_parts.append(
+                    f'<div><span style="color:#718096">Urgência:</span> <span style="color:{urg_color};font-weight:700">{h(urg_label)}</span></div>'
+                )
+            racional_html = details_block("Ver racional", "".join(racional_parts)) if racional_parts else ""
+
             impacto_rows += (
                 f'<div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
                 f'<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">'
@@ -1532,22 +2186,29 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
                 f'<span style="font-size:.68rem;color:{dir_col}">{icon}</span>'
                 f'</div>'
                 f'<div style="font-size:.74rem;color:#A8B3C2;line-height:1.45">{h(d.get("impacto") or "")}</div>'
+                f'{racional_html}'
                 f'</div>'
             )
 
-    # Sparkline IPS por frente — substitui SVG decorativo
-    hist_data_local = data.get("hist_data") or {}
-    pressure_weeks  = hist_data_local.get("pressure_weeks") or []
-    _sparkline_block = _render_sparkline_ips(pressure_weeks)
+    # Matriz Tecnologia × xTech — fica ao lado do pentágono, à direita (visual)
+    # substitui o antigo sparkline "IPS por frente"
+    _tech_matrix_block = _render_tech_matrix(data)
 
+    # Curva de formação do vetor #1 do ciclo — logo abaixo do radar setorial
+    # (Mudança 2). vetores[0] é o mesmo vetor #1 já exibido nos badges acima
+    # (pós sort_vetores_for_priority), com curva_formacao já embutida pelo
+    # pipeline (scenario_tracker_v1.aplicar_curva_formacao_vetor1).
+    _vetor1_curva_block = _render_vetor1_curva_block(vetores[0] if vetores else None)
+
+    # Impacto por frente xTech — vai para a esquerda, logo após o briefing
+    # (leitura editorial, não gráfico) — equilibra a altura das duas colunas.
     impacto_block = (
-        f'{_sparkline_block}'
-        f'<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:14px">'
-        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;text-transform:uppercase;'
-        f'letter-spacing:.10em;color:#718096;margin-bottom:6px">Impacto por frente xTech</div>'
-        f'{impacto_rows}'
+        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">'
+        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#79A3FF;margin-bottom:6px">Impacto por frente xTech</div>'
+        f'<div>{impacto_rows}</div>'
         f'</div>'
-    ) if impacto_rows else _sparkline_block
+    ) if impacto_rows else ""
 
     # Aviso de corte de dados — alerta âmbar quando ciclo > 1 dia antes de hoje
     from datetime import date as _date
@@ -1556,6 +2217,7 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
     _cut_color = "#718096"
     _cut_icon  = "·"
     _cut_alert = ""
+    _ciclo_fmt = _fmt_ciclo(_ciclo_str) if _ciclo_str else ""
     try:
         _ciclo_dt = _date.fromisoformat(_ciclo_str)
         _dias_atraso = (_hoje - _ciclo_dt).days
@@ -1566,7 +2228,7 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
                 f'<div style="margin:12px 0 0;padding:9px 13px;border-radius:8px;'
                 f'background:rgba(212,160,23,.10);border:1px solid rgba(212,160,23,.30);'
                 f'font-size:.78rem;color:#D4A017;line-height:1.55">'
-                f'<strong>Corte de dados: {_ciclo_str}.</strong> '
+                f'<strong>Corte de dados: {_ciclo_fmt}.</strong> '
                 f'Eventos ocorridos após esta data não estão incorporados a esta análise. '
                 f'Verifique fontes primárias para fatos de alto impacto recentes.'
                 f'</div>'
@@ -1575,20 +2237,37 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
         pass
     _ciclo_label = (
         f' <span style="color:{_cut_color};font-family:\'IBM Plex Mono\',monospace;font-size:.68rem;">'
-        f'{_cut_icon} dados até {h(_ciclo_str)}</span>'
+        f'{_cut_icon} dados até {h(_ciclo_fmt)}</span>'
         if _ciclo_str else ""
     )
 
     _kicker_eyebrow = h(kicker) if kicker else f"Sala de Situação Executiva"
+
+    # v11.1 (feedback 2026-07-19): os vetores dominantes ficavam num <div> sem
+    # rótulo, logo abaixo de "Impacto por frente xTech" — lia-se como
+    # continuação do mesmo bloco, quando na verdade é outro dado (prévia dos
+    # mesmos vetores que ganham análise completa no Mapa de Pressão, H2).
+    # Rótulo próprio + link cruzado deixam essa relação explícita.
+    vetores_dom_block = (
+        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">'
+        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#79A3FF;margin-bottom:6px">Vetores Dominantes deste Ciclo</div>'
+        f'<div>{badges_html}</div>'
+        f'<a href="#mapa-pressao" class="rte5-hnav-link" data-target="mapa-pressao" style="display:inline-flex;margin-top:10px">'
+        f'Análise completa → Horizonte 2</a>'
+        f'</div>'
+    ) if badges_html else ""
+
     return f"""
 <section class="rte5-situation" id="sala-situacao">
   <div class="rte5-sit-left">
-    <div class="rte5-eyebrow">{_kicker_eyebrow}{_ciclo_label}</div>
+    <div class="rte5-eyebrow" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">{_kicker_eyebrow}{_ciclo_label}{type_badge("leitura")}</div>
     <h1 class="rte5-headline">{h(headline)}</h1>
     <p class="rte5-subtitle" style="font-style:italic">{h(subtitle)}</p>
     <p class="rte5-subtitle" style="font-size:.89rem;max-width:900px">{h(lede)}</p>
     {_cut_alert}
-    <div style="margin-top:14px">{badges_html}</div>
+    {impacto_block}
+    {vetores_dom_block}
   </div>
   <div class="rte5-sit-right">
     <div class="rte5-metrics">
@@ -1597,7 +2276,13 @@ def render_situation_room_v8(data: Dict[str, Any]) -> str:
       <div class="rte5-metric"><div class="rte5-metric-val">{h(paises)}</div><div class="rte5-metric-label">países cobertos</div></div>
       <div class="rte5-metric"><div class="rte5-metric-val">{h(ips)}</div><div class="rte5-metric-label"><span class="rte5-ips-wrap">IPS médio<span class="rte5-ips-icon" onclick="this.closest('.rte5-ips-wrap').classList.toggle('active')">ⓘ</span><span class="rte5-ips-tip">IPS médio considera o universo total de sinais monitorados. Os vetores exibidos são apenas os priorizados — por isso seus IPS individuais são mais altos que a média geral.</span></span></div></div>
     </div>
-    {impacto_block}
+    <div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">
+      {_render_radar_setorial_svg(data, cycle)}
+    </div>
+    {_vetor1_curva_block}
+    <div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">
+      {_tech_matrix_block}
+    </div>
   </div>
 </section>"""
 
@@ -1764,12 +2449,12 @@ def render_map(data: Dict[str, Any]) -> str:
 
     return f"""
 <section class="rte5-section" id="mapa-pressao">
-  <div class="rte5-section-head"><h2 class="rte5-title">Mapa de Pressão Estratégica × Janela de Decisão</h2></div>
+  {section_head_open("dado")}<h2 class="rte5-title">Mapa de Pressão Estratégica × Janela de Decisão</h2>{type_badge("dado")}</div>
   <div class="rte5-map-wrap">
     <div class="rte5-chart-card"><canvas id="rte5-vetores-canvas"></canvas></div>
     <div class="rte5-map-side">{side}</div>
   </div>
-  <div class="rte5-section-head" style="margin-top:18px"><h3 class="rte5-title">Vetores Prioritários do Mapa</h3></div>
+  {section_head_open("leitura")}<h3 class="rte5-title">Vetores Prioritários do Mapa</h3>{type_badge("leitura")}</div>
   <div class="rte5-vector-cards">{''.join(cards)}</div>
   <script>
   (function() {{
@@ -1780,6 +2465,7 @@ def render_map(data: Dict[str, Any]) -> str:
       s.onload = cb;
       document.head.appendChild(s);
     }}
+    function _rte5InitVetoresChart() {{
     loadChart(function() {{
       var ctx = document.getElementById('rte5-vetores-canvas');
       if (!ctx || !window.Chart) return;
@@ -1828,6 +2514,8 @@ def render_map(data: Dict[str, Any]) -> str:
         plugins:[quadrantPlugin]
       }});
     }});
+    }}
+    window.__rte5RegisterLazy('horizonte-2', _rte5InitVetoresChart);
   }})();
   </script>
   <div style="font-size:.70rem;color:#718096;font-family:'IBM Plex Mono',monospace;padding:4px 0 0 2px">Período coberto: {periodo_coberto}</div>
@@ -1866,6 +2554,11 @@ def render_capital_panel(data: Dict[str, Any]) -> str:
 
 def render_convergence(data: Dict[str, Any]) -> str:
     clusters = get_clusters(data)
+    if not clusters:
+        # v11: sem convergência nem clusters neste ciclo — omite a seção em vez
+        # de renderizar um cabeçalho sem nenhum card embaixo (mesmo padrão já
+        # usado em render_cenarios_xtech).
+        return ""
     cards = []
     for c in clusters:
         sinais = c.get("titulos_noticias") or []
@@ -1883,7 +2576,7 @@ def render_convergence(data: Dict[str, Any]) -> str:
 </div>""")
     return f"""
 <section class="rte5-section" id="convergencia">
-  <div class="rte5-section-head"><h2 class="rte5-title">Motor de Convergência Estratégica</h2></div>
+  {section_head_open("leitura")}<div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Motor de Convergência Estratégica</h2>{type_badge("leitura")}</div></div>
   <div class="rte5-grid-3">{''.join(cards)}</div>
 </section>"""
 
@@ -1962,7 +2655,7 @@ def render_footer(data: Dict[str, Any]) -> str:
     return f"""
 <div class="rte5-footer">
   <span>Efagundes Intelligence Engine · Radar xTechs</span>
-  <span>Ciclo {h(ciclo)} · Gerado em {h(gen)}</span>
+  <span>Ciclo {h(_fmt_ciclo(ciclo))} · Gerado em {h(gen)}</span>
 </div>"""
 
 
@@ -2078,6 +2771,7 @@ def render_curva_convergencia(hist_data: Dict[str, Any]) -> str:
     document.head.appendChild(s);
   };
 
+  function _rte5InitCurva() {
   window._efLoadD3(function() {
     const svg = d3.select("#rte5-ctc-svg");
     const g   = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
@@ -2167,14 +2861,16 @@ def render_curva_convergencia(hist_data: Dict[str, Any]) -> str:
         + `<br>${d.signal}`;
     }
   });
+  }
+  window.__rte5RegisterLazy('horizonte-3', _rte5InitCurva);
 })();
 </script>"""
     )
 
     return (
         f'<section class="rte5-section" id="curva-convergencia">\n'
-        f'  <div class="rte5-section-head">\n'
-        f'    <h2 class="rte5-title">Curva de Maturidade da Convergência Tecnológica — xTechs</h2>\n'
+        f'  {section_head_open("dado")}\n'
+        f'    <div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Curva de Maturidade da Convergência Tecnológica — xTechs</h2>{type_badge("dado")}</div>\n'
         f'    <span class="rte5-note">'
         + (f'{cycle_date} · ' if cycle_date else '')
         + f'21 tecnologias · 7 estágios · valor sistêmico</span>\n'
@@ -2283,7 +2979,56 @@ def _short_label(title: str, max_len: int = 52) -> str:
     return truncated + "…"
 
 
-def render_intel_graph(hist_data: Dict[str, Any]) -> str:
+def _render_graph_briefing(data: Dict[str, Any]) -> str:
+    """Briefing (o que está impactando / o que observar) acima do Grafo de
+    Inteligência, no lugar do antigo parágrafo explicando cores dos nós —
+    mesma fonte de dado do parágrafo-resposta do Horizonte 2 (SCR/convergência)."""
+    scr = (data.get("v31_horizonte1") or {}).get("sala_situacao_com_acao") or {}
+    complicacao = clean_text(scr.get("complicacao") or "")
+    acoes       = scr.get("acao_recomendada") or []
+    urgencia    = scr.get("urgencia") or ""
+
+    conv_list = (data.get("convergencias") or data.get("convergencia") or {})
+    if isinstance(conv_list, dict):
+        conv_list = conv_list.get("convergencias") or []
+    conv_text = ""
+    if conv_list and isinstance(conv_list, list) and len(conv_list) > 0:
+        first = conv_list[0]
+        conv_text = clean_text(first.get("tese") or first.get("descricao") or first.get("convergencia") or "")
+
+    body = complicacao or conv_text
+    if not body:
+        return ""
+
+    urg_color = {"alta": "#D96C6C", "media": "#D4A017", "baixa": "#2FA87C"}.get(urgencia.lower(), C_MUTED) if urgencia else C_MUTED
+    urgencia_badge = (
+        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;font-weight:700;'
+        f'text-transform:uppercase;letter-spacing:.08em;color:{urg_color}">● urgência {h(urgencia)}</span>'
+    ) if urgencia else ""
+
+    acoes_html = ""
+    if acoes:
+        items = acoes[:3] if isinstance(acoes, list) else [str(acoes)]
+        acoes_html = (
+            f'<ul style="margin:10px 0 0 16px;padding:0;font-size:.82rem;color:#8B99A8;line-height:1.65">'
+            + "".join(f'<li style="margin-bottom:4px">{h(a)}</li>' for a in items)
+            + '</ul>'
+        )
+
+    return (
+        f'<div style="width:100%;margin:0 0 14px;padding:16px 20px;'
+        f'background:rgba(91,140,255,.06);border-left:3px solid #5B8CFF;'
+        f'border-radius:0 10px 10px 0;box-sizing:border-box;">'
+        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;font-weight:700;'
+        f'text-transform:uppercase;letter-spacing:.08em;color:#79A3FF;margin-bottom:8px;">'
+        f'O que está impactando{" — " if urgencia_badge else ""}{urgencia_badge}</div>'
+        f'<div style="font-size:.84rem;color:#A8B3C2;line-height:1.70">{h(body)}</div>'
+        f'{acoes_html}'
+        f'</div>'
+    )
+
+
+def render_intel_graph(hist_data: Dict[str, Any], data: Dict[str, Any] | None = None) -> str:
     """Grafo D3 dinâmico — zoom, drag, física. WordPress-safe via shared loader e viewBox fixo."""
     memories = hist_data.get("memories") or FALLBACK_MEMORIES
     zettels   = hist_data.get("zettels")  or FALLBACK_ZETTELS
@@ -2440,7 +3185,11 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
     links_json     = json.dumps(d3_links, ensure_ascii=False)
     node_data_json = json.dumps(node_details, ensure_ascii=False)
 
-    W, H = 960, 460
+    # H aumentado ~41% (460→650): a simulação de força (hubR=205, dist até 150px
+    # do centro) espalha nós/rótulos além dos 460px originais de altura, cortando
+    # texto no topo/base do viewBox. Canvas mais alto evita o corte — o grafo
+    # aparenta menor/mais espalhado, mas o usuário reenquadra com zoom/drag.
+    W, H = 960, 650
     bg_color   = C_BG
     bg2_color  = C_BG2
     muted_color = C_MUTED
@@ -2473,8 +3222,12 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
         "  const detail = " + node_data_json + ";\n"
         "  const nodesRaw = " + nodes_json + ";\n"
         "  const linksRaw = " + links_json + ";\n"
+        # v11.2 fix: W/H vêm do Python (mesmos valores do viewBox do SVG). Antes
+        # estavam hardcoded como 960×460 aqui, dessincronizados do viewBox 960×650
+        # — a simulação de força centralizava em H/2=230 num canvas de 650px de
+        # altura, amontoando os nós no topo e deixando faixa vazia embaixo.
+        "  const W = " + str(W) + ", H = " + str(H) + ";\n"
         r"""
-  const W = 960, H = 460;
   const nodeById = Object.fromEntries(nodesRaw.map(n => [n.id, n]));
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -2522,6 +3275,7 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
     document.head.appendChild(s);
   };
 
+  function _rte5InitGraph() {
   window._efLoadD3(function() {
     const svg  = d3.select("#rte5-gr-svg");
     const root = d3.select("#rte5-gr-g");
@@ -2702,6 +3456,8 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
       });
     }
   });
+  }
+  window.__rte5RegisterLazy('horizonte-2', _rte5InitGraph);
 
   // Info panel
   window.rte5GrInfo = function(id) {
@@ -2753,6 +3509,8 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
 </script>"""
     )
 
+    briefing_block = _render_graph_briefing(data) if data else ""
+
     return (
         f'<style>'
         f'.rte5-filter-btn{{font-family:"IBM Plex Mono",monospace;font-size:.68rem;padding:6px 12px;'
@@ -2762,37 +3520,24 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
         f'.rte5-filter-active{{font-weight:700;box-shadow:0 0 0 2px currentColor;}}'
         f'</style>\n'
         f'<section class="rte5-section" id="intel-graph">\n'
-        f'  <div class="rte5-section-head">\n'
-        f'    <h2 class="rte5-title">Grafo de Inteligência — 5 Frentes xTechs</h2>\n'
-        f'    <span class="rte5-note">Zoom · Drag · Movimento contínuo · Clique para detalhes</span>\n'
+        f'  {section_head_open("dado")}\n'
+        f'    <div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Grafo de Inteligência — 5 Frentes xTechs</h2>{type_badge("dado")}</div>\n'
+        f'    <span class="rte5-note">Zoom · Drag · Clique para detalhes</span>\n'
         f'  </div>\n'
-        f'  <p style="font-size:.84rem;color:#A8B3C2;line-height:1.70;margin:0 0 14px;'
-        f'width:100%;max-width:100%;box-sizing:border-box;display:block;">'
-        f'O Grafo de Inteligência processa cinco frentes tecnológicas simultaneamente. '
-        f'<strong style="color:#E6EDF3">Nós maiores = frentes xTech</strong>. '
-        f'<span style="color:#B48EFF">● Roxos = Memórias Estratégicas</span> — '
-        f'padrões acumulados em múltiplos ciclos; a <em>espessura da conexão</em> reflete '
-        f'o <strong>peso (strength)</strong> da memória: linhas mais largas indicam padrões '
-        f'de maior força e persistência histórica. '
-        f'<span style="color:#79A3FF">● Azuis = Zettels</span> — sínteses de alta precisão '
-        f'com janela de ação definida; linhas tracejadas indicam conexão indireta via memória-pai. '
-        f'<span style="color:#D96C6C">● Vermelhos = Entidades regulatórias</span> que '
-        f'condicionam o ambiente de cada frente. '
-        f'Clique em qualquer nó para ver a análise e o peso de conexão.'
-        f'</p>\n'
-        f'  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;">\n'
+        f'  {briefing_block}\n'
+        f'  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 8px;">\n'
         f'    <div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;">{filter_btns}</div>\n'
         f'  </div>\n'
         f'  <div class="rte5-card" style="padding:0;overflow:hidden;border-radius:10px;'
         f'background:radial-gradient(circle at 50% 50%,rgba(91,140,255,.08),transparent 45%),{C_BG};">\n'
         f'    <svg id="rte5-gr-svg" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet"\n'
-        f'         style="width:100%;height:auto;max-height:460px;display:block;cursor:grab;">\n'
+        f'         style="width:100%;height:auto;max-height:480px;display:block;cursor:grab;">\n'
         f'      <g id="rte5-gr-g"></g>\n'
         f'    </svg>\n'
         f'  </div>\n'
-        f'  <div style="font-size:.70rem;color:{C_WEAK};text-align:right;margin-top:4px;'
+        f'  <div style="font-size:.64rem;color:{C_WEAK};text-align:right;margin-top:4px;'
         f'font-family:\'IBM Plex Mono\',monospace;">\n'
-        f'    scroll para zoom · arraste para mover · movimento contínuo · clique no nó para detalhes · duplo clique centraliza\n'
+        f'    scroll para zoom · arraste para mover · clique no nó para detalhes\n'
         f'  </div>\n'
         f'  <div id="rte5-gr-info" style="margin-top:10px;padding:14px 16px;background:{C_BG2};'
         f'border-radius:12px;font-size:.84rem;color:{C_MUTED};line-height:1.65;min-height:78px;'
@@ -2806,12 +3551,14 @@ def render_intel_graph(hist_data: Dict[str, Any]) -> str:
 
 
 def render_pressure_trend(hist_data: Dict[str, Any], data: Dict[str, Any] | None = None) -> str:
-    """Tendência de Pressão por Frente — 60 dias com Chart.js."""
+    """Tendência de Pressão por Frente — série semanal (hist_data.pressure_weeks) com
+    Chart.js. Bloco H2·Seção 8 da reorganização de layout v11 — dados e biblioteca já
+    disponíveis no gerador, sem necessidade de acesso novo ao banco."""
     pressure_weeks = hist_data.get("pressure_weeks") or FALLBACK_PRESSURE_WEEKS
     has_real_data = bool(hist_data.get("pressure_weeks"))
-    anchors_tr = get_graph_anchors(data or {{}})
+    anchors_tr = get_graph_anchors(data or {})
     periodo_coberto = anchors_tr.get("periodo_coberto") or (
-        f"{{(hist_data.get('data_inicio') or '')[:7]}} – {{(hist_data.get('data_fim') or '')[:7]}}"
+        f"{(hist_data.get('data_inicio') or '')[:7]} – {(hist_data.get('data_fim') or '')[:7]}"
         if hist_data.get('data_inicio') else "Ciclo atual"
     )
 
@@ -2836,9 +3583,9 @@ def render_pressure_trend(hist_data: Dict[str, Any], data: Dict[str, Any] | None
 
     return f"""
 <section class="rte5-section" id="pressure-trend">
-  <div class="rte5-section-head">
-    <h2 class="rte5-title">Tendência de Pressão por Frente — 60 dias</h2>
-    <span class="rte5-note">Score médio semanal por frente xTech · volume ponderado</span>
+  {section_head_open("dado")}
+    <div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Tendência de Pressão por Frente</h2>{type_badge("dado")}</div>
+    <span class="rte5-note">Score médio semanal por frente xTech · volume ponderado · {h(periodo_coberto)}</span>
   </div>
   {data_note}
   <div class="rte5-chart-card">
@@ -2861,6 +3608,7 @@ def render_pressure_trend(hist_data: Dict[str, Any], data: Dict[str, Any] | None
       s.onload = cb;
       document.head.appendChild(s);
     }}
+    function _rte5InitTrendChart() {{
     loadChartJS(function() {{
       var ctx = document.getElementById('rte5-trend-canvas');
       if (!ctx || !window.Chart) return;
@@ -2901,6 +3649,8 @@ def render_pressure_trend(hist_data: Dict[str, Any], data: Dict[str, Any] | None
         }}
       }});
     }});
+    }}
+    window.__rte5RegisterLazy('horizonte-2', _rte5InitTrendChart);
   }})();
   </script>
 </section>"""
@@ -3065,34 +3815,98 @@ def render_vetores_v7(data: Dict[str, Any]) -> str:
 
 
 def render_aplicacoes_corporativas(data: Dict[str, Any]) -> str:
-    """Block 12: Aplicações Corporativas [NOVO]."""
+    """Block 12: Consultoria do Think Tank: Temas Críticos do Ciclo.
+
+    Tabela compacta (não mais cards): cada linha é um tema crítico do ciclo —
+    seja de CONVERGÊNCIA (sinais que atravessam múltiplas xTechs, ex. um mesmo
+    evento afetando energia, indústria e agronegócio ao mesmo tempo) ou um
+    VETOR CRÍTICO de pressão máxima dentro de uma única xTech. A leitura
+    completa e os setores impactados ficam num <details> por linha, para a
+    tabela continuar escaneável mesmo com mais temas.
+    """
     apl = data.get("aplicacoes_corporativas") or {}
-    if not apl:
+    temas = apl.get("temas") or []
+    if not temas:
         return ""
-    ctx   = apl.get("contexto") or ""
-    items = apl.get("aplicacoes") or []
-    if not items:
-        return ""
-    cards = []
-    icons = ["⚡","📊","🔍","🤝","📋","🌐","💡","🛡️"]
-    for i, item in enumerate(items[:8]):
-        uso  = item.get("uso") or "Aplicação"
-        como = item.get("como") or ""
-        cards.append(
-            f'<div class="rte5-card" style="display:flex;align-items:flex-start;gap:10px">'
-            f'<div style="font-size:1.2rem;flex-shrink:0">{icons[i % len(icons)]}</div>'
-            f'<div><div style="font-size:.88rem;font-weight:700;color:#E6EDF3;margin-bottom:4px">{h(uso)}</div>'
-            f'<div style="font-size:.80rem;color:#A8B3C2;line-height:1.5">{h(como)}</div></div>'
-            f'</div>'
+    ctx = apl.get("contexto") or ""
+
+    rows = []
+    for tema in temas[:6]:
+        titulo       = tema.get("titulo") or "Tema do ciclo"
+        xtechs       = tema.get("xtechs") or []
+        fato         = tema.get("fato_chave") or ""
+        leitura      = tema.get("leitura_think_tank") or ""
+        setores      = tema.get("setores_impactados") or []
+        consultorias = tema.get("consultorias") or tema.get("entregaveis") or []
+
+        xtech_badges = "".join(
+            f'<span style="font-size:.64rem;font-weight:700;background:{_XTECH_COLORS_V7.get(xt, C_MUTED)}22;'
+            f'color:{_XTECH_COLORS_V7.get(xt, C_MUTED)};border-radius:6px;padding:2px 7px;margin-right:3px;'
+            f'display:inline-block;margin-bottom:3px">{h(xt)}</span>'
+            for xt in xtechs[:4]
         )
+        setores_html = "".join(
+            f'<span style="font-size:.66rem;background:rgba(255,255,255,.05);color:#A8B3C2;'
+            f'border-radius:6px;padding:2px 8px;margin-right:4px;margin-bottom:4px;display:inline-block">{h(s)}</span>'
+            for s in setores[:5]
+        )
+        consultorias_html = "".join(
+            f'<li style="font-size:.80rem;color:#E6EDF3;display:flex;gap:7px;align-items:flex-start;margin-bottom:6px">'
+            f'<span style="color:#2FA87C;flex-shrink:0">→</span><span>{h(item)}</span></li>'
+            for item in consultorias[:3]
+        )
+        consultorias_resumo = "; ".join(consultorias[:2]) if consultorias else "—"
+
+        rows.append(
+            f'<tr style="border-top:1px solid rgba(255,255,255,.06)">'
+            f'<td style="padding:10px 10px 10px 0;font-size:.86rem;font-weight:700;color:#E6EDF3;vertical-align:top">{h(titulo)}</td>'
+            f'<td style="padding:10px;vertical-align:top;white-space:nowrap">{xtech_badges}</td>'
+            f'<td style="padding:10px;font-family:\'IBM Plex Mono\',monospace;font-size:.76rem;font-weight:700;color:#5DCAA5;vertical-align:top">{h(fato)}</td>'
+            f'<td style="padding:10px 0 10px 10px;font-size:.80rem;color:#A8B3C2;vertical-align:top">{h(consultorias_resumo)}</td>'
+            f'</tr>'
+            f'<tr style="border-top:none">'
+            f'<td colspan="4" style="padding:0 0 14px 0">'
+            f'<details>'
+            f'<summary style="cursor:pointer;list-style:none;font-family:\'IBM Plex Mono\',monospace;'
+            f'font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:#718096;'
+            f'display:inline-flex;align-items:center;gap:5px;user-select:none">'
+            f'<span style="font-size:.58rem">▶</span> Leitura completa e consultoria detalhada</summary>'
+            f'<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.02);border-radius:8px">'
+            f'{f"<div style=\"font-size:.82rem;color:#A8B3C2;line-height:1.6;margin-bottom:10px\">{h(leitura)}</div>" if leitura else ""}'
+            f'{f"<div style=\"margin-bottom:10px\">{setores_html}</div>" if setores else ""}'
+            f'{f"<div style=\"font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:#718096;margin-bottom:6px\">Consultoria que podemos realizar para sua empresa</div><ul style=\"list-style:none;margin:0 0 10px;padding:0\">{consultorias_html}</ul>" if consultorias else ""}'
+            f'<a href="https://efagundes.com/contato/" target="_blank" rel="noopener" '
+            f'style="font-size:.78rem;font-weight:700;color:#2FA87C;text-decoration:none">'
+            f'Solicitar este parecer ao Think Tank →</a>'
+            f'</div>'
+            f'</details>'
+            f'</td>'
+            f'</tr>'
+        )
+
     ctx_html = f'<div style="font-size:.85rem;color:#A8B3C2;line-height:1.7;padding:0 0 16px 0">{h(ctx)}</div>' if ctx else ""
     return (
         f'<section class="rte5-section" id="aplicacoes-corporativas">'
-        f'<div class="rte5-section-head"><h2 class="rte5-title">Como Usar Este Radar na Sua Empresa</h2>'
-        f'<span class="rte5-note">Como aplicar na prática?</span></div>'
-        f'<div style="font-size:.82rem;color:#A8B3C2;line-height:1.6;padding:0 0 14px 0">Identifique acima qual Lente de Decisão descreve melhor o seu momento. As aplicações abaixo mostram como empresas com esse perfil estão usando o Radar para transformar sinal em decisão.</div>'
+        f'{section_head_open("leitura")}<div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Consultoria do Think Tank: Temas Críticos do Ciclo</h2>{type_badge("leitura")}</div>'
+        f'<span class="rte5-note">Do sinal ao parecer · {len(temas[:6])} temas</span></div>'
+        f'<div style="font-size:.82rem;color:#A8B3C2;line-height:1.6;padding:0 0 14px 0">'
+        f'O Think Tank efagundes.com presta consultoria sobre os temas mais críticos de cada ciclo — '
+        f'alguns cruzam várias xTechs ao mesmo tempo (uma aprovação regulatória, um investimento, uma '
+        f'mudança de política que abre janela simultânea em setores diferentes, algo que análises '
+        f'isoladas não capturam), outros são sinais de pressão máxima dentro de uma única frente que '
+        f'merecem parecer aprofundado. Cada tema abaixo vira um serviço sob encomenda: estudo setorial, '
+        f'parecer técnico ou diagnóstico de exposição para a sua empresa.'
+        f'</div>'
         f'{ctx_html}'
-        f'<div class="rte5-grid-3">{"".join(cards)}</div>'
+        f'<table style="width:100%;border-collapse:collapse">'
+        f'<thead><tr>'
+        f'<th style="text-align:left;padding:0 10px 8px 0;font-size:.60rem;text-transform:uppercase;letter-spacing:.08em;color:#718096">Tema</th>'
+        f'<th style="text-align:left;padding:0 10px 8px;font-size:.60rem;text-transform:uppercase;letter-spacing:.08em;color:#718096">xTech(s)</th>'
+        f'<th style="text-align:left;padding:0 10px 8px;font-size:.60rem;text-transform:uppercase;letter-spacing:.08em;color:#718096">Fato-chave</th>'
+        f'<th style="text-align:left;padding:0 0 8px 10px;font-size:.60rem;text-transform:uppercase;letter-spacing:.08em;color:#718096">Consultoria</th>'
+        f'</tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody>'
+        f'</table>'
         f'</section>'
     )
 
@@ -3438,13 +4252,154 @@ function rte5CenTab(uid,key){
 </script>"""
     return (
         f'<section class="rte5-section" id="cenarios-xtech">'
-        f'<div class="rte5-section-head"><h2 class="rte5-title">Cenários por Frente xTech</h2>'
+        f'{section_head_open("leitura")}<div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Cenários por Frente xTech</h2>{type_badge("leitura")}</div>'
         f'<span class="rte5-note">O que pode acontecer nos próximos 6–12 meses?</span></div>'
         f'<div style="font-size:.82rem;color:#A8B3C2;line-height:1.6;padding:0 0 16px 0">Cenário não é previsão. É hipótese estruturada sob incerteza — construída a partir de sinais acumulados e memória histórica do Radar.</div>'
         f'<div class="rte5-grid-3">{cards_html}</div>'
         f'{tab_js}'
         f'</section>'
     )
+
+
+_HONESTIDADE_TRACK_RECORD = (
+    "Sinais captados por semana sobre o tema. A inclinação mostra o tema esquentando "
+    "antes do desfecho — não é projeção de probabilidade."
+)
+_TIPO_CENARIO_COLOR = {"Risco": C_DANGER, "Oportunidade": C_GREEN, "Misto": C_AMBER}
+
+
+def _render_curva_formacao_svg(
+    curva: List[Dict[str, Any]] | None,
+    idx_emissao: int | None,
+    idx_confirmacao: int | None,
+    w: int = 220,
+    hgt: int = 40,
+) -> str:
+    """Line chart compacto reaproveitando o padrão de _render_sparkline_ips
+    (polyline SVG inline, sem lib JS) — ponto âmbar na emissão, vermelho na
+    confirmação (quando houver)."""
+    if not curva:
+        return '<div style="font-size:.6rem;color:#4A5568;padding:8px 0">Sem massa de sinais suficiente para curva.</div>'
+    vals = [p.get("n", 0) for p in curva]
+    n = len(vals)
+    lo, hi = 0, max(vals) if max(vals) > 0 else 1
+
+    def x_pos(i: int) -> float:
+        return round(i * w / max(n - 1, 1), 1)
+
+    def y_pos(v: float) -> float:
+        return round(hgt - 3 - (v - lo) / (hi - lo) * (hgt - 6), 1) if hi > lo else hgt / 2
+
+    pts = " ".join(f"{x_pos(i)},{y_pos(v)}" for i, v in enumerate(vals))
+    parts = [
+        f'<svg width="{w}" height="{hgt}" viewBox="0 0 {w} {hgt}" style="display:block;overflow:visible">',
+        f'<polyline points="{pts}" fill="none" stroke="{C_TERRA}" stroke-width="1.6" '
+        f'stroke-linejoin="round" stroke-linecap="round"/>',
+    ]
+    if idx_emissao is not None and 0 <= idx_emissao < n:
+        parts.append(
+            f'<circle cx="{x_pos(idx_emissao)}" cy="{y_pos(vals[idx_emissao])}" r="3" '
+            f'fill="{C_AMBER}" stroke="#0F1722" stroke-width="1"><title>Emissão do cenário</title></circle>'
+        )
+    if idx_confirmacao is not None and 0 <= idx_confirmacao < n:
+        parts.append(
+            f'<circle cx="{x_pos(idx_confirmacao)}" cy="{y_pos(vals[idx_confirmacao])}" r="3" '
+            f'fill="{C_DANGER}" stroke="#0F1722" stroke-width="1"><title>Confirmação</title></circle>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _render_track_record_card(item: Dict[str, Any]) -> str:
+    tipo = item.get("tipo") or "Misto"
+    tipo_color = _TIPO_CENARIO_COLOR.get(tipo, C_MUTED)
+    status = item.get("status")
+    is_confirmado = status == "confirmado"
+    status_label = "Confirmado" if is_confirmado else "Não-materializado"
+    status_color = C_GREEN if is_confirmado else C_MUTED
+    dias = item.get("dias_antecedencia")
+    meta = f" · {dias}d de antecedência" if is_confirmado and dias is not None else ""
+    svg = _render_curva_formacao_svg(item.get("curva_formacao"), item.get("idx_emissao"), item.get("idx_confirmacao"))
+    return (
+        f'<div style="background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+        f'border-radius:10px;padding:12px;">'
+        f'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
+        f'<div style="font-size:.72rem;font-weight:700;color:{C_TEXT};line-height:1.3">{h(item.get("titulo"))}</div>'
+        f'<span style="font-size:.56rem;color:{tipo_color};border:1px solid {tipo_color};border-radius:8px;'
+        f'padding:1px 6px;white-space:nowrap;flex-shrink:0">{h(tipo)}</span>'
+        f'</div>'
+        f'<div style="font-size:.62rem;color:{status_color};margin-bottom:6px">{status_label}{meta}</div>'
+        f'{svg}'
+        f'<div style="font-size:.60rem;color:#8B99A8;margin-top:6px">{h(item.get("evidencia_resumo") or "")}</div>'
+        f'</div>'
+    )
+
+
+def render_track_record(data: Dict[str, Any]) -> str:
+    """Track Record — curvas de formação dos cenários prospectivos com
+    desfecho conhecido (spec: curva de formação nos cenários confirmados).
+    Mostra os N_TRACK_RECORD_DESTAQUE (4) de destaque recolhidos; "ver
+    todos" expande o restante, incluindo os não-materializados com o mesmo
+    peso visual — honestidade é o argumento, não só os acertos."""
+    tracking = data.get("scenario_tracking") or {}
+    itens = tracking.get("track_record") or []
+    destaques = [it for it in itens if it.get("destaque")]
+    if not destaques:
+        return ""
+    resto = [it for it in itens if not it.get("destaque")]
+
+    cards_destaque = "".join(_render_track_record_card(it) for it in destaques)
+    ver_todos = ""
+    if resto:
+        cards_resto = "".join(_render_track_record_card(it) for it in resto)
+        ver_todos = details_block(
+            f"Ver todos os {len(itens)} cenários com desfecho conhecido",
+            f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px">{cards_resto}</div>',
+        )
+
+    return (
+        f'<section class="rte5-section" id="track-record">'
+        f'{section_head_open("leitura")}<h2 class="rte5-title">Track Record — Cenários em Formação</h2>{type_badge("leitura")}</div>'
+        f'<div style="font-size:.62rem;color:#8B99A8;margin:2px 0 12px">{h(_HONESTIDADE_TRACK_RECORD)}</div>'
+        f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">{cards_destaque}</div>'
+        f'{ver_todos}'
+        f'</section>'
+    )
+
+
+def _render_vetor1_curva_block(vetor1: Dict[str, Any] | None) -> str:
+    """H1, abaixo do radar setorial — curva de formação do vetor #1 do
+    ciclo (Mudança 2). Complementa o radar setorial (onde está a pressão
+    AGORA nas 5 frentes) com profundidade temporal (esse tema está
+    esquentando no tempo?) — não substitui, o radar preserva a visão
+    panorâmica da abertura. Omite graciosamente se o pipeline não gravou
+    curva_formacao (piso de volume ou série plana demais, sem fallback
+    utilizável — ver aplicar_curva_formacao_vetor1 em scenario_tracker_v1.py)."""
+    if not vetor1:
+        return ""
+    curva = vetor1.get("curva_formacao")
+    if not curva:
+        return ""
+    titulo = vetor1.get("curva_formacao_titulo") or vetor1.get("nome") or "Vetor #1"
+    nota_origem = (
+        " Sinal do vetor #1 estava plano demais para contar uma história — mostrando o "
+        "tema de maior formação do ciclo."
+        if vetor1.get("curva_formacao_origem") == "tema_saliente" else ""
+    )
+    svg = _render_curva_formacao_svg(curva, None, None, w=240, hgt=44)
+    return (
+        f'<div style="margin-top:14px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.06);'
+        f'border-radius:12px;padding:14px;">'
+        f'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">'
+        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:.10em;color:#79A3FF;">Formação do sinal: {h(titulo)}</span>{type_badge("dado")}'
+        f'</div>'
+        f'<div style="font-size:.58rem;color:#8B99A8;margin-bottom:6px">{h(_HONESTIDADE_TRACK_RECORD)}{h(nota_origem)}</div>'
+        f'{svg}'
+        f'</div>'
+    )
+
+
 def render_convergencia_v7(data: Dict[str, Any]) -> str:
     conv = get_convergencia_v7(data)
     if not conv:
@@ -3483,37 +4438,66 @@ def render_convergencia_v7(data: Dict[str, Any]) -> str:
 </div>""")
     return f"""
 <section class="rte5-section" id="convergencia">
-  <div class="rte5-section-head"><h2 class="rte5-title">Motor de Convergência Estratégica</h2></div>
+  {section_head_open("leitura")}<div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Motor de Convergência Estratégica</h2>{type_badge("leitura")}</div></div>
   <div class="rte5-grid-3">{''.join(cards)}</div>
 </section>"""
 
 
 _LENTE_PROFILES = [
-    {"perfil": "Gestor de Risco / CRO",                "cor": "#D96C6C"},
-    {"perfil": "Empreendedor / Fundador",              "cor": "#79A3FF"},
-    {"perfil": "Especialista Técnico / Engenheiro",    "cor": "#2FA87C"},
-    {"perfil": "Investidor / Alocador",                "cor": "#D9A441"},
-    {"perfil": "Head de Compliance / ESG / Jurídico",  "cor": "#5B8CFF"},
-    {"perfil": "Conselheiro / Executivo",              "cor": "#A78BFA"},
+    {"perfil": "Gestor de Risco / CRO",                            "cor": "#D96C6C"},
+    {"perfil": "Empreendedor / Fundador",                          "cor": "#79A3FF"},
+    {"perfil": "Especialista Técnico / Engenheiro",                "cor": "#2FA87C"},
+    {"perfil": "Investidor / Alocador",                            "cor": "#D9A441"},
+    {"perfil": "Head de Compliance / Jurídico Interno (empresa)",  "cor": "#5B8CFF"},
+    {"perfil": "Conselheiro / Executivo",                          "cor": "#A78BFA"},
+    {"perfil": "Sócio / Escritório de Advocacia (externo)",        "cor": "#E08659", "opcional": True},
+    {"perfil": "Executivo de Expansão Regional / Head LatAm",      "cor": "#4FBFA8", "opcional": True},
 ]
 
+# spec-lente-decisao-v2: perfis 7 e 8 são condicionais — só renderizam quando o
+# ciclo tem evidência que sustente o card (ver analyzer_v33_agent.py). Casamento
+# por palavra-chave (não por igualdade exata de string) porque o LLM pode variar
+# levemente o rótulo do card condicional.
+def _lente_match(perfil_template: str, perfil_card: str) -> bool:
+    perfil_card = (perfil_card or "").strip().lower()
+    template_lower = perfil_template.lower()
+    if "advocacia" in template_lower:
+        return "advocacia" in perfil_card or "escritório" in perfil_card
+    if "latam" in template_lower.replace(" ", ""):
+        return "latam" in perfil_card.replace(" ", "") or "regional" in perfil_card
+    return perfil_card == perfil_template.strip().lower()
+
+
 _LENTE_SYSTEM_PROMPT = """Você receberá os dados de um ciclo do Radar xTech.
-Gere o conteúdo para os 6 cards da seção "Lente de Decisão".
-Para cada perfil abaixo, produza exatamente três campos:
+Gere o conteúdo para os cards da seção "Lente de Decisão": 6 perfis fixos, mais
+um 7º perfil condicional.
+Para cada perfil, produza exatamente três campos:
   - sinal: uma frase sobre o sinal mais relevante do ciclo para este perfil
   - decisao: uma frase sobre a ação que não pode esperar (semanas, não trimestres)
   - risco: uma frase sobre o risco que provavelmente ainda não está no modelo deste perfil
-Perfis:
+Perfis fixos (sempre gerar os 6):
 1. Gestor de Risco / CRO
 2. Empreendedor / Fundador
 3. Especialista Técnico / Engenheiro
 4. Investidor / Alocador
-5. Head de Compliance / ESG / Jurídico
+5. Head de Compliance / Jurídico Interno (empresa) — ótica da empresa AFETADA por uma
+   mudança regulatória: decisão trata de exposição própria (mapear exposição, revisar
+   contrato, adequar processo). NUNCA mencione cliente, carteira ou oferta de serviço.
 6. Conselheiro / Executivo
+Perfil condicional (gerar SOMENTE se o sinal do ciclo tiver desdobramento plausível de
+prestação de serviço jurídico a terceiros; caso contrário OMITA — omissão é preferível
+a card fraco):
+7. Sócio / Escritório de Advocacia (externo) — ótica do PRESTADOR de serviço jurídico
+   que atende empresas afetadas pelo mesmo sinal do perfil 5: decisão trata de
+   oportunidade de prática e cliente (identificar clientes da carteira expostos,
+   desenvolver oferta, antecipar contato consultivo). Risco: perder a janela para outro
+   escritório. NUNCA mencione adequação interna, contrato próprio ou due diligence da
+   própria organização.
 Regras:
 - Cada frase: máximo 25 palavras
 - Sem jargão vazio — cada frase deve conter uma afirmação específica e verificável
-- Não repetir o mesmo sinal em perfis diferentes
+- Perfis 5 e 7 podem compartilhar o mesmo sinal de origem (isso é esperado), mas devem
+  ter decisao e risco de natureza distinta conforme descrito acima
 - Retornar JSON puro, sem markdown, sem explicação
 Formato de saída:
 {"lente_decisao": [{"perfil": "Gestor de Risco / CRO", "sinal": "...", "decisao": "...", "risco": "..."}, ...]}"""
@@ -3562,13 +4546,24 @@ def generate_lente_decisao(data: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def render_lente_decisao(data: Dict[str, Any]) -> str:
-    """Bloco 4 — Lente de Decisão: 5 cards por perfil de decisor."""
+    """Bloco 4 — Lente de Decisão: 6 cards fixos + 1 condicional (Sócio /
+    Escritório de Advocacia — spec-lente-decisao-v2), casados por NOME de
+    perfil, não por posição — o card condicional pode estar ausente ou vir em
+    posição diferente na lista retornada pelo LLM, e o mapeamento posicional
+    antigo desalinhava os cards nesse caso."""
     cards_data = data.get("lente_decisao") or []
     cards_html = []
-    for i, profile in enumerate(_LENTE_PROFILES):
+    for profile in _LENTE_PROFILES:
         cor = profile["cor"]
         perfil_label = profile["perfil"]
-        content = cards_data[i] if i < len(cards_data) else {}
+        content = next(
+            (c for c in cards_data if _lente_match(perfil_label, c.get("perfil", ""))),
+            None,
+        )
+        if content is None:
+            if profile.get("opcional"):
+                continue  # regra 3 do spec: perfil condicional ausente = omitir, não forçar
+            content = {}
         sinal   = h(content.get("sinal", "—"))
         decisao = h(content.get("decisao", "—"))
         risco   = h(content.get("risco", "—"))
@@ -3582,8 +4577,8 @@ def render_lente_decisao(data: Dict[str, Any]) -> str:
         )
     return (
         f'<section class="rte5-section" id="lente-decisao">'
-        f'<div class="rte5-section-head">'
-        f'<h2 class="rte5-title">Lente de Decisão</h2>'
+        f'{section_head_open("leitura")}'
+        f'<div style="display:flex;align-items:center;gap:10px"><h2 class="rte5-title">Lente de Decisão</h2>{type_badge("leitura")}</div>'
         f'<span class="rte5-note">Para quem este ciclo fala — e o que não pode esperar</span>'
         f'</div>'
         f'<div class="rte5-grid-3">{"".join(cards_html)}</div>'
@@ -3592,29 +4587,155 @@ def render_lente_decisao(data: Dict[str, Any]) -> str:
 
 
 def render_cta(data: Dict[str, Any]) -> str:
+    """CTA final (v11.2) — carrega a oferta do e-book 'O Fim do Dashboard'
+    (Cap. 8): o e-book é a tese, o Radar xTech é a prova viva, e o Programa
+    Piloto (cohort fundadora) é o próximo passo. Ambos os cards roteiam para
+    efagundes.com/contato — não invento URL de download do e-book (o próprio
+    livro diz que o contato fica no site)."""
     return """
 <section class="rte5-section" id="cta">
-  <div style="background:linear-gradient(135deg,rgba(47,168,124,.07),rgba(91,140,255,.05));border:1px solid rgba(47,168,124,.22);border-radius:20px;padding:40px 36px;max-width:620px;margin:0 auto;text-align:center">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.14em;color:#2FA87C;margin-bottom:14px">efagundes.com · Think Tank</div>
-    <div style="font-size:1.18rem;font-weight:700;color:#E6EDF3;line-height:1.38;margin-bottom:12px">Quer aplicar esta análise nas decisões da sua empresa?</div>
-    <div style="font-size:.86rem;color:#A8B3C2;line-height:1.7;margin-bottom:28px">O Radar xTech é atualizado a cada ciclo de inteligência.<br>Entre em contato para transformar sinal em decisão.</div>
-    <a href="https://efagundes.com/contato/"
-       style="display:inline-block;background:#2FA87C;color:#fff;font-weight:700;font-size:.92rem;padding:13px 32px;border-radius:10px;text-decoration:none;letter-spacing:.02em">
-      Entrar em contato →
-    </a>
+  <div class="rte5-cta-section">
+    <div class="rte5-cta-card live">
+      <div class="rte5-cta-kicker">e-book · efagundes.com</div>
+      <div class="rte5-cta-headline">Este radar é a prova viva de uma tese.</div>
+      <div class="rte5-cta-desc">
+        <strong style="color:#E6EDF3">O Fim do Dashboard</strong> — como radares temáticos com IA estão
+        redefinindo o planejamento estratégico. O argumento completo por trás do que você acabou de ver:
+        de Aguilar (1967) e os sinais fracos de Ansoff à arquitetura de memória vetorial que sustenta este radar.
+      </div>
+      <a href="https://efagundes.com/contato/" target="_blank" rel="noopener" class="rte5-cta-btn">Quero o e-book →</a>
+    </div>
+    <div class="rte5-cta-card empresa">
+      <div class="rte5-cta-kicker">Programa Piloto · vagas limitadas</div>
+      <div class="rte5-cta-headline">Um radar temático curado para o seu setor.</div>
+      <div class="rte5-cta-desc">
+        O efagundes.com — Tech &amp; Energy Think Tank — abre um <strong style="color:#E6EDF3">Grupo Fundador</strong>:
+        radares dedicados, desenhados em conjunto com a organização parceira, cruzando o sinal externo com o seu
+        contexto de decisão — com curadoria especializada e sessões diretas de leitura estratégica, não apenas briefings automatizados.
+      </div>
+      <a href="https://efagundes.com/contato/" target="_blank" rel="noopener" class="rte5-cta-btn">Fazer parte do Grupo Fundador →</a>
+    </div>
   </div>
 </section>"""
 
 
-# ─── Cabeçalho de Horizonte (v9) ─────────────────────────────────────────────
-
-def render_horizonte_header(n: int, nome: str, audiencia: str, pergunta: str) -> str:
-    """Renderiza o cabeçalho divisor de horizonte conforme REQ-06 / xtech-system-spec-v1 seção 4.6.2."""
+def render_metodologia() -> str:
+    """Faixa de metodologia antes do rodapé (v11.2, Onda 2) — fecha a narrativa
+    do e-book em três afirmações verdadeiras e sem dado fabricado: sinais fracos
+    (Ansoff, 1975), a arquitetura de três camadas, e a divisão de trabalho
+    IA↔curadoria humana (Cap. 5 e 7 do e-book)."""
     return (
-        f'<div class="radar-horizonte-header">'
+        f'<div style="margin:34px 0 0;padding:18px 22px;border:1px solid {C_LINE};'
+        f'border-left:3px solid {C_TERRA};background:{C_BG2};border-radius:0 12px 12px 0;">'
+        f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;font-weight:700;'
+        f'text-transform:uppercase;letter-spacing:.10em;color:{C_TERRA_LIGHT};margin-bottom:8px">'
+        f'Como este radar funciona</div>'
+        f'<div style="font-size:.82rem;color:{C_MUTED};line-height:1.7">'
+        f'Captação contínua de <strong style="color:{C_TEXT}">sinais fracos</strong> — indícios ainda '
+        f'ambíguos que precedem mudanças relevantes (Ansoff, 1975) — indexados numa '
+        f'<strong style="color:{C_TEXT}">memória vetorial que se acumula a cada ciclo</strong>, e '
+        f'traduzidos em <strong style="color:{C_TEXT}">leitura decisória</strong>. A inteligência '
+        f'artificial capta e sintetiza o volume de sinal que nenhuma equipe humana processaria nessa '
+        f'escala; a <strong style="color:{C_TEXT}">curadoria humana do Think Tank</strong> julga o que, '
+        f'entre tudo que foi capturado, realmente importa para a decisão.'
+        f'</div>'
+        f'</div>'
+    )
+
+
+# ─── Cabeçalho de Horizonte (v9; promovido a contêiner <details> na v11) ─────
+
+def render_horizonte_open(n: int, nome: str, audiencia: str, pergunta: str, resumo: str = "", open_by_default: bool = False) -> str:
+    """Abre o contêiner <details> de um horizonte, com o cabeçalho divisor
+    (REQ-06 / xtech-system-spec-v1 seção 4.6.2) promovido a <summary> clicável.
+    Fechar com render_horizonte_close(). (v11 — reorganização de layout)"""
+    open_attr = " open" if open_by_default else ""
+    resumo_html = f'<span class="horizonte-resumo">{h(resumo)}</span>' if resumo else ""
+    return (
+        f'<details class="radar-horizonte-details" id="horizonte-{h(str(n))}"{open_attr}>'
+        f'<summary class="radar-horizonte-header">'
         f'<span class="horizonte-label">Horizonte {h(str(n))} · {h(nome)}</span>'
         f'<span class="horizonte-audiencia">Para: {h(audiencia)}</span>'
         f'<span class="horizonte-pergunta">&#8220;{h(pergunta)}&#8221;</span>'
+        f'{resumo_html}'
+        f'<span class="horizonte-toggle" aria-hidden="true">+</span>'
+        f'</summary>'
+        f'<div class="radar-horizonte-body">'
+    )
+
+
+def render_horizonte_close() -> str:
+    return '</div></details>'
+
+
+def render_horizon_overview(horizons: List[Dict[str, str]]) -> str:
+    """Mapa do conteúdo (v11.1) + navegação fixa (sticky) por horizonte.
+
+    Resolve o feedback do cliente (2026-07-19): no topo da página o visitante
+    via os 3 horizontes, mas só o 1º aberto — os outros dois ficavam
+    resumidos numa <summary> soterrada depois de rolar todo o H1. Este bloco
+    mostra, ANTES de qualquer scroll, um card por horizonte (rótulo,
+    audiência, pergunta-guia, resumo do ciclo) para o visitante decidir onde
+    ir. Reaproveita os mesmos textos já usados nas <summary> dos <details> —
+    nenhum conteúdo novo é inventado aqui.
+
+    Clique numa âncora fechada abre o <details> antes de rolar até a seção —
+    tanto nos cards quanto na nav sticky, que compartilham a mesma classe
+    `.rte5-hnav-link` e o mesmo listener. O alvo (`data-target`) não precisa
+    ser o próprio <details> de horizonte: pode ser qualquer id dentro dele
+    (ex. "mapa-pressao" dentro de #horizonte-2) — o listener sobe até o
+    <details> ancestral mais próximo pra abrir, mas rola até o elemento alvo
+    exato (v11.1 — cross-link de Vetores Dominantes em H1 até o Mapa de
+    Pressão em H2, feedback 2026-07-19)."""
+    cards = "".join(
+        f'<a href="#horizonte-{hz["n"]}" class="rte5-hmap-card rte5-hnav-link" data-target="horizonte-{hz["n"]}">'
+        f'<div class="rte5-hmap-num">Horizonte {hz["n"]}</div>'
+        f'<div class="rte5-hmap-label">{h(hz["nome"])}</div>'
+        f'<div class="rte5-hmap-audiencia">Para: {h(hz["audiencia"])}</div>'
+        f'<div class="rte5-hmap-pergunta">&#8220;{h(hz["pergunta"])}&#8221;</div>'
+        + (f'<div class="rte5-hmap-resumo">{h(hz["resumo"])}</div>' if hz.get("resumo") else '')
+        + f'<div class="rte5-hmap-cta">Ver Horizonte {hz["n"]} →</div>'
+        f'</a>'
+        for hz in horizons
+    )
+    pills = "".join(
+        f'<a href="#horizonte-{hz["n"]}" class="rte5-hnav-link" data-target="horizonte-{hz["n"]}">H{hz["n"]} · {h(hz["nome"])}</a>'
+        for hz in horizons
+    )
+    return f"""
+<div class="rte5-hmap">{cards}</div>
+<nav class="rte5-hnav">{pills}</nav>
+<script>
+(function() {{
+  document.querySelectorAll('.rte5-hnav-link').forEach(function(a) {{
+    a.addEventListener('click', function(ev) {{
+      var id = a.getAttribute('data-target');
+      var target = document.getElementById(id);
+      if (!target) return;
+      ev.preventDefault();
+      var det = target.tagName === 'DETAILS' ? target : target.closest('details');
+      if (det && !det.open) det.open = true;
+      requestAnimationFrame(function() {{
+        target.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+        if (window.history && window.history.replaceState) {{
+          window.history.replaceState(null, '', '#' + id);
+        }}
+      }});
+    }});
+  }});
+}})();
+</script>"""
+
+
+def render_horizon_soft_cta(texto: str) -> str:
+    """CTA curto ao fim de H1/H2 — a seção completa de Consultoria do Think
+    Tank continua só em H3 (v11.1, feedback do cliente 2026-07-19: evita
+    duplicar a oferta inteira 3x, mas garante que quem só lê H1/H2 e nunca
+    abre H3 ainda veja um próximo passo)."""
+    return (
+        f'<div class="rte5-horizon-cta">'
+        f'<div class="rte5-horizon-cta-text">{h(texto)}</div>'
+        f'<a href="https://efagundes.com/contato/" target="_blank" rel="noopener" class="rte5-horizon-cta-link">Falar com o Think Tank →</a>'
         f'</div>'
     )
 
@@ -3726,84 +4847,151 @@ def render_html(data: Dict[str, Any], hist_data: Dict[str, Any] | None = None) -
     # O parâmetro opcional mantém compatibilidade com chamadas legadas.
     hist_data = hist_data or data.get("hist_data") or {}
     anchors = get_graph_anchors(data)
+    dash = get_dashboard(data)
 
     def _with_anchor(section_html: str, anchor_key: str) -> str:
         anchor = anchors.get(anchor_key) or ""
         if not anchor:
             return section_html
-        return section_html.replace(
-            '<div class="rte5-section-head">',
-            f'{_anchor_block(anchor)}\n<div class="rte5-section-head">',
-            1,
+        # v11: casa por prefixo (não string exata) — seções agora podem ter
+        # atributos extras (border-left de acento dado/leitura) no mesmo <div>.
+        return re.sub(
+            r'<div class="rte5-section-head"[^>]*>',
+            lambda m: f'{_anchor_block(anchor)}\n{m.group(0)}',
+            section_html,
+            count=1,
         )
 
-    # v10 — estrutura por três horizontes de uso (REQ-06 / xtech-system-spec-v1 seção 4.6)
-    graph_html = _with_anchor(render_intel_graph(hist_data),        "xtech_graph")
-    curva_html = _with_anchor(render_curva_convergencia(hist_data), "maturity_curve")
+    # v11 — reorganização de layout: Mapa de Pressão + Tendência de IPS movem de
+    # H1 para H2 (arquitetura de informação da spec v1.1, Seção 5) para ficarem
+    # junto do Grafo de Inteligência, Convergência e Cenários — todos blocos de
+    # "planejamento estratégico". H1 fica só com a leitura do ciclo corrente
+    # (Sala de Situação + Lente de Decisão).
     map_html   = _with_anchor(render_map(data),                     "pressure_map")
+    trend_html = _with_anchor(render_pressure_trend(hist_data, data), "trend_60d")
+    graph_html = _with_anchor(render_intel_graph(hist_data, data),  "xtech_graph")
+    curva_html = _with_anchor(render_curva_convergencia(hist_data), "maturity_curve")
 
-    h1 = render_horizonte_header(
-        1,
-        "Operação e monitoramento",
-        "analistas, gestores, consultores",
-        "O que mudou hoje? O que devo monitorar?",
-    )
-    h2 = render_horizonte_header(
-        2,
-        "Planejamento estratégico",
-        "diretores, C-level, comitês de estratégia",
-        "Qual é a tendência de 6–18 meses? Onde estão os riscos?",
-    )
-    h3 = render_horizonte_header(
-        3,
-        "Desenvolvimento de projetos",
-        "empreendedores, consultores, equipes de consultoria",
-        "Qual oportunidade posso capturar? Quais competências preciso?",
-    )
+    total = dash.get("total_sinais") or data.get("total_itens") or "—"
+    h1_resumo = f"{total} sinais monitorados neste ciclo" if total != "—" else ""
+    h2_resumo = anchors.get("pressure_map") or ""
+    h3_resumo = anchors.get("maturity_curve") or ""
 
-    # v10: parágrafos-resposta executivos para H2 e H3
-    h2_resposta = _render_horizonte_resposta_h2(data)
+    # v11.1: lista única (fonte de verdade) dos 3 horizontes — usada tanto para
+    # abrir cada <details> quanto para o mapa do conteúdo (render_horizon_overview),
+    # evitando manter rótulo/audiência/pergunta duplicados em dois lugares.
+    horizons = [
+        {
+            "n": "1", "nome": "Operação e monitoramento",
+            "audiencia": "analistas, gestores, consultores",
+            "pergunta": "O que mudou hoje? O que devo monitorar?",
+            "resumo": h1_resumo,
+        },
+        {
+            "n": "2", "nome": "Planejamento estratégico",
+            "audiencia": "diretores, C-level, comitês de estratégia",
+            "pergunta": "Qual é a tendência de 6–18 meses? Onde estão os riscos?",
+            "resumo": h2_resumo,
+        },
+        {
+            "n": "3", "nome": "Desenvolvimento de projetos",
+            "audiencia": "empreendedores, consultores, equipes de consultoria",
+            "pergunta": "Qual oportunidade posso capturar? Quais competências preciso?",
+            "resumo": h3_resumo,
+        },
+    ]
+    h1_open = render_horizonte_open(1, horizons[0]["nome"], horizons[0]["audiencia"], horizons[0]["pergunta"], resumo=h1_resumo, open_by_default=True)
+    h2_open = render_horizonte_open(2, horizons[1]["nome"], horizons[1]["audiencia"], horizons[1]["pergunta"], resumo=h2_resumo)
+    h3_open = render_horizonte_open(3, horizons[2]["nome"], horizons[2]["audiencia"], horizons[2]["pergunta"], resumo=h3_resumo)
+    h_close = render_horizonte_close()
+
+    # v11.1: CTA leve ao fim de H1/H2 (feedback do cliente 2026-07-19) — a
+    # seção completa de Consultoria do Think Tank continua só em H3.
+    h1_cta = render_horizon_soft_cta("Quer que o Think Tank aprofunde a leitura de um sinal deste ciclo para sua empresa?")
+    h2_cta = render_horizon_soft_cta("Precisa de um parecer sobre como esses vetores afetam sua estratégia de 6–18 meses?")
+
+    # v10: parágrafo-resposta executivo para H3 (H2 moveu para o Grafo de Inteligência)
     h3_resposta = _render_horizonte_resposta_h3(data)
+
+    # v11: script de wiring — liga cada <details> de horizonte às inicializações
+    # adiadas (Chart.js do mapa/tendência, D3 do grafo/curva) registradas via
+    # window.__rte5RegisterLazy (ver render_header). Fica no fim do documento
+    # para garantir que todo registro já ocorreu durante o parse (v11).
+    wiring_js = """
+<script>
+(function() {
+  function wire(id) {
+    var det = document.getElementById(id);
+    if (!det) return;
+    var done = false;
+    function run() {
+      if (done || !det.open) return;
+      done = true;
+      (window.__rte5Lazy && window.__rte5Lazy[id] || []).forEach(function(fn) {
+        try { fn(); } catch (e) { console.error(e); }
+      });
+    }
+    det.addEventListener('toggle', run);
+    run();
+  }
+  ['horizonte-1', 'horizonte-2', 'horizonte-3'].forEach(wire);
+})();
+</script>"""
 
     return (
         f'<div class="rte5">'
         f'{_css()}'
         f'{render_header(data)}'
+        f'{render_manifesto(data, hist_data)}'
+        f'{render_horizon_overview(horizons)}'
 
         # ── HORIZONTE 1: Operação e monitoramento ─────────────────────────────
-        # v10: cabeçalho H1 ANTES da Sala de Situação (lógica do horizonte)
-        f'{h1}'
+        f'{h1_open}'
         # H1·B0 — Sala de Situação Executiva
         f'{render_situation_room_v8(data)}'
         # H1·B1 — Lente de Decisão
         f'{render_lente_decisao(data)}'
-        # H1·B2 — Vetores Prioritários (Mapa de Pressão Estratégica × Janela de Decisão)
-        f'{map_html}'
-        # v10: base_evidencia removida (redundante com Sala de Situação)
+        # v11.1 — CTA leve (quem só lê H1 ainda vê um próximo passo)
+        f'{h1_cta}'
+        f'{h_close}'
 
         # ── HORIZONTE 2: Planejamento estratégico ─────────────────────────────
-        f'{h2}'
-        # v10: parágrafo-resposta — tendência + riscos (SCR / convergência)
-        f'{h2_resposta}'
+        f'{h2_open}'
+        # H2·B2 — Mapa de Pressão Estratégica × Janela de Decisão + Vetores Prioritários
+        f'{map_html}'
+        # H2·B3 — Tendência de Pressão por Frente (série semanal de IPS)
+        f'{trend_html}'
+        # v11: parágrafo-resposta (SCR/convergência) moveu para dentro do Grafo
+        # de Inteligência (coluna lateral, ver _render_graph_briefing) — não
+        # renderiza mais aqui para evitar duplicação.
         # H2·B4 — Grafo de Inteligência (intro embutido dentro da section do grafo)
         f'{graph_html}'
         # H2·B5 — Motor de Convergência Estratégica
         f'{render_convergencia_v7(data)}'
         # H2·B6 — Cenários por Frente xTech
         f'{render_cenarios_xtech(data)}'
+        # H2·B7 — Track Record: curvas de formação dos cenários com desfecho conhecido
+        f'{render_track_record(data)}'
+        # v11.1 — CTA leve (quem só lê H1/H2 e nunca abre H3 ainda vê um próximo passo)
+        f'{h2_cta}'
+        f'{h_close}'
 
         # ── HORIZONTE 3: Desenvolvimento de projetos ──────────────────────────
-        f'{h3}'
+        f'{h3_open}'
         # v10: parágrafo-resposta — oportunidades + competências (aplicações corporativas)
         f'{h3_resposta}'
         # H3·B7 — Curva de Maturidade xTech
         f'{curva_html}'
         # H3·B8 — Análise Reversa de Competências — versão pública
         f'{render_aplicacoes_corporativas(data)}'
-        # H3·B9 — CTA · efagundes.com · think tank
+        # H3·B9 — CTA · e-book O Fim do Dashboard + Programa Piloto
         f'{render_cta(data)}'
+        f'{h_close}'
 
+        # v11.2 (Onda 2) — faixa de metodologia (sinais fracos / memória / IA+curadoria)
+        f'{render_metodologia()}'
         f'{render_footer(data)}'
+        f'{wiring_js}'
         f'</div>'
     )
 # ─── main ─────────────────────────────────────────────────────────────────────
